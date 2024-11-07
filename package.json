@@ -1,0 +1,21 @@
+{
+  "name": "tarotlog",
+  "version": "1.0.0",
+  "description": "Web based journal with PostgreSQL backend. Journal contains tarot themes and memory of previous prompts.",
+  "main": "index.js",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "http": "^0.0.1-security",
+    "lodash": "^4.17.21",
+    "neon": "^2.0.0",
+    "pg": "^8.13.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

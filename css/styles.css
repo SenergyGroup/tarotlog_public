@@ -1,0 +1,130 @@
+/* Reset some default styles */
+body, h1, p, button {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Set a simple, clean font */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* Container styling */
+.container {
+    text-align: center;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    max-width: 400px;
+    width: 90%;
+}
+
+/* Heading style */
+h1 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Card container */
+.card-container {
+    margin-bottom: 15px;
+}
+
+/* Styling for the card image */
+#drawn-card {
+    width: 100%;
+    max-width: 200px;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Hide the card by default */
+.hidden {
+    display: none;
+}
+
+/* Button styling */
+#draw-card-btn {
+    background-color: #6b6fcb;
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+#draw-card-btn:hover {
+    background-color: #4b4f9b;
+}
+
+/* Card header */
+.card-header {
+    margin-top: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    padding: 10px;
+    background-color: #ececec;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+#card-title {
+    margin: 0;
+    font-size: 16px;
+}
+
+
+/* Prompt container */
+.prompt-container {
+    margin-top: 15px;
+    padding: 10px;
+    text-align: left; /* or center, if you prefer */
+}
+
+#card-prompt {
+    font-size: 14px;
+    color: #444;
+    line-height: 1.5;
+}
+
+
+/* Style for the response text boxes */
+.response-box {
+    width: 90%;
+    height: 60px;
+    margin: 10px 0;
+    padding: 8px;
+    font-size: 14px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+    resize: none;
+}
+
+/* Save button */
+#save-response-btn {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+#save-response-btn:hover {
+    background-color: #388E3C;
+}

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarot Card Drawer</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Tarot Card Drawer</h1>
+        <div class="card-container">
+            <img id="drawn-card" src="" alt="Drawn Card" class="hidden">
+        </div>
+        <button id="draw-card-btn">Draw a Card</button>
+        
+        <div class="card-header hidden">
+            <h2 id="card-title"></h2>
+        </div>
+        
+        <div class="prompt-container">
+            <p id="card-prompt"></p>
+            <!-- Add text boxes for user responses -->
+            <textarea id="response-1" class="response-box" placeholder="Your answer to the first prompt..."></textarea>
+            <button id="save-response-btn" class="hidden">Save Response</button>
+        </div>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+
+</html>
