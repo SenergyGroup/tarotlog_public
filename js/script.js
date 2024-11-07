@@ -1,9 +1,11 @@
+const API_BASE_URL = 'https://tarotlog-public.onrender.com';
+
 document.getElementById('draw-card-btn').addEventListener('click', drawCard);
 document.getElementById('save-response-btn').addEventListener('click', saveResponses);
 
 async function drawCard() {
     try {
-        const response = await fetch('http://localhost:3000/api/draw-card');
+        const response = await fetch(`${API_BASE_URL}/api/draw-card`);
         if (!response.ok) {
             throw new Error('Failed to fetch card');
         }
@@ -43,7 +45,7 @@ async function saveResponses() {
     const userId = 1; // Placeholder until authentication is implemented
 
     try {
-        const response = await fetch('http://localhost:3000/api/save-response', {
+        const response = await fetch('${API_BASE_URL}/api/save-response', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
