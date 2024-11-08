@@ -39,10 +39,15 @@ async function drawCard() {
 }
 
 async function saveResponses() {
-    const response1 = document.getElementById('response-1').value;
-    const promptText = document.getElementById('card-prompt').innerText;
+    const response1 = document.getElementById('response-1').value.trim();
+    const promptText = document.getElementById('card-prompt').innerText.trim();
     const cardId = document.getElementById('drawn-card').dataset.cardId;
     const userId = 1; // Placeholder until authentication is implemented
+
+    if (!response1 || !promptText || !cardId) {
+        alert('All fields must be filled out.');
+        return;
+    }
 
     try {
         const response = await fetch('${API_BASE_URL}/api/save-response', {
@@ -54,7 +59,7 @@ async function saveResponses() {
                 user_id: userId,
                 card_id: cardId,
                 prompt_text: promptText,
-                response_text: `${response1}`.trim(),
+                response_text: response1,
             }),
         });
 
