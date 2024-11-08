@@ -63,8 +63,6 @@ async function saveResponses() {
             }),
         });
 
-        console.log('API_BASE_URL:', API_BASE_URL);
-
         if (!response.ok) {
             const errorText = await response.text();
             throw new Error(`Server Error: ${response.status} - ${errorText}`);

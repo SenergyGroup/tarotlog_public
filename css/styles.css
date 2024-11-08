@@ -1,14 +1,15 @@
 /* Reset some default styles */
-body, h1, p, button {
+body, h1, p, button, textarea {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* Set a simple, clean font */
+/* Dark tarot theme */
 body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f4f4f4;
+    font-family: 'Cinzel', serif;
+    background-color: #1c1c1c;
+    color: #e0e0e0;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -18,18 +19,20 @@ body {
 /* Container styling */
 .container {
     text-align: center;
-    background-color: #ffffff;
-    padding: 20px;
+    background-color: #2e2e2e;
+    padding: 25px;
     border-radius: 10px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
     max-width: 400px;
     width: 90%;
+    border: 1px solid #444; 
 }
 
 /* Heading style */
 h1 {
-    color: #333;
-    margin-bottom: 20px;
+    color: #f5c542; 
+    font-size: 28px;
+    margin-bottom: 15px;
 }
 
 /* Card container */
@@ -43,7 +46,8 @@ h1 {
     max-width: 200px;
     height: auto;
     border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
+    border: 1px solid #333;
 }
 
 /* Hide the card by default */
@@ -53,18 +57,19 @@ h1 {
 
 /* Button styling */
 #draw-card-btn {
-    background-color: #6b6fcb;
+    background-color: #7a4b9f;
     color: #ffffff;
-    border: none;
-    padding: 10px 20px;
+    border: 1px solid #4b3074;
+    padding: 10px 25px;
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.2s;
 }
 
 #draw-card-btn:hover {
-    background-color: #4b4f9b;
+    background-color: #5e3b7d;
+    transform: scale(1.05);
 }
 
 /* Card header */
@@ -72,12 +77,11 @@ h1 {
     margin-top: 10px;
     font-size: 18px;
     font-weight: bold;
-    color: #333;
-    padding: 10px;
-    background-color: #ececec;
+    color: #f5c542;
+    background-color: #3b3b3b;
     border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+    padding: 15px;
 }
 
 #card-title {
@@ -89,13 +93,15 @@ h1 {
 /* Prompt container */
 .prompt-container {
     margin-top: 15px;
-    padding: 10px;
-    text-align: left; /* or center, if you prefer */
+    padding: 15px;
+    background-color: #252525;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
 
 #card-prompt {
     font-size: 14px;
-    color: #444;
+    color: #bbb;
     line-height: 1.5;
 }
 
@@ -103,28 +109,40 @@ h1 {
 /* Style for the response text boxes */
 .response-box {
     width: 90%;
-    height: 60px;
+    height: 150px;
     margin: 10px 0;
-    padding: 8px;
+    padding: 10px;
     font-size: 14px;
     border-radius: 5px;
-    border: 1px solid #ccc;
-    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+    border: 1px solid #555;
+    background-color: #1f1f1f;
+    color: #e0e0e0;
     resize: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
 /* Save button */
 #save-response-btn {
-    background-color: #4CAF50;
-    color: white;
+    background-color: #8a9a5b;
+    color: #ffffff;
     border: none;
     padding: 10px 20px;
     border-radius: 5px;
     cursor: pointer;
     font-size: 14px;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.2s;
 }
 
 #save-response-btn:hover {
-    background-color: #388E3C;
+    background-color: #6d7949;
+    transform: scale(1.05);
+}
+
+#card-title, #card-prompt, h1 {
+    transition: color 0.3s ease;
+}
+
+
+h1:hover, #card-title:hover, #card-prompt:hover {
+    color: #ffdd57; 
 }
