@@ -60,7 +60,7 @@ app.post('/api/save-response', async (req, res) => {
     res.json(result.rows[0]);
   } catch (error) {
     console.error('Error saving response:', error);
-    res.status(500).json({ error: 'Database error' });
+    res.status(500).json({ error: error.message || 'Database error' });
   }
 });
 

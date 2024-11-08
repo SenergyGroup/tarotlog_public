@@ -64,14 +64,15 @@ async function saveResponses() {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to save response');
+            const errorText = await response.text();
+            throw new Error(`Server Error: ${response.status} - ${errorText}`);
         }
 
         alert('Responses saved successfully!');
         clearResponseFields();
     } catch (error) {
-        console.error('Error saving response:', error);
-        alert('Failed to save responses.');
+        console.error('Error saving response:', error.message);
+        alert(`Failed to save responses: ${error.message}`);
     }
 }
 
