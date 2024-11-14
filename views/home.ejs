@@ -1,14 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
+<%- include('partials/header'); -%>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tarot Card Drawer</title>
-    <link rel="stylesheet" href="css/styles.css">
-</head>
-
-<body>
     <div class="container">
         <h1>Tarot Card Drawer</h1>
         <div class="card-container">
@@ -23,12 +14,11 @@
         <div class="prompt-container">
             <p id="card-prompt"></p>
             <!-- Add text boxes for user responses -->
-            <textarea id="response-1" class="response-box" placeholder="Your answer to the first prompt..."></textarea>
+            <textarea id="response-1" class="hidden" placeholder="Your answer to the first prompt..."></textarea>
             <button id="save-response-btn" class="hidden">Save Response</button>
         </div>
     </div>
 
-    <script src="js/script.js"></script>
-</body>
+    <script src="/script.js"></script>
 
-</html>
+<%- include('partials/footer'); -%>

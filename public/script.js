@@ -33,6 +33,8 @@ async function drawCard() {
 
         // Show response text boxes and save button
         document.getElementById('save-response-btn').classList.remove('hidden');
+        document.getElementById('response-1').classList.remove('hidden');
+        document.getElementById('response-1').classList.add('response-box');
     } catch (error) {
         console.error('Error drawing card:', error);
     }

@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
+const authRoutes = require('./routes/authRoutes');
 
 // Neon Database Backend and API
 const app = express();
@@ -16,6 +17,21 @@ const pool = new Pool({
     rejectUnauthorized: false, 
   },
 });
+
+// Middleware
+app.use(express.static('public'));
+app.use(express.json());
+
+// View engine
+app.set('view engine', 'ejs');
+
+// Sync user model with database
+const sequelize = require('./config/database');
+const User = require('./models/User');
+
+sequelize.sync({ force: false }) // Set force to true to drop and recreate tables during development
+  .then(() => console.log('Database synced'))
+  .catch(err => console.error('Error syncing database:', err));
 
 // Route to draw a random card
 app.get('/api/draw-card', async (req, res) => {
@@ -69,3 +85,9 @@ app.post('/api/save-response', async (req, res) => {
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
+
+
+//EJS Routes
+app.get('/', (req, res) => res.render('home'));
+app.get('/tarotlog', (req,res) => res.render('tarotlog'));
+app.use(authRoutes);

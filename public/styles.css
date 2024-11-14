@@ -5,6 +5,58 @@ body, h1, p, button, textarea {
     box-sizing: border-box;
 }
 
+header, footer {
+    display: block;
+    width: 100%;
+}
+
+header {
+    font-family: 'Cinzel', serif;
+    background-color: #1c1c1c;
+    padding: 10px 20px; /* Add some horizontal padding */
+    position: fixed;
+    top: 0;
+    width: 100%;
+    display: flex; /* Flexbox layout */
+    align-items: center;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between; /* Push left and right groups apart */
+    width: 100%; /* Ensure full width usage */
+}
+
+.nav-left h1, .nav-right h1 {
+    margin: 0; /* Remove default margin from h1 */
+    font-size: 2rem; /* Adjust font size as needed */
+}
+
+.nav-left a, .nav-right a {
+    color: #f5c542;
+    text-decoration: none;
+}
+
+.nav-right {
+    display: flex;
+    gap: 20px; /* Space between Sign Up and Log In */
+    padding-right: 20px;
+}
+
+.nav-right h1 {
+    font-size: 1.2rem; /* Adjust to differentiate from the title */
+}
+
+footer {
+    font-family: 'Cinzel', serif;
+    background-color: #1c1c1c;
+    padding: 10px;
+    text-align: center;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
 /* Dark tarot theme */
 body {
     font-family: 'Cinzel', serif;
@@ -145,4 +197,17 @@ h1 {
 
 h1:hover, #card-title:hover, #card-prompt:hover {
     color: #ffdd57; 
+}
+
+@media (max-width: 768px) {
+    nav {
+        flex-direction: column; /* Stack items */
+        text-align: center;
+    }
+
+    .nav-right {
+        flex-direction: column; /* Stack Sign Up and Log In */
+        gap: 10px; /* Adjust gap */
+        padding-right: 20px;
+    }
 }
