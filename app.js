@@ -2,14 +2,12 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
+const cookieParser = require('cookie-parser');
 const authRoutes = require('./routes/authRoutes');
 
 // Neon Database Backend and API
 const app = express();
 const port = process.env.PORT || 3000;
-
-app.use(cors());
-app.use(express.json());
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -20,7 +18,10 @@ const pool = new Pool({
 
 // Middleware
 app.use(express.static('public'));
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(cors());
+app.use(cookieParser());
 
 // View engine
 app.set('view engine', 'ejs');
@@ -91,3 +92,4 @@ app.listen(port, () => {
 app.get('/', (req, res) => res.render('home'));
 app.get('/tarotlog', (req,res) => res.render('tarotlog'));
 app.use(authRoutes);
+app.use('signup', authRoutes);

@@ -199,6 +199,88 @@ h1:hover, #card-title:hover, #card-prompt:hover {
     color: #ffdd57; 
 }
 
+
+/* Form container styling */
+form {
+    background-color: #2e2e2e; /* Dark background for the form */
+    color: #f5c542; /* Gold accents for text */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); /* Subtle shadow for depth */
+    max-width: 400px;
+    min-width: 300px;
+    margin: 0 auto;
+    font-family: 'Cinzel', serif; /* Journaling aesthetic font */
+}
+
+/* Form heading */
+form h1 {
+    font-size: 24px;
+    margin-bottom: 15px;
+    color: #e0e0e0; /* Light color for heading */
+    text-align: center;
+}
+
+/* Labels */
+form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #bbb; /* Softer color for labels */
+}
+
+/* Input fields */
+form input[type="text"],
+form input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: 1px solid #555;
+    background-color: #1f1f1f; /* Dark background for inputs */
+    color: #e0e0e0;
+    font-size: 14px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    transition: border 0.3s ease;
+}
+
+form input:focus {
+    border: 1px solid #f5c542; /* Highlighted border on focus */
+    outline: none;
+}
+
+/* Error messages */
+.error {
+    font-size: 12px;
+    color: #ff6b6b; /* Red for error messages */
+    margin-bottom: 10px;
+}
+
+/* Button styling */
+form button {
+    background-color: #7a4b9f; /* Mystical purple for the button */
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%; /* Full width button */
+    transition: background-color 0.3s ease, transform 0.2s;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+form button:hover {
+    background-color: #5e3b7d;
+    transform: scale(1.05);
+}
+
+/* Form layout */
+form div {
+    margin-bottom: 15px;
+}
+
+
 @media (max-width: 768px) {
     nav {
         flex-direction: column; /* Stack items */
@@ -209,5 +291,19 @@ h1:hover, #card-title:hover, #card-prompt:hover {
         flex-direction: column; /* Stack Sign Up and Log In */
         gap: 10px; /* Adjust gap */
         padding-right: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    form {
+        padding: 15px;
+    }
+
+    form h1 {
+        font-size: 20px;
+    }
+
+    form button {
+        font-size: 14px;
     }
 }
