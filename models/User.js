@@ -3,6 +3,12 @@ const sequelize = require('../config/database');
 const bcrypt = require('bcrypt');
 
 const User = sequelize.define('User', {
+    user_id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true, // Automatically generates a unique ID
+      allowNull: false
+    },
     username: {
       type: DataTypes.STRING,
       allowNull: false,

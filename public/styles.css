@@ -281,6 +281,58 @@ form div {
 }
 
 
+/* Alert Styling */
+.alert-success {
+    display: none; /* Hidden by default */
+    position: fixed; /* Positioned relative to the viewport */
+    top: 50%; /* Center vertically */
+    left: 50%; /* Center horizontally */
+    transform: translate(-50%, -50%); /* Offset for perfect centering */
+    background-color: #3c763d; /* Green for success */
+    color: #dff0d8; /* Light green for text */
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #d6e9c6;
+    font-family: 'Cinzel', serif; /* Match your aesthetic */
+    font-size: 18px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); /* Subtle depth */
+    z-index: 1000; /* Ensure it appears on top of everything */
+    animation: fadeIn 1s ease-out;
+}
+
+/* Fade-in animation for the alert */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -60%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
+
+/* Display alert when active */
+.alert-success.show {
+    display: block;
+}
+
+.overlay {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Dark overlay */
+    z-index: 999; /* Just below the alert */
+}
+
+.overlay.show {
+    display: block;
+}
+
 @media (max-width: 768px) {
     nav {
         flex-direction: column; /* Stack items */

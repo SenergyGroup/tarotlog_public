@@ -13,6 +13,12 @@
     <button type="submit">Sign up</button>
 </form>
 
+<!-- Success alert -->
+<div class="overlay" id="overlay"></div>
+<div class="alert-success" id="success-alert">
+    Account created successfully!
+</div>
+
 <script>
     const form = document.querySelector('form');
     const emailError = document.querySelector('.email.error');
@@ -37,10 +43,23 @@
                 headers: { 'Content-Type': 'application/json' }
             });
             const data = await res.json();
-            console.log(data);
             if (data.errors) {
                 emailError.textContent = data.errors.email;
                 passwordError.textContent = data.errors.password;
+            }
+            if (data.user) {
+                const successAlert = document.getElementById("success-alert");
+                const overlay = document.getElementById("overlay");
+
+                successAlert.classList.add("show"); // Show the alert
+                overlay.classList.add("show");
+
+                setTimeout(() => {
+                    successAlert.classList.remove("show");
+                    overlay.classList.remove("show");
+                    location.assign('/');
+                }, 3000);
+                
             }
         }
         catch (err) {

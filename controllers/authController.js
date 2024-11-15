@@ -23,39 +23,33 @@ module.exports.login_get = (req, res) => {
 
 
 module.exports.signup_post = async (req, res) => {
-    console.log('Request body:', req.body);
-    const { user: username, email, password} = req.body;
-    console.log('Extracted fields:', { username, email, password });
+    const { username, email, password} = req.body;
 
     try {
         // Attempt to create a new user
         const userData = { username, email, password };
-        console.log('Data passed to User.create:', userData); // Log data before creating
         const newUser = await User.create(userData);
-        console.log('User created:', newUser);
         const token = createToken(newUser.id);
         res.cookie('jwt', token, { httpOnly: true, maxAgeCookie});
         res.status(201).json({ message: 'User created successfully', user: newUser });
 
       } catch (error) {
-        console.error('Error creating user:', error);
+        let errors = {};
+
         // Catch validation or uniqueness errors
         if (error.name === 'SequelizeValidationError') {
-            const errors = error.errors.map(err => ({
-                message: err.message,
-                path: err.path,
-                value: err.value
-              }));
-          return res.status(400).json({ errors });
+            error.errors.forEach(err => {
+                errors[err.path] = err.message;
+            });
         }
         if (error.name === 'SequelizeUniqueConstraintError') {
-            return res.status(400).json({ message: 'Email is already registered' });
+            errors.email = 'This email is already registered';
         }
-        console.error('Error creating user:', error);
-        res.status(500).json({ message: 'Internal server error' });
+
+        res.status(400).json({ errors });
       }
       
-}
+};
 
 
 module.exports.login_post = (req, res) => {
