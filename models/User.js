@@ -58,5 +58,22 @@ const User = sequelize.define('User', {
     }
   });
 
+// static method to login user
+User.login = async function(email, password){
+  const user = await User.findOne({ where: { email } });
+
+  if (!user) {
+    throw new Error('No email associated with account.');
+  }
+
+  const auth = await bcrypt.compare(password, user.password); // Compare provided password with hashed password
+  
+  if (!auth) {
+    throw new Error('Incorrect password.');
+  }
+
+  return user;
+};
+
 
 module.exports = User;

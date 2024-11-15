@@ -1,0 +1,30 @@
+<%- include('partials/header'); -%>
+
+<script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+<script>
+    const user = <%- JSON.stringify(user) %>;
+</script>
+
+
+    <div class="container">
+        <h1>Tarot Card Drawer</h1>
+        <div class="card-container">
+            <img id="drawn-card" src="" alt="Drawn Card" class="hidden">
+        </div>
+        <button id="draw-card-btn">Draw a Card</button>
+        
+        <div class="card-header hidden">
+            <h2 id="card-title"></h2>
+        </div>
+        
+        <div class="prompt-container">
+            <p id="card-prompt"></p>
+            <!-- Add text boxes for user responses -->
+            <textarea id="response-1" class="hidden" placeholder="Your answer to the first prompt..."></textarea>
+            <button id="save-response-btn" class="hidden">Save Response</button>
+        </div>
+    </div>
+
+    <script src="/script.js"></script>
+
+<%- include('partials/footer'); -%>

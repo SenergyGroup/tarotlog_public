@@ -4,6 +4,7 @@ const cors = require('cors');
 const { Pool } = require('pg');
 const cookieParser = require('cookie-parser');
 const authRoutes = require('./routes/authRoutes');
+const { checkUser } = require('./middleware/authMiddleware');
 
 // Neon Database Backend and API
 const app = express();
@@ -22,6 +23,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors());
 app.use(cookieParser());
+app.use(checkUser);
+
 
 // View engine
 app.set('view engine', 'ejs');

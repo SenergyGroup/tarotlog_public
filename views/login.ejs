@@ -1,9 +1,7 @@
 <%- include('partials/header'); -%>
 
-<form>
+<form action="/login" method="POST">
     <h1>Log in</h1>
-    <label for="username">Username</label>
-    <input type="text" name="username" required />
     <div class="username error"></div>
     <label for="email">Email</label>
     <input type="text" name="email" required />
@@ -14,18 +12,67 @@
     <button>Log in</button>
 </form>
 
-<script>
-    const form = document.querySelector('form');
+<!-- Success alert -->
+<div class="overlay" id="overlay"></div>
+<div class="alert-success" id="success-alert">
+    Logging in...
+</div>
 
-    form.addEventListener('submit', (e) => {
+<script>
+const form = document.querySelector('form');
+    const emailError = document.querySelector('.email.error');
+    const passwordError = document.querySelector('.password.error');
+
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
+        // reset errors
+        emailError.textContent = '';
+        passwordError.textContent = '';
+
         //get the values
-        const username = form.username.value;
         const email = form.email.value;
         const password = form.password.value;
 
-        console.log(username, email, password)
+        try {
+            const res = await fetch('/login', {
+                method: 'POST',
+                body: JSON.stringify({ email, password }),
+                headers: { 'Content-Type': 'application/json' }
+            });
+            console.log('Fetch response:', res);
+            const data = await res.json();
+            console.log('Response data:', data);
+            if (data.errors) {
+                emailError.textContent = data.errors.email;
+                passwordError.textContent = data.errors.password;
+            }
+            if (data.userID) {
+                console.log('Successful login, redirecting...');
+                const successAlert = document.getElementById("success-alert");
+                const overlay = document.getElementById("overlay");
+
+                successAlert.classList.add("show"); // Show the alert
+                overlay.classList.add("show");
+
+                setTimeout(() => {
+                    successAlert.classList.remove("show");
+                    overlay.classList.remove("show");
+                    location.assign('/tarot');
+                }, 3000);
+                
+            }
+            if (res.status === 401) {
+                console.error('Login failed:', data.error);
+            emailError.textContent = data.error.includes('Email') ? data.error : '';
+            passwordError.textContent = data.error.includes('password') ? data.error : '';
+            } else if (res.status === 500) {
+            console.log('Server error:', data.error);
+            }
+        }
+        catch (err) {
+            console.log(err)
+        }
     })
 </script>
 

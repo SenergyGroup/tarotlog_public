@@ -52,10 +52,23 @@ module.exports.signup_post = async (req, res) => {
 };
 
 
-module.exports.login_post = (req, res) => {
+module.exports.login_post = async (req, res) => {
     const { email, password} = req.body;
 
-    console.log(email, password);
+    try {
+        const user = await User.login(email, password);
+        const token = jwt.sign({ id: user.user_id, username: user.username }, process.env.JWT_SECRET, { expiresIn: maxAge });
+        res.cookie('jwt', token, { httpOnly: true, maxAge: 3 * 24 * 60 * 60 * 1000 }); // Store token in a cookie
 
-    res.send('user login')
-}
+        res.status(200).json({ userID: user.user_id, username: user.username });
+    }
+    catch (err) {
+        if (err.message.includes('No email associated')) {
+            return res.status(401).json({ error: 'Email not found.' });
+        } else if (err.message.includes('Incorrect password')) {
+            return res.status(401).json({ error: 'Incorrect password.' });
+        } 
+        console.error('Login error:', err); // Log any unexpected errors
+        res.status(500).json({ error: 'An internal server error occurred.' });
+    }
+};

@@ -44,7 +44,11 @@ async function saveResponses() {
     const response1 = document.getElementById('response-1').value.trim();
     const promptText = document.getElementById('card-prompt').innerText.trim();
     const cardId = document.getElementById('drawn-card').dataset.cardId;
-    const userId = 1; // Placeholder until authentication is implemented
+    
+    if (!user || !user.id) {  // Use global 'user' object passed from server
+        alert('User is not authenticated. Please log in.');
+        return;
+    }
 
     if (!response1 || !promptText || !cardId) {
         alert('All fields must be filled out.');
@@ -58,7 +62,7 @@ async function saveResponses() {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                user_id: userId,
+                user_id: user.id,
                 card_id: cardId,
                 prompt_text: promptText,
                 response_text: response1,
@@ -71,6 +75,12 @@ async function saveResponses() {
         }
 
         alert('Responses saved successfully!');
+        document.getElementById('drawn-card').classList.add('hidden');
+        document.getElementById('response-1').classList.add('hidden');
+        document.getElementById('card-prompt').classList.add('hidden');
+        document.getElementById('save-response-btn').classList.add('hidden');
+        document.querySelector('.card-header').classList.add('hidden');
+
         clearResponseFields();
     } catch (error) {
         console.error('Error saving response:', error.message);

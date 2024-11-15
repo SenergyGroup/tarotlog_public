@@ -1,24 +1,15 @@
 <%- include('partials/header'); -%>
 
-    <div class="container">
-        <h1>Tarot Card Drawer</h1>
-        <div class="card-container">
-            <img id="drawn-card" src="" alt="Drawn Card" class="hidden">
-        </div>
-        <button id="draw-card-btn">Draw a Card</button>
-        
-        <div class="card-header hidden">
-            <h2 id="card-title"></h2>
-        </div>
-        
-        <div class="prompt-container">
-            <p id="card-prompt"></p>
-            <!-- Add text boxes for user responses -->
-            <textarea id="response-1" class="hidden" placeholder="Your answer to the first prompt..."></textarea>
-            <button id="save-response-btn" class="hidden">Save Response</button>
-        </div>
+<div class="container">
+    <!-- Welcome Section -->
+    <h1>Welcome to Tarot Card Drawer</h1>
+    <p>Your journey of self-reflection starts here. Please log in or sign up to start.</p>
+    
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <a href="/login" class="btn">Log In</a>
+      <a href="/signup" class="btn">Sign Up</a>
     </div>
-
-    <script src="/script.js"></script>
+</div>
 
 <%- include('partials/footer'); -%>

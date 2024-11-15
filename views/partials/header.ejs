@@ -12,6 +12,11 @@
             <div class="nav-left">
                 <h1><a href="/">TarotLog</a></h1>
             </div>
+            <div class="nav-center">
+                <% if (user) { %>
+                    <h2><%= user.username %></h2>
+                  <% } %>
+              </div>
             <div class="nav-right">
                 <h1><a href="/signup">Sign Up</a></h1>
                 <h1><a href="/login">Log In</a></h1>
