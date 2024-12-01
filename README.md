@@ -5,6 +5,7 @@ Web based journal with PostgreSQL backend. Journal contains tarot themes and dat
 https://tarotlog-public.onrender.com/
 
 # To Do
-- Sign in proceedures before saving a response
+- Add log out proceedures
+- Add forgot password option
 - Add prompt below the description, What does this card make you think about?
 - Splice the card meanings into tags where the person can click on them to add them to the SQL table (Prompt would be, which of these tags most aligns with what you wrote?)
