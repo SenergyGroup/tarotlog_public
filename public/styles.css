@@ -388,6 +388,95 @@ form div {
     animation: fadeIn 1s ease-out;
 }
 
+/**************************
+ * Entry List Page Styles *
+ **************************/
+ .entry-list-page {
+    width: 90%;
+    max-width: 800px;
+    margin: 2rem auto;
+    font-family: 'Arial', sans-serif;
+    color: #f2c14e;
+  }
+  
+  .page-title {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Filter Section */
+  .filter-container {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .filter-container label {
+    font-size: 1.2rem;
+    margin-right: 0.5rem;
+  }
+  
+  .filter-dropdown {
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #444;
+    border-radius: 5px;
+    background-color: #252525;
+    color: #f2c14e;
+  }
+  
+  /* Entries List */
+  .entries-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .entry-item {
+    background-color: #2e2e2e;
+    border: 1px solid #444;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .entry-item:hover {
+    background-color: #3b3b3b;
+  }
+  
+  /* Entry Summary */
+  .entry-summary {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1rem;
+    font-weight: bold;
+  }
+  
+  .entry-date {
+    font-size: 0.9rem;
+    color: #bbb;
+  }
+  
+  .entry-card {
+    font-size: 1rem;
+    color: #f2c14e;
+  }
+  
+  /* Entry Details (Initially Hidden) */
+  .entry-details {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: #ddd;
+  }
+  
+  .entry-details p {
+    margin: 0.5rem 0;
+  }
+
+
+
 /* Fade-in animation for the alert */
 @keyframes fadeIn {
     from {

@@ -10,5 +10,8 @@ router.post('/login', authConroller.login_post)
 router.get('/tarot', (req, res) => {
     res.render('tarot', { user: res.locals.user }); 
   });
+router.get('/entries', (req, res) => {
+  res.render('tarot', { user: res.locals.user }); 
+});
 
 module.exports = router

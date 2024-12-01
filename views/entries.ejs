@@ -1,0 +1,42 @@
+<%- include('partials/header'); -%>
+
+<script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+<script>
+    const user = <%- JSON.stringify(user) %>;
+</script>
+
+<div class="entry-list-page">
+    <!-- Title -->
+    <h1 class="page-title">Your Journal Entries</h1>
+  
+    <!-- Filter Section -->
+    <div class="filter-container">
+      <label for="filter-dropdown">Filter By:</label>
+      <select id="filter-dropdown" class="filter-dropdown">
+        <option value="most-recent">Most Recent</option>
+        <option value="oldest">Oldest</option>
+        <option value="card">Card</option>
+        <option value="date">Date</option>
+      </select>
+    </div>
+  
+    <!-- Entries List -->
+    <ul class="entries-list">
+      <!-- Example Entry -->
+      <li class="entry-item">
+        <div class="entry-summary" data-entry-id="1">
+          <span class="entry-date">12/01/2024</span>
+          <span class="entry-card">The Fool</span>
+        </div>
+        <div class="entry-details hidden">
+          <p class="entry-prompt">Prompt: What new beginnings are you exploring?</p>
+          <p class="entry-response">Response: I'm starting a new journaling habit and exploring my creative side.</p>
+        </div>
+      </li>
+      <!-- Add more entries dynamically here -->
+    </ul>
+  </div>
+
+  <script src="script.js"></script>
+
+  <%- include('partials/footer'); -%>

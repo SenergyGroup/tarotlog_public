@@ -91,3 +91,10 @@ async function saveResponses() {
 function clearResponseFields() {
     document.getElementById('response-1').value = '';
 }
+
+document.querySelectorAll('.entry-summary').forEach(summary => {
+    summary.addEventListener('click', () => {
+      const details = summary.nextElementSibling;
+      details.classList.toggle('hidden');
+    });
+  });
