@@ -24,7 +24,7 @@ header {
 nav {
     display: flex;
     justify-content: space-between; /* Push left and right groups apart */
-    width: 100%; /* Ensure full width usage */
+    width: 95%; /* Ensure full width usage */
 }
 
 .nav-left h1, .nav-right h1 {
@@ -66,18 +66,21 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    overflow: hidden;
 }
 
 /* Container styling */
 .container {
-    text-align: center;
-    background-color: #2e2e2e;
-    padding: 25px;
-    border-radius: 10px;
-    box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
-    max-width: 400px;
-    width: 90%;
-    border: 1px solid #444; 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    background-color: transparent; 
+    padding: 0; 
+    border-radius: 0; 
+    box-shadow: none; 
+    max-width: 1200px; 
+    width: 90%; 
+    border: none; 
 }
 
 /* Heading style */
@@ -85,6 +88,35 @@ h1 {
     color: #f5c542; 
     font-size: 28px;
     margin-bottom: 15px;
+}
+
+.start-button {
+    display: inline-block;
+    text-decoration: none;
+    background-color: transparent;
+    border: 2px solid #f2c14e;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    color: #f2c14e;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.start-button:hover {
+    background-color: #f2c14e;
+    color: #1a1a1a;
+}
+
+.illustration {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+  
+.illustration img {
+    max-width: 250px;
+    filter: drop-shadow(0 0 10px #f2c14e);
 }
 
 /* Card container */
