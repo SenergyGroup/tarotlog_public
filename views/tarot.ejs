@@ -6,22 +6,24 @@
 </script>
 
 
-    <div class="container">
-        <h1>Tarot Card Drawer</h1>
-        <div class="card-container">
-            <img id="drawn-card" src="" alt="Drawn Card" class="hidden">
+    <div class="app-container">
+        <h1 class-="app-title">Tarot Card Drawer</h1>
+        <div class="card-section">
+            <div class="card-container">
+                <img id="drawn-card" src="" alt="Drawn Card" class="card-image hidden">
+            </div>
+            <button id="draw-card-btn" class="draw-button">Draw a Card</button>
+            
+            <div class="card-header hidden">
+                <h2 id="card-title"></h2>
+            </div>
         </div>
-        <button id="draw-card-btn">Draw a Card</button>
         
-        <div class="card-header hidden">
-            <h2 id="card-title"></h2>
-        </div>
-        
-        <div class="prompt-container">
-            <p id="card-prompt"></p>
+        <div class="prompt-section">
+            <p id="card-prompt" class="prompt-text"></p>
             <!-- Add text boxes for user responses -->
-            <textarea id="response-1" class="hidden" placeholder="Your answer to the first prompt..."></textarea>
-            <button id="save-response-btn" class="hidden">Save Response</button>
+            <textarea id="response-1" class="reponse-box hidden" placeholder="Your answer to the prompt..."></textarea>
+            <button id="save-response-btn" class="save-button hidden">Save Response</button>
         </div>
     </div>
 
