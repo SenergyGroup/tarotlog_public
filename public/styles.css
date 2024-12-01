@@ -131,20 +131,49 @@ h1 {
     filter: drop-shadow(0 0 10px #f2c14e);
 }
 
+
+.app-container {
+    width: 90%;
+    max-width: 600px; /* Restricts width for better readability */
+    text-align: center;
+    display: flex;
+    flex-direction: column; /* Ensures elements stack top-to-bottom */
+    gap: 2rem; /* Adds space between sections */
+  }
+  
+  /* Title Styling */
+.app-title {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+}
+
+
 /* Card container */
+.card-section {
+    background-color: #2e2e2e;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+  }
+
 .card-container {
-    margin-bottom: 15px;
+    margin-bottom: 1rem;
 }
 
 /* Styling for the card image */
-#drawn-card {
+.card-image {
     width: 100%;
     max-width: 200px;
     height: auto;
     border-radius: 8px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
     border: 1px solid #333;
+    transition: transform 0.3s ease;
 }
+
+ .card-image:hover {
+    transform: scale(1.05);
+  }
 
 /* Hide the card by default */
 .hidden {
@@ -152,26 +181,26 @@ h1 {
 }
 
 /* Button styling */
-#draw-card-btn {
-    background-color: #7a4b9f;
-    color: #ffffff;
-    border: 1px solid #4b3074;
-    padding: 10px 25px;
+.draw-button {
+    background-color: #6c63ff;
+    color: #fff;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-size: 1.2rem;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 16px;
     transition: background-color 0.3s ease, transform 0.2s;
-}
-
-#draw-card-btn:hover {
-    background-color: #5e3b7d;
+  }
+  
+.draw-button:hover {
+    background-color: #584ce0;
     transform: scale(1.05);
-}
+  }
 
 /* Card header */
 .card-header {
-    margin-top: 10px;
-    font-size: 18px;
+    margin-top: 1rem;
+    font-size: 1.5rem;
     font-weight: bold;
     color: #f5c542;
     background-color: #3b3b3b;
@@ -180,67 +209,58 @@ h1 {
     padding: 15px;
 }
 
-#card-title {
-    margin: 0;
-    font-size: 16px;
-}
-
 
 /* Prompt container */
-.prompt-container {
-    margin-top: 15px;
-    padding: 15px;
+.prompt-section {
     background-color: #252525;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-}
-
-#card-prompt {
-    font-size: 14px;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+  }
+  
+.prompt-text {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
     color: #bbb;
-    line-height: 1.5;
-}
+    line-height: 1.7;
+  }
 
 
 /* Style for the response text boxes */
 .response-box {
-    width: 90%;
+    width: 100%;
     height: 150px;
-    margin: 10px 0;
-    padding: 10px;
-    font-size: 14px;
-    border-radius: 5px;
-    border: 1px solid #555;
-    background-color: #1f1f1f;
-    color: #e0e0e0;
+    padding: 1rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: 1px solid #444;
+    background-color: #1a1a1a;
+    color: #f2c14e;
     resize: none;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-}
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    transition: box-shadow 0.3s ease;
+  }
+  
+.response-box:focus {
+    box-shadow: 0 0 10px #6c63ff;
+    outline: none;
+  }
 
 /* Save button */
-#save-response-btn {
-    background-color: #8a9a5b;
-    color: #ffffff;
+.save-button {
+    background-color: #3ca745;
+    color: #fff;
     border: none;
-    padding: 10px 20px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 14px;
     transition: background-color 0.3s ease, transform 0.2s;
-}
-
-#save-response-btn:hover {
-    background-color: #6d7949;
+  }
+  
+  .save-button:hover {
+    background-color: #2f8935;
     transform: scale(1.05);
-}
-
-#card-title, #card-prompt, h1 {
-    transition: color 0.3s ease;
-}
-
-
-h1:hover, #card-title:hover, #card-prompt:hover {
-    color: #ffdd57; 
 }
 
 /* Action buttons */
