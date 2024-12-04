@@ -100,18 +100,24 @@ document.querySelectorAll('.entry-summary').forEach(summary => {
   });
 
 document.addEventListener("DOMContentLoaded", () => {
-    const profileCircle = document.getElementById("profile-circle");
-    const dropdownMenu = document.getElementById("dropdown-menu");
+    const profileCircle = document.querySelector("#profile-circle");
+    const dropdownMenu = document.querySelector("#dropdown-menu");
 
-    // Toggle dropdown menu visibility on click
-    profileCircle.addEventListener("click", () => {
-        dropdownMenu.classList.toggle("show");
-    });
+    if (profileCircle && dropdownMenu) {
+        // Toggle dropdown menu visibility on click
+        profileCircle.addEventListener("click", (event) => {
+            dropdownMenu.classList.toggle("show");
+            console.log("Dropdown toggled:", dropdownMenu.classList.contains("show"));
+            event.stopPropagation();
+        });
 
-    // Close dropdown if clicked outside
-    document.addEventListener("click", (event) => {
-        if (!profileCircle.contains(event.target) && !dropdownMenu.contains(event.target)) {
-            dropdownMenu.classList.remove("show");
-        }
-    });
+        // Close dropdown if clicked outside
+        document.addEventListener("click", (event) => {
+            if (!dropdownMenu.contains(event.target) && !profileCircle.contains(event.target)) {
+                dropdownMenu.classList.remove("show");
+            }
+        });
+    } else {
+        console.error("Profile circle or dropdown menu not found!");
+    }
 });
