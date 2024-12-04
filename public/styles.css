@@ -527,11 +527,6 @@ form div {
   color: #007BFF;
 }
 
-/* Show dropdown on hover */
-.profile-menu:hover .dropdown-menu {
-  display: block;
-}
-
 /* Default: Hidden */
 .dropdown-menu {
   display: none;
