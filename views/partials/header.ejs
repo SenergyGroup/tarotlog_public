@@ -10,19 +10,31 @@
     <header>
         <nav>
             <div class="nav-left">
-                <h1><a href="/">TarotLog</a></h1>
+                <% if (user) { %>
+                    <h1><a href="/tarot">TarotLog</a></h1>
+                <% } else { %>
+                    <h1><a href="/">TarotLog</a></h1>
+                <% } %>
             </div>
             <div class="nav-center">
-                <% if (user) { %>
-                    <h2><%= user.username %></h2>
-                  <% } %>
+                <!-- Add content here if I want to have something-->
               </div>
-            <div class="nav-right">
+              <div class="nav-right">
                 <% if (user) { %>
-                    <h1><a href="/entries">Entries</a></h1>
+                    <!-- Profile Circle with Dropdown -->
+                    <div class="profile-menu">
+                        <div class="profile-circle" id="profile-circle">👤</div> <!-- Placeholder for profile picture -->
+                        <div class="dropdown-menu" id="dropdown-menu">
+                            <p><strong><%= user.username %></strong></p>
+                            <a href="/entries">Entries</a>
+                            <a href="/data">Data</a>
+                            <a href="/logout">Log Out</a>
+                        </div>
+                    </div>
+                <% } else { %>
+                    <h1><a href="/signup">Sign Up</a></h1>
+                    <h1><a href="/login">Log In</a></h1>
                 <% } %>
-                <h1><a href="/signup">Sign Up</a></h1>
-                <h1><a href="/login">Log In</a></h1>
             </div>
         </nav>
     </header>

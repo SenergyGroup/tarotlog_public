@@ -98,3 +98,20 @@ document.querySelectorAll('.entry-summary').forEach(summary => {
       details.classList.toggle('hidden');
     });
   });
+
+document.addEventListener("DOMContentLoaded", () => {
+    const profileCircle = document.getElementById("profile-circle");
+    const dropdownMenu = document.getElementById("dropdown-menu");
+
+    // Toggle dropdown menu visibility on click
+    profileCircle.addEventListener("click", () => {
+        dropdownMenu.classList.toggle("show");
+    });
+
+    // Close dropdown if clicked outside
+    document.addEventListener("click", (event) => {
+        if (!profileCircle.contains(event.target) && !dropdownMenu.contains(event.target)) {
+            dropdownMenu.classList.remove("show");
+        }
+    });
+});
