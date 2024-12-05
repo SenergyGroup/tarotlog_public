@@ -13,10 +13,9 @@
     <div class="filter-container">
       <label for="filter-dropdown">Filter By:</label>
       <select id="filter-dropdown" class="filter-dropdown">
-          <option value="most-recent" selected>Most Recent</option> <!-- Default and pre-selected -->
+          <option value="most-recent">Most Recent</option>
           <option value="oldest">Oldest</option>
           <option value="card">Card</option>
-          <option value="date">Date</option>
       </select>
   </div>
   
@@ -40,5 +39,20 @@
       <% } %>
     </ul>
   </div>
+
+  <script>
+    document.getElementById('filter-dropdown').addEventListener('change', function () {
+      const selectedFilter = this.value;
+      const currentUrl = window.location.origin + window.location.pathname; // Preserve current URL
+      window.location.href = `${currentUrl}?filter=${selectedFilter}`; // Redirect with query parameter
+    });
+  </script>
+
+<script>
+  // Set the dropdown to the current filter value
+  const urlParams = new URLSearchParams(window.location.search);
+  const currentFilter = urlParams.get('filter') || 'most-recent';
+  document.getElementById('filter-dropdown').value = currentFilter;
+</script>
 
   <%- include('partials/footer'); -%>

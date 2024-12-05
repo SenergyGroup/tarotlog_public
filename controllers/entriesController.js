@@ -10,7 +10,8 @@ router.get('/', authenticateToken, async (req, res) => {
     try {
         console.log('User from JWT:', req.user);
         const userId = req.user.id; // Extract user ID from JWT
-        const { filter } = req.query; // Get the filter parameter from query string
+        const filter = req.query.filter || 'most-recent'; // Get the filter parameter from query string
+        
         let query;
         let params = [userId];
 
