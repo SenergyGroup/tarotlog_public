@@ -22,19 +22,23 @@
   
     <!-- Entries List -->
     <ul class="entries-list">
-      <% entries.forEach(entry => { %>
+      <% if (entries.length > 0) { %>
+        <% entries.forEach(entry => { %>
           <li class="entry-item">
-              <div class="entry-summary" data-entry-id="<%= entry.response_id %>">
-                  <span class="entry-date"><%= new Date(entry.created_at).toLocaleDateString() %></span>
-                  <span class="entry-card"><%= entry.card_name %></span>
-              </div>
-              <div class="entry-details hidden">
-                  <p class="entry-prompt">Prompt: <%= entry.prompt_text %></p>
-                  <p class="entry-response">Response: <%= entry.response_text %></p>
-              </div>
+            <div class="entry-summary" data-entry-id="<%= entry.response_id %>">
+              <span class="entry-date"><%= new Date(entry.created_at).toLocaleDateString() %></span>
+              <span class="entry-card"><%= entry.card_name %></span>
+            </div>
+            <div class="entry-details hidden">
+              <p class="entry-prompt">Prompt: <%= entry.prompt_text %></p>
+              <p class="entry-response">Response: <%= entry.response_text %></p>
+            </div>
           </li>
-      <% }) %>
-  </ul>
+        <% }) %>
+      <% } else { %>
+        <li>No entries found.</li>
+      <% } %>
+    </ul>
   </div>
 
   <%- include('partials/footer'); -%>

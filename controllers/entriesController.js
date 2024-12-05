@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../config/database'); // PostgreSQL connection pool
+const authenticateToken = require('../middleware/authMiddleware');
+
 
 pool.query('SELECT NOW()', (err, res) => {
     if (err) {
@@ -12,7 +14,7 @@ pool.query('SELECT NOW()', (err, res) => {
 
 
 // Fetch entries for logged-in user with optional filters
-router.get('/entries', async (req, res) => {
+router.get('/entries', authenticateToken, async (req, res) => {
     try {
         console.log('User from JWT:', req.user);
         const userId = req.user.id; // Extract user ID from JWT
@@ -61,8 +63,9 @@ router.get('/entries', async (req, res) => {
         }
 
         // Return the results as JSON
+        console.log('Fetched entries:', rows);
         res.render('entries', { entries: rows, user: req.user });
-        
+
     } catch (err) {
         console.error('Error fetching entries:', err.stack);
         res.status(500).send('Internal Server Error');
