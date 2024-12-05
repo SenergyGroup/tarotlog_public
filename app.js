@@ -88,7 +88,9 @@ app.post('/api/save-response', async (req, res) => {
 
 //EJS Routes
 app.get('/', (req, res) => res.render('home'));
-app.get('/tarotlog', (req,res) => res.render('tarotlog'));
+app.get('/tarot', (req, res) => {
+  res.render('tarot', { user: res.locals.user });
+});
 
 // Route files
 app.use('/auth', authRoutes);
