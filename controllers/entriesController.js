@@ -14,6 +14,7 @@ pool.query('SELECT NOW()', (err, res) => {
 // Fetch entries for logged-in user with optional filters
 router.get('/entries', async (req, res) => {
     try {
+        console.log('User from JWT:', req.user);
         const userId = req.user.id; // Extract user ID from JWT
         const { filter } = req.query; // Get the filter parameter from query string
         let query;
@@ -47,14 +48,21 @@ router.get('/entries', async (req, res) => {
                 FROM responses r 
                 JOIN tarot_cards t ON r.card_id = t.card_id 
                 WHERE r.user_id = $1
-                ORDER BY t.card_name ASC`;
+                ORDER BY t.card_id ASC`;
         }
 
         // Execute query
         const { rows } = await pool.query(query, params);
 
+        console.log('Fetched entries:', rows);
+
+        if (rows.length === 0) {
+            console.log('No entries found for user:', userId);
+        }
+
         // Return the results as JSON
-        res.status(200).json(rows);
+        res.render('entries', { entries: rows, user: req.user });
+        
     } catch (err) {
         console.error('Error fetching entries:', err.stack);
         res.status(500).send('Internal Server Error');
