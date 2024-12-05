@@ -53,15 +53,17 @@ router.get('/', authenticateToken, async (req, res) => {
                 ORDER BY t.card_id ASC`;
         }
 
+        console.log('Executing query:', query);
+        console.log('With parameters:', params);
+        
         // Execute query
         const { rows } = await pool.query(query, params);
 
-        console.log('Fetched entries:', rows);
-
         if (rows.length === 0) {
             console.log('No entries found for user:', userId);
+            return res.render('entries', { entries: [], user: req.user });
         }
-
+    
         // Return the results as JSON
         console.log('Fetched entries:', rows);
         res.render('entries', { entries: rows, user: req.user });
