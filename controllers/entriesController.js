@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const pool = require('../config/db'); // PostgreSQL connection pool
+const pool = require('../config/database'); // PostgreSQL connection pool
 
 
 // Fetch entries for logged-in user with optional filters
