@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../config/database'); // PostgreSQL connection pool
-const authenticateToken = require('../middleware/authMiddleware');
+const { checkUser: authenticateToken } = require('../middleware/authMiddleware');
 
 
 pool.query('SELECT NOW()', (err, res) => {
