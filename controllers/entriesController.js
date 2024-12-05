@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const pool = require('../config/database'); // PostgreSQL connection pool
+const { pool } = require('../config/database'); // PostgreSQL connection pool
 const { checkUser: authenticateToken } = require('../middleware/authMiddleware');
 
 
