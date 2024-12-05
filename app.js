@@ -4,7 +4,7 @@ const cors = require('cors');
 const { Pool } = require('pg');
 const cookieParser = require('cookie-parser');
 const authRoutes = require('./routes/authRoutes');
-const entriesController = require('./routes/entriesController');
+const entriesController = require('./controllers/entriesController');
 const { checkUser } = require('./middleware/authMiddleware');
 
 // Neon Database Backend and API
