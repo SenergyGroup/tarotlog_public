@@ -4,14 +4,6 @@ const pool = require('../config/database'); // PostgreSQL connection pool
 const { checkUser: authenticateToken } = require('../middleware/authMiddleware');
 
 
-pool.query('SELECT NOW()', (err, res) => {
-    if (err) {
-        console.error('Database connection failed:', err.stack);
-    } else {
-        console.log('Database connected successfully for entries. Current time:', res.rows[0].now);
-    }
-});
-
 
 // Fetch entries for logged-in user with optional filters
 router.get('/', authenticateToken, async (req, res) => {
