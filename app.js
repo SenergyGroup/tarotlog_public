@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
 const cookieParser = require('cookie-parser');
+const { sequelize } = require('./config/database');
 const authRoutes = require('./routes/authRoutes');
 const entriesController = require('./controllers/entriesController');
 const { checkUser } = require('./middleware/authMiddleware');
@@ -31,7 +32,6 @@ app.use(checkUser);
 app.set('view engine', 'ejs');
 
 // Sync user model with database
-const sequelize = require('./config/database');
 const User = require('./models/User');
 
 sequelize.sync({ force: false }) // Set force to true to drop and recreate tables during development
