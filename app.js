@@ -4,6 +4,7 @@ const cors = require('cors');
 const { Pool } = require('pg');
 const cookieParser = require('cookie-parser');
 const authRoutes = require('./routes/authRoutes');
+const entriesController = require('./routes/entriesController');
 const { checkUser } = require('./middleware/authMiddleware');
 
 // Neon Database Backend and API
@@ -85,14 +86,22 @@ app.post('/api/save-response', async (req, res) => {
 });
 
 
+//EJS Routes
+app.get('/', (req, res) => res.render('home'));
+app.get('/tarotlog', (req,res) => res.render('tarotlog'));
+
+// Route files
+app.use('/auth', authRoutes);
+app.use('/entries', entriesController);
+
+// Global Error Handler
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err.stack);
+  res.status(500).send('Something broke!');
+});
+
+
 // Start the server
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
-
-
-//EJS Routes
-app.get('/', (req, res) => res.render('home'));
-app.get('/tarotlog', (req,res) => res.render('tarotlog'));
-app.use(authRoutes);
-app.use('signup', authRoutes);

@@ -19,7 +19,7 @@ router.get('/entries', authenticateToken, (req, res) => {
     if (!req.user || !req.user.id) {
         return res.status(400).send('User is not authenticated properly.');
     }
-    res.send('Route is working');
+    res.render('entries', { entries: [], user: req.user });
 });
 /*
 router.get('/entries', authenticateToken, async (req, res) => {

@@ -11,11 +11,13 @@ const checkUser = (req, res, next) => {
         next();
       } else {
         res.locals.user = { id: decodedToken.id, username: decodedToken.username };
+        req.user = { id: decodedToken.id, username: decodedToken.username };
         next();
       }
     });
   } else {
     res.locals.user = null;
+    req.user = null;
     next();
   }
 };
