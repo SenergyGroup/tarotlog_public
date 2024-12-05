@@ -2,6 +2,14 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../config/database'); // PostgreSQL connection pool
 
+pool.query('SELECT NOW()', (err, res) => {
+    if (err) {
+        console.error('Database connection failed:', err.stack);
+    } else {
+        console.log('Database connected successfully for entries. Current time:', res.rows[0].now);
+    }
+});
+
 
 // Fetch entries for logged-in user with optional filters
 router.get('/entries', async (req, res) => {
@@ -48,7 +56,7 @@ router.get('/entries', async (req, res) => {
         // Return the results as JSON
         res.status(200).json(rows);
     } catch (err) {
-        console.error('Error fetching entries:', err);
+        console.error('Error fetching entries:', err.stack);
         res.status(500).send('Internal Server Error');
     }
 });
