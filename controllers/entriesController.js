@@ -14,7 +14,7 @@ pool.query('SELECT NOW()', (err, res) => {
 
 
 // Fetch entries for logged-in user with optional filters
-router.get('/entries', authenticateToken, (req, res) => {
+router.get('/', authenticateToken, (req, res) => {
     console.log('Route hit successfully. User from JWT:', req.user);
     if (!req.user || !req.user.id) {
         return res.status(400).send('User is not authenticated properly.');
