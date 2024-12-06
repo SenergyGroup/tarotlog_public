@@ -463,6 +463,11 @@ form div {
     font-size: 1rem;
     color: #f2c14e;
   }
+
+  .entry-orientation {
+    font-size: 1rem;
+    color: #9f2cd4;
+  }
   
   /* Entry Details (Initially Hidden) */
   .entry-details {

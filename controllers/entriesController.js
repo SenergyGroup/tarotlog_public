@@ -17,7 +17,7 @@ router.get('/', authenticateToken, async (req, res) => {
         // Default query: Most Recent
         query = `
             SELECT 
-                r.response_id, r.prompt_text, r.response_text, r.created_at, 
+                r.response_id, r.prompt_text, r.response_text, r.created_at, r.orientation,
                 t.card_name 
             FROM responses r 
             JOIN tarot_cards t ON r.card_id = t.card_id 
@@ -28,7 +28,7 @@ router.get('/', authenticateToken, async (req, res) => {
         if (filter === 'oldest') {
             query = `
                 SELECT 
-                    r.response_id, r.prompt_text, r.response_text, r.created_at, 
+                    r.response_id, r.prompt_text, r.response_text, r.created_at, r.orientation,
                     t.card_name 
                 FROM responses r 
                 JOIN tarot_cards t ON r.card_id = t.card_id 
@@ -37,7 +37,7 @@ router.get('/', authenticateToken, async (req, res) => {
         } else if (filter === 'card') {
             query = `
                 SELECT 
-                    r.response_id, r.prompt_text, r.response_text, r.created_at, 
+                    r.response_id, r.prompt_text, r.response_text, r.created_at, r.orientation, 
                     t.card_name 
                 FROM responses r 
                 JOIN tarot_cards t ON r.card_id = t.card_id 

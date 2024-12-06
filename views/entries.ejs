@@ -27,6 +27,7 @@
             <div class="entry-summary" data-entry-id="<%= entry.response_id %>">
               <span class="entry-date"><%= new Date(entry.created_at).toLocaleDateString() %></span>
               <span class="entry-card"><%= entry.card_name %></span>
+              <span class="entry-orientation"><%= entry.orientation %></span>
             </div>
             <div class="entry-details hidden">
               <p class="entry-prompt">Prompt: <%= entry.prompt_text %></p>
