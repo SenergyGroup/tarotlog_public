@@ -72,3 +72,33 @@ module.exports.login_post = async (req, res) => {
         res.status(500).json({ error: 'An internal server error occurred.' });
     }
 };
+
+// Log out
+const logout = (req, res) => {
+    try {
+      // Clear the JWT cookie
+      res.cookie('jwt', '', { httpOnly: true, maxAge: 1 }); // Set a past expiration
+  
+      // Optional: Update the database with the logout timestamp (replace User with your model)
+      /*
+      if (req.user && req.user.id) {
+        // Assuming you have a User model with a method to update the logout time
+        User.findByIdAndUpdate(req.user.id, { lastLogout: Date.now() })
+          .then(() => {
+            console.log("User's logout time updated");
+          })
+          .catch((err) => {
+            console.error('Error updating logout time:', err);
+          });
+      }
+        */
+  
+      // Redirect to home
+      res.redirect('/');
+    } catch (err) {
+      console.error('Error during logout:', err);
+      res.status(500).json({ message: 'Error during logout' });
+    }
+  };
+  
+  module.exports = { logout };

@@ -1,5 +1,6 @@
 const { Router }    = require('express')
 const authConroller = require('../controllers/authController')
+const { logout } = require('./authController');
 
 const router = Router()
 
@@ -10,5 +11,6 @@ router.post('/login', authConroller.login_post)
 router.get('/tarot', (req, res) => {
     res.render('tarot', { user: res.locals.user }); 
   });
+router.get('/logout', logout);
 
 module.exports = router
