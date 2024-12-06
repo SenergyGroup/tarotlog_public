@@ -1,6 +1,7 @@
 const { Router }    = require('express')
 const authConroller = require('../controllers/authController')
 const { logout } = require('../controllers/authController');
+console.log(logout);
 
 const router = Router()
 

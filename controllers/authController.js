@@ -99,6 +99,6 @@ const logout = (req, res) => {
       console.error('Error during logout:', err);
       res.status(500).json({ message: 'Error during logout' });
     }
-  };
+};
   
-  module.exports = { logout };
+module.exports = { logout };
