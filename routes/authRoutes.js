@@ -10,6 +10,6 @@ router.post('/login', authConroller.login_post)
 router.get('/tarot', (req, res) => {
     res.render('tarot', { user: res.locals.user }); 
   });
-router.get('/logout', authConroller.logout);
+router.get('/auth/logout', authConroller.logout);
 
 module.exports = router
