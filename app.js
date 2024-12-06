@@ -74,7 +74,7 @@ app.post('/api/save-response', async (req, res) => {
   try {
     const result = await pool.query(
       `INSERT INTO responses (user_id, card_id, prompt_text, response_text, created_at, updated_at, orientation)
-             VALUES ($1, $2, $3, $4, $5, NOW(), NOW()) RETURNING *`,
+             VALUES ($1, $2, $3, $4, NOW(), NOW(),  $5) RETURNING *`,
             [user_id, card_id, prompt_text, response_text, orientation]
     );
 
