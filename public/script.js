@@ -142,6 +142,11 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
+        if (!drawnCard || !drawnCard.orientation) {
+            alert('Card orientation is missing. Please draw a card again.');
+            return;
+        }
+
         try {
             const response = await fetch(`${API_BASE_URL}/api/save-response`, {
                 method: 'POST',
@@ -153,6 +158,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     card_id: cardId,
                     prompt_text: promptText,
                     response_text: response1,
+                    orientation: drawnCard.orientation
                 }),
             });
 
