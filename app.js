@@ -65,17 +65,17 @@ app.get('/api/draw-card', async (req, res) => {
 
 // Route to save a response
 app.post('/api/save-response', async (req, res) => {
-  const { user_id, card_id, prompt_text, response_text } = req.body;
+  const { user_id, card_id, prompt_text, response_text, orientation } = req.body;
 
-  if (!user_id || !card_id || !prompt_text || !response_text) {
+  if (!user_id || !card_id || !prompt_text || !response_text || !orientation) {
     return res.status(400).json({ error: 'All fields are required' });
   }
 
   try {
     const result = await pool.query(
-      `INSERT INTO responses (user_id, card_id, prompt_text, response_text, created_at, updated_at)
-             VALUES ($1, $2, $3, $4, NOW(), NOW()) RETURNING *`,
-            [user_id, card_id, prompt_text, response_text]
+      `INSERT INTO responses (user_id, card_id, prompt_text, response_text, orientation, created_at, updated_at)
+             VALUES ($1, $2, $3, $4, $5, NOW(), NOW()) RETURNING *`,
+            [user_id, card_id, prompt_text, response_text, orientation]
     );
 
     res.json(result.rows[0]);

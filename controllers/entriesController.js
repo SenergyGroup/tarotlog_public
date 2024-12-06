@@ -8,7 +8,6 @@ const { checkUser: authenticateToken } = require('../middleware/authMiddleware')
 // Fetch entries for logged-in user with optional filters
 router.get('/', authenticateToken, async (req, res) => {
     try {
-        console.log('User from JWT:', req.user);
         const userId = req.user.id; // Extract user ID from JWT
         const filter = req.query.filter || 'most-recent'; // Get the filter parameter from query string
         
@@ -45,10 +44,7 @@ router.get('/', authenticateToken, async (req, res) => {
                 WHERE r.user_id = $1
                 ORDER BY t.card_id ASC`;
         }
-
-        console.log('Executing query:', query);
-        console.log('With parameters:', params);
-        
+       
         // Execute query
         const { rows } = await pool.query(query, params);
 
@@ -58,7 +54,6 @@ router.get('/', authenticateToken, async (req, res) => {
         }
     
         // Return the results as JSON
-        console.log('Fetched entries:', rows);
         res.render('entries', { entries: rows, user: req.user });
 
     } catch (err) {
