@@ -6,6 +6,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const profileCircle = document.querySelector("#profile-circle");
     const dropdownMenu = document.querySelector("#dropdown-menu");
 
+    let drawnCard;
+
     // Add event listener for draw-card-btn
     if (drawCardBtn) {
         drawCardBtn.addEventListener('click', drawCard);
@@ -98,11 +100,14 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             const randomCard = await response.json();
+            drawnCard = randomCard;
 
             const cardImage = document.getElementById('drawn-card');
             cardImage.src = randomCard.image_data;
             cardImage.dataset.cardId = randomCard.card_id; // Store card_id for later
             cardImage.classList.remove('hidden');
+
+            console.log('Card drawn:', drawnCard);
 
             // Apply orientation (upright or reversed)
             if (randomCard.orientation === 'Reversed') {
