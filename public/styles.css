@@ -1,26 +1,27 @@
 /* Reset some default styles */
-body, h1, p, button, textarea {
+h1, p, button, textarea {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
 header, footer {
-    display: block;
-    width: 100%;
+  position: fixed;
+  left: 0;
+  width: 100%;
+  z-index: 1000; /* Ensure header/footer stay on top */
+  background-color: #1c1c1c;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
 }
 
 header {
-    font-family: 'Cinzel', serif;
-    background-color: #1c1c1c;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-    padding: 10px 20px; /* Add some horizontal padding */
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 1000;
-    display: flex; /* Flexbox layout */
-    align-items: center;
+  top: 0;
+  padding: 10px 20px;
+}
+
+footer {
+  bottom: 0;
+  padding: 10px 20px;
 }
 
 nav {
@@ -49,31 +50,18 @@ nav {
     font-size: 1.2rem; /* Adjust to differentiate from the title */
 }
 
-footer {
-    font-family: 'Cinzel', serif;
-    background-color: #1c1c1c;
-    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.5);
-    padding: 10px;
-    text-align: center;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    z-index: 1000;
-}
-
 /* Dark tarot theme */
 body {
-    /*
-    padding-top: 70px;
-    padding-botton: 50px;
-    */
     font-family: 'Cinzel', serif;
     background-color: #1c1c1c;
     color: #e0e0e0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    margin: 0;
+    padding: 0;
+    display: block;
     min-height: 100vh;
+    padding-top: 80px;
+    padding-bottom: 60px;
+    box-sizing: border-box;
 }
 
 /* Container styling */
@@ -140,14 +128,16 @@ h1 {
 
 
 .app-container {
-    width: 90%;
-    max-width: 600px; /* Restricts width for better readability */
+    width: 100%;
+    max-width: 800px; /* Restricts width for better readability */
     text-align: center;
     display: flex;
     flex-direction: column; /* Ensures elements stack top-to-bottom */
     align-items: center;
     margin-top: 20px;
     gap: 2rem; /* Adds space between sections */
+    margin: 10px 0;
+    padding-bottom: 20px;
   }
   
   /* Title Styling */
