@@ -116,8 +116,7 @@ document.addEventListener("DOMContentLoaded", () => {
             
 
             // Show response text boxes and save button
-            document.getElementById('response-1').classList.remove('hidden');
-            document.getElementById('save-response-btn').classList.remove('hidden');
+            document.getElementById('prompt-section').classList.remove('hidden');
         } catch (error) {
             console.error('Error drawing card:', error);
         }
@@ -173,16 +172,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function resetCardUI() {
         const cardImage = document.getElementById('drawn-card');
-        const responseBox = document.getElementById('response-1');
         const cardTitleContainer = document.querySelector('.card-header');
-        const cardPrompt = document.getElementById('card-prompt');
-        const saveResponseBtn = document.getElementById('save-response-btn');
+        const promptSection = document.querySelector('.prompt-section');
     
-        cardImage.src = '/assets/facedown_card.jpg'; // Reset to facedown image
+        cardImage.src = 'https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/image_back.png'; // Reset to facedown image
         cardImage.alt = 'Facedown Card';
-        responseBox.value = ''; // Clear response box
+        
+        document.getElementById('response-1').value = '';
+        
         cardTitleContainer.classList.add('hidden');
-        cardPrompt.classList.add('hidden');
-        saveResponseBtn.classList.add('hidden');
+        promptSection.classList.add('hidden');
     }
 });
