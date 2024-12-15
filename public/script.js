@@ -117,6 +117,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // Show response text boxes and save button
             document.getElementById('prompt-section').classList.remove('hidden');
+
+            // Slight scroll effect to keep the card visible
+            setTimeout(() => {
+                window.scrollTo({
+                    top: cardImage.offsetTop - 50, // Push the view up slightly, but not above screen
+                    behavior: 'smooth',
+                });
+            }, 100);
         } catch (error) {
             console.error('Error drawing card:', error);
         }
