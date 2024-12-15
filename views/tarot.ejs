@@ -6,26 +6,100 @@
 </script>
 
 
-    <div class="app-container">
-        <h1 class-="app-title">Tarot Card Drawer</h1>
-        <div class="card-section">
-            <div class="card-container">
-                <img id="drawn-card" src="" alt="Drawn Card" class="card-image hidden">
-            </div>
-            <button id="draw-card-btn" class="draw-button">Draw a Card</button>
-            
-            <div class="card-header hidden">
-                <h2 id="card-title"></h2>
-            </div>
+<div class="app-container">
+    <h1 class-="app-title">Tarot Card Drawer</h1>
+    <div class="card-section">
+        <div class="card-container">
+            <img id="drawn-card" src="https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/image_back.png" alt="Facedown Card" class="card-image">
         </div>
+        <button id="draw-card-btn" class="draw-button">Draw a Card</button>
         
-        <div class="prompt-section">
-            <p id="card-prompt" class="prompt-text"></p>
-            <!-- Add text boxes for user responses -->
-            <textarea id="response-1" class="reponse-box hidden" placeholder="Your answer to the prompt..."></textarea>
-            <button id="save-response-btn" class="save-button hidden">Save Response</button>
+        <div class="card-header hidden">
+            <h2 id="card-title"></h2>
         </div>
     </div>
+    
+    <div class="prompt-section">
+        <p id="card-prompt" class="prompt-text"></p>
+        <textarea id="response-1" class="reponse-box hidden" placeholder="Your answer to the prompt..."></textarea>
+        <button id="save-response-btn" class="save-button hidden">Save Response</button>
+    </div>
+</div>
 
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const drawCardBtn = document.getElementById("draw-card-btn");
+        const drawnCard = document.getElementById("drawn-card");
+        const cardTitle = document.getElementById("card-title");
+        const cardPrompt = document.getElementById("card-prompt");
+        const saveResponseBtn = document.getElementById("save-response-btn");
+        const responseBox = document.getElementById("response-1");
+
+        // Draw card event
+        drawCardBtn.addEventListener("click", async () => {
+            try {
+                const response = await fetch("/api/draw-card");
+                const card = await response.json();
+
+                // Update card image
+                drawnCard.src = card.image_data;
+                drawnCard.alt = `${card.card_name} - ${card.orientation}`;
+                drawnCard.style.transform = card.orientation === "Reversed" ? "rotate(180deg)" : "rotate(0deg)";
+
+                // Update card title and prompt
+                cardTitle.textContent = `${card.card_name} (${card.orientation})`;
+                cardPrompt.textContent = card.description;
+
+                // Show relevant sections
+                cardTitle.parentElement.classList.remove("hidden");
+                cardPrompt.parentElement.classList.remove("hidden");
+                responseBox.classList.remove("hidden");
+                saveResponseBtn.classList.remove("hidden");
+            } catch (error) {
+                console.error("Error drawing card:", error);
+            }
+        });
+
+        // Save response event
+        saveResponseBtn.addEventListener("click", async () => {
+            try {
+                const response1 = responseBox.value.trim();
+                const promptText = cardPrompt.textContent.trim();
+                const cardId = drawnCard.dataset.cardId;
+
+                if (!response1) {
+                    alert("Please enter a response before saving.");
+                    return;
+                }
+
+                const saveResponse = await fetch("/api/save-response", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        card_id: cardId,
+                        response_text: response1,
+                        prompt_text: promptText,
+                        orientation: drawnCard.alt.includes("Reversed") ? "Reversed" : "Upright",
+                    }),
+                });
+
+                if (saveResponse.ok) {
+                    alert("Response saved successfully!");
+                    // Reset UI
+                    responseBox.value = "";
+                    drawnCard.src = "/assets/facedown_card.jpg";
+                    cardTitle.parentElement.classList.add("hidden");
+                    cardPrompt.parentElement.classList.add("hidden");
+                    responseBox.classList.add("hidden");
+                    saveResponseBtn.classList.add("hidden");
+                } else {
+                    console.error("Error saving response:", saveResponse.statusText);
+                }
+            } catch (error) {
+                console.error("Error saving response:", error);
+            }
+        });
+    });
+</script>
 
 <%- include('partials/footer'); -%>

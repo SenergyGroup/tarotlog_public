@@ -22,7 +22,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (profileCircle && dropdownMenu) {
         profileCircle.addEventListener("click", (event) => {
             dropdownMenu.classList.toggle("show");
-            console.log("Dropdown toggled:", dropdownMenu.classList.contains("show"));
             event.stopPropagation();
         });
 
@@ -104,29 +103,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const cardImage = document.getElementById('drawn-card');
             cardImage.src = randomCard.image_data;
+            cardImage.alt = `${randomCard.card_name} - ${randomCard.orientation}`;
             cardImage.dataset.cardId = randomCard.card_id; // Store card_id for later
-            cardImage.classList.remove('hidden');
-
-            console.log('Card drawn:', drawnCard);
 
             // Apply orientation (upright or reversed)
-            if (randomCard.orientation === 'Reversed') {
-                cardImage.style.transform = 'rotate(180deg)';
-            } else {
-                cardImage.style.transform = 'rotate(0deg)';
-            }
+            cardImage.style.transform = randomCard.orientation === 'Reversed' ? 'rotate(180deg)' : 'rotate(0deg)';
 
             // Display card title and prompt
-            const cardTitle = `${randomCard.suit}: ${randomCard.card_name} (${randomCard.orientation})`;
-            document.getElementById('card-title').innerText = cardTitle;
+            document.getElementById('card-title').innerText = `${randomCard.card_name} (${randomCard.orientation})`;
             document.querySelector('.card-header').classList.remove('hidden');
             document.getElementById('card-prompt').innerText = randomCard.description;
             
 
             // Show response text boxes and save button
-            document.getElementById('save-response-btn').classList.remove('hidden');
             document.getElementById('response-1').classList.remove('hidden');
-            document.getElementById('response-1').classList.add('response-box');
+            document.getElementById('save-response-btn').classList.remove('hidden');
         } catch (error) {
             console.error('Error drawing card:', error);
         }
@@ -173,20 +164,25 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             alert('Responses saved successfully!');
-            document.getElementById('drawn-card').classList.add('hidden');
-            document.getElementById('response-1').classList.add('hidden');
-            document.getElementById('card-prompt').classList.add('hidden');
-            document.getElementById('save-response-btn').classList.add('hidden');
-            document.querySelector('.card-header').classList.add('hidden');
-
-            clearResponseFields();
+            resetCardUI();
         } catch (error) {
             console.error('Error saving response:', error.message);
             alert(`Failed to save responses: ${error.message}`);
         }
     }
 
-    function clearResponseFields() {
-        document.getElementById('response-1').value = '';
+    function resetCardUI() {
+        const cardImage = document.getElementById('drawn-card');
+        const responseBox = document.getElementById('response-1');
+        const cardTitleContainer = document.querySelector('.card-header');
+        const cardPrompt = document.getElementById('card-prompt');
+        const saveResponseBtn = document.getElementById('save-response-btn');
+    
+        cardImage.src = '/assets/facedown_card.jpg'; // Reset to facedown image
+        cardImage.alt = 'Facedown Card';
+        responseBox.value = ''; // Clear response box
+        cardTitleContainer.classList.add('hidden');
+        cardPrompt.classList.add('hidden');
+        saveResponseBtn.classList.add('hidden');
     }
 });
