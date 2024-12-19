@@ -7,21 +7,21 @@ h1, p, button, textarea {
 
 header, footer {
   position: fixed;
-  left: 0;
-  width: 100%;
+  left: 50%; /* Changed from 0 to ensure centering */
+  transform: translateX(-50%); /* Added to center the header/footer */
+  width: 95%; /* Changed to ensure 95% width with space on sides */
   z-index: 1000; /* Ensure header/footer stay on top */
   background-color: #1c1c1c;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+  padding: 10px 20px;
 }
 
 header {
   top: 0;
-  padding: 10px 20px;
 }
 
 footer {
   bottom: 0;
-  padding: 10px 20px;
 }
 
 nav {
@@ -43,25 +43,32 @@ nav {
 .nav-right {
     display: flex;
     gap: 20px; /* Space between Sign Up and Log In */
-    padding-right: 20px;
 }
 
 .nav-right h1 {
     font-size: 1.2rem; /* Adjust to differentiate from the title */
 }
 
+
+body, .app-container, .entry-list-page, form {
+  display: flex; /* Added to center align content */
+  flex-direction: column; /* Ensure stacking of content */
+  align-items: center; /* Horizontally align content */
+  justify-content: center; /* Vertically align content */
+  text-align: center; /* Center text */
+}
+
 /* Dark tarot theme */
 body {
-    font-family: 'Cinzel', serif;
-    background-color: #1c1c1c;
-    color: #e0e0e0;
-    margin: 0;
-    padding: 0;
-    display: block;
-    min-height: 100vh;
-    padding-top: 80px;
-    padding-bottom: 60px;
-    box-sizing: border-box;
+  font-family: 'Cinzel', serif;
+  background-color: #1c1c1c;
+  color: #e0e0e0;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  padding-top: 80px;
+  padding-bottom: 60px;
+  box-sizing: border-box;
 }
 
 /* Container styling */
@@ -70,12 +77,8 @@ body {
     align-items: center; 
     justify-content: space-between; 
     background-color: transparent; 
-    padding: 0; 
-    border-radius: 0; 
-    box-shadow: none; 
     max-width: 1200px; 
     width: 90%; 
-    border: none; 
 }
 
 /* Heading style */
@@ -107,7 +110,6 @@ h1 {
     color: #f2c14e;
     cursor: pointer;
     transition: all 0.3s ease;
-    text-align: center;
 }
 
 .start-button:hover {
@@ -136,7 +138,7 @@ h1 {
     align-items: center;
     margin-top: 20px;
     gap: 2rem; /* Adds space between sections */
-    margin: 10px 0;
+    margin: 20px 0;
     padding-bottom: 20px;
   }
   
@@ -218,13 +220,11 @@ h1 {
     border-radius: 10px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
     max-width: 600px;
-    margin-top: 10px;
     margin: 0 auto;
   }
   
 .prompt-text {
     font-size: 1.2rem;
-    margin-bottom: 1rem;
     color: #f5f5f5;
     margin-bottom: 1rem;
     line-height: 1.5;
@@ -581,29 +581,52 @@ form div {
     display: block;
 }
 
+/* Mobile responsiveness */
 @media (max-width: 768px) {
-    nav {
-        flex-direction: column; /* Stack items */
-        text-align: center;
-    }
+  nav {
+      flex-direction: column; /* Stack items */
+      align-items: center; /* Center-align stacked items */
+      text-align: center;
+  }
 
-    .nav-right {
-        flex-direction: column; /* Stack Sign Up and Log In */
-        gap: 10px; /* Adjust gap */
-        padding-right: 20px;
-    }
+  .nav-right {
+      flex-direction: column; /* Stack Sign Up and Log In */
+      gap: 10px; /* Adjust gap */
+      padding-right: 20px;
+  }
+
+  .app-container {
+      padding: 10px; /* Added for better spacing */
+      gap: 1rem;
+  }
+
+  .card-image {
+      max-width: 150px; /* Reduced size for smaller screens */
+  }
+
+  .prompt-section {
+      padding: 1rem; /* Adjust padding for smaller screens */
+  }
 }
 
 @media (max-width: 480px) {
-    form {
-        padding: 15px;
-    }
+  form {
+      padding: 15px; /* Adjusted for smaller screens */
+  }
 
-    form h1 {
-        font-size: 20px;
-    }
+  form h1 {
+      font-size: 20px; /* Adjusted heading size */
+  }
 
-    form button {
-        font-size: 14px;
-    }
+  form button {
+      font-size: 14px; /* Adjusted button font size */
+  }
+
+  .card-header {
+      font-size: 1.2rem; /* Reduced for smaller screens */
+  }
+
+  .prompt-section {
+      padding: 0.5rem; /* Further adjusted for very small screens */
+  }
 }

@@ -117,6 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const cardImage = document.getElementById('drawn-card');
         const cardTitleElement = document.getElementById('card-title');
+        const cardHeaderElement = document.getElementById('card-header');
         const cardPrompt = document.getElementById('card-prompt');
         const responseBox = document.getElementById('response-1');
         const saveButton = document.getElementById('save-response-btn');
@@ -135,6 +136,7 @@ document.addEventListener("DOMContentLoaded", () => {
             cardTitleElement.innerText = `${card.suit}: ${card.card_name} (${card.orientation})`;
             cardPrompt.innerText = card.orientation === 'Reversed' ? card.meaning_reversed : card.meaning_upright;
 
+            cardHeaderElement.classList.remove('hidden');
             cardTitleElement.classList.remove('hidden');
             promptSection.classList.remove('hidden');
             responseBox.classList.remove('hidden');
