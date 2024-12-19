@@ -7,10 +7,41 @@ document.addEventListener("DOMContentLoaded", () => {
     const dropdownMenu = document.querySelector("#dropdown-menu");
 
     let drawnCard;
+    let isDrawing = false; // Prevent multiple requests
+
+    // Add a spinner element
+    spinner.id = 'spinner';
+    spinner.style.display = 'none';
+    spinner.style.position = 'absolute';
+    spinner.style.top = '50%';
+    spinner.style.left = '50%';
+    spinner.style.transform = 'translate(-50%, -50%)';
+    spinner.style.border = '4px solid rgba(0,0,0,0.1)';
+    spinner.style.borderTop = '4px solid #f3f3f3';
+    spinner.style.borderRadius = '50%';
+    spinner.style.width = '40px';
+    spinner.style.height = '40px';
+    spinner.style.animation = 'spin 1s linear infinite';
+    document.body.appendChild(spinner);
+
+    // Add CSS animation for the spinner
+    const style = document.createElement('style');
+    style.innerHTML = `
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }`;
+    document.head.appendChild(style);
 
     // Add event listener for draw-card-btn
     if (drawCardBtn) {
-        drawCardBtn.addEventListener('click', drawCard);
+        drawCardBtn.addEventListener('click', () => {
+            if (!isDrawing) {
+                isDrawing = true;
+                spinner.style.display = 'block';
+                drawCard();
+            }
+        });
     }
 
     // Add event listener for save-response-btn
@@ -101,22 +132,35 @@ document.addEventListener("DOMContentLoaded", () => {
             const randomCard = await response.json();
             drawnCard = randomCard;
 
+            // Debugging log
+            console.log('Random Card Data:', randomCard);
+
             const cardImage = document.getElementById('drawn-card');
+            if (!cardImage) {
+                throw new Error('Card image element not found');
+            }
+
             cardImage.src = randomCard.image_data;
-            cardImage.alt = `${randomCard.card_name} - ${randomCard.orientation}`;
             cardImage.dataset.cardId = randomCard.card_id; // Store card_id for later
+
+            // Add debugging logs to verify the `randomCard` object before this assignment:
+            console.log('Card Data Received:', randomCard); // Ensure correct `card_id`
 
             // Apply orientation (upright or reversed)
             cardImage.style.transform = randomCard.orientation === 'Reversed' ? 'rotate(180deg)' : 'rotate(0deg)';
 
             // Display card title and prompt
-            document.getElementById('card-title').innerText = `${randomCard.card_name} (${randomCard.orientation})`;
+            const cardTitle = `${randomCard.suit}: ${randomCard.card_name} (${randomCard.orientation})`;
+            document.getElementById('card-title').innerText = cardTitle
             document.querySelector('.card-header').classList.remove('hidden');
             document.getElementById('card-prompt').innerText = randomCard.description;
             
 
             // Show response text boxes and save button
             document.getElementById('prompt-section').classList.remove('hidden');
+            const responseBox = document.getElementById('response-1');
+            responseBox.classList.remove('hidden');
+            responseBox.classList.add('response-box');
 
             // Slight scroll effect to keep the card visible
             setTimeout(() => {
@@ -127,13 +171,20 @@ document.addEventListener("DOMContentLoaded", () => {
             }, 100);
         } catch (error) {
             console.error('Error drawing card:', error);
+            alert(`Failed to draw card: ${error.message}`);
+        } finally {
+            isDrawing = false;
+            spinner.style.display = 'none';
         }
     }
 
     async function saveResponses() {
         const response1 = document.getElementById('response-1').value.trim();
         const promptText = document.getElementById('card-prompt').innerText.trim();
-        const cardId = document.getElementById('drawn-card').dataset.cardId;
+        const cardId = parseInt(document.getElementById('drawn-card').dataset.cardId, 10);
+        if (isNaN(cardId)) {
+            throw new Error('Card ID is invalid or missing.');
+        }
         
         if (!user || !user.id) {  // Use global 'user' object passed from server
             alert('User is not authenticated. Please log in.');
@@ -191,4 +242,14 @@ document.addEventListener("DOMContentLoaded", () => {
         cardTitleContainer.classList.add('hidden');
         promptSection.classList.add('hidden');
     }
+
+    fetch('/api/draw-card')
+        .then(response => response.json())
+        .then(data => {
+            console.assert(data.card_id, 'Card ID should exist');
+            console.assert(data.card_id > 0, 'Card ID should be valid');
+            console.log('Test Passed:', data);
+        })
+        .catch(error => console.error('Test Failed:', error));
 });
+

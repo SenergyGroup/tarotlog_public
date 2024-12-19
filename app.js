@@ -45,6 +45,14 @@ app.get('/api/draw-card', async (req, res) => {
       'SELECT * FROM tarot_cards ORDER BY RANDOM() LIMIT 1'
     );
     const card = result.rows[0];
+
+    // Validate the `card_id` exists in the database
+    if (!card || !card.card_id) {
+      throw new Error('Card ID missing in database response.');
+    }
+
+    // Debugging log for validation
+    console.log('Fetched Card:', card);
     
     // Randomly determine orientation
     const isReversed = Math.random() < 0.5; // 50% chance for reversed
@@ -69,6 +77,12 @@ app.post('/api/save-response', async (req, res) => {
 
   if (!user_id || !card_id || !prompt_text || !response_text || !orientation) {
     return res.status(400).json({ error: 'All fields are required' });
+  }
+
+  // Validate `card_id` matches a record in `tarot_cards`
+  const cardExists = await pool.query('SELECT 1 FROM tarot_cards WHERE card_id = $1', [card_id]);
+  if (cardExists.rowCount === 0) {
+      return res.status(400).json({ error: 'Invalid card ID' });
   }
 
   try {
