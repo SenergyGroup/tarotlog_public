@@ -74,18 +74,20 @@ app.get('/api/draw-card', async (req, res) => {
 // Route to save a response
 app.post('/api/save-response', async (req, res) => {
   const { user_id, card_id, prompt_text, response_text, orientation } = req.body;
+  console.log('Received Payload:', req.body);
 
   if (!user_id || !card_id || !prompt_text || !response_text || !orientation) {
+    console.error('Missing required fields:', req.body);
     return res.status(400).json({ error: 'All fields are required' });
   }
 
-  // Validate `card_id` matches a record in `tarot_cards`
-  const cardExists = await pool.query('SELECT 1 FROM tarot_cards WHERE card_id = $1', [card_id]);
-  if (cardExists.rowCount === 0) {
-      return res.status(400).json({ error: 'Invalid card ID' });
-  }
-
   try {
+    // Validate `card_id` matches a record in `tarot_cards`
+    const cardExists = await pool.query('SELECT 1 FROM tarot_cards WHERE card_id = $1', [card_id]);
+    if (cardExists.rowCount === 0) {
+        return res.status(400).json({ error: 'Invalid card ID' });
+    }
+
     const result = await pool.query(
       `INSERT INTO responses (user_id, card_id, prompt_text, response_text, created_at, updated_at, orientation)
              VALUES ($1, $2, $3, $4, NOW(), NOW(),  $5) RETURNING *`,

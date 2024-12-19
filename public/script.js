@@ -43,16 +43,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 spinner.style.display = 'block';
 
                 try {
+                    console.log("Starting card draw...");
                     const response = await fetch(`${API_BASE_URL}/api/draw-card`);
                     if (!response.ok) {
                         throw new Error('Failed to fetch card');
                     }
 
                     const randomCard = await response.json();
+                    console.log('Fetched Card Data:', randomCard);
+                    
                     drawnCard = randomCard;
-
-                    console.log('Random Card Data:', randomCard);
-
                     updateCardUI(randomCard);
 
                 } catch (error) {
@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (saveResponseBtn) {
         saveResponseBtn.addEventListener('click', async () => {
             if (!drawnCard) {
-                alert('No card drawn. Please draw a card before saving responses.');
+                console.warn('No card drawn, aborting save.');
                 return;
             }
 
@@ -78,7 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const promptText = document.getElementById('card-prompt')?.innerText.trim();
 
             if (!response1 || !promptText) {
-                alert('All fields must be filled out.');
+                console.warn('Missing fields:', { response1, promptText });
                 return;
             }
 
@@ -89,6 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 response_text: response1,
                 orientation: drawnCard.orientation
             });
+            console.log('Payload to be sent:', payload);
 
             try {
                 const response = await fetch(`${API_BASE_URL}/api/save-response`, {
@@ -96,25 +97,19 @@ document.addEventListener("DOMContentLoaded", () => {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        user_id: user?.id,
-                        card_id: drawnCard.card_id,
-                        prompt_text: promptText,
-                        response_text: response1,
-                        orientation: drawnCard.orientation
-                    }),
+                    body: JSON.stringify(payload),
                 });
 
                 if (!response.ok) {
                     const errorText = await response.text();
-                    console.error('Backend Error:', errorText);
-                    throw new Error(`Server Error: ${response.status} - ${errorText}`);
+                    console.error('Server Error:', response.status, errorText);
+                    throw new Error(errorText);
                 }
 
                 alert('Responses saved successfully!');
                 resetCardUI();
             } catch (error) {
-                console.error('Error saving response:', error.message);
+                console.error('Error saving response:', error);
                 alert(`Failed to save responses: ${error.message}`);
             }
         });
