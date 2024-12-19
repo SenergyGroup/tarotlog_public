@@ -120,6 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const cardPrompt = document.getElementById('card-prompt');
         const responseBox = document.getElementById('response-1');
         const saveButton = document.getElementById('save-response-btn');
+        const promptSection = document.querySelector('.prompt-section');
 
         if (!cardImage || !cardTitleElement || !cardPrompt) {
             console.error('UI elements for card display not found.');
@@ -134,6 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
             cardTitleElement.innerText = `${card.suit}: ${card.card_name} (${card.orientation})`;
             cardPrompt.innerText = card.orientation === 'Reversed' ? card.meaning_reversed : card.meaning_upright;
 
+            promptSection.classList.remove('hidden');
             responseBox.classList.remove('hidden');
             saveButton.classList.remove('hidden');
         } else {
