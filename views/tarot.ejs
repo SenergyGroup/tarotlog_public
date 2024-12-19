@@ -5,6 +5,7 @@
     const user = <%- JSON.stringify(user) %>;
 </script>
 
+<script src="/public/script.js"></script>
 
 <div class="app-container">
     <div class="card-section">
@@ -24,81 +25,5 @@
         <button id="save-response-btn" class="save-button">Save Response</button>
     </div>
 </div>
-
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const drawCardBtn = document.getElementById("draw-card-btn");
-        const drawnCard = document.getElementById("drawn-card");
-        const cardTitle = document.getElementById("card-title");
-        const cardPrompt = document.getElementById("card-prompt");
-        const saveResponseBtn = document.getElementById("save-response-btn");
-        const responseBox = document.getElementById("response-1");
-
-        // Draw card event
-        drawCardBtn.addEventListener("click", async () => {
-            try {
-                const response = await fetch("/api/draw-card");
-                const card = await response.json();
-
-                // Update card image
-                drawnCard.src = card.image_data;
-                drawnCard.alt = `${card.card_name} - ${card.orientation}`;
-                drawnCard.style.transform = card.orientation === "Reversed" ? "rotate(180deg)" : "rotate(0deg)";
-
-                // Update card title and prompt
-                cardTitle.textContent = `${card.card_name} (${card.orientation})`;
-                cardPrompt.textContent = card.description;
-
-                // Show relevant sections
-                cardTitle.parentElement.classList.remove("hidden");
-                cardPrompt.parentElement.classList.remove("hidden");
-                responseBox.classList.remove("hidden");
-                saveResponseBtn.classList.remove("hidden");
-            } catch (error) {
-                console.error("Error drawing card:", error);
-            }
-        });
-
-        // Save response event
-        saveResponseBtn.addEventListener("click", async () => {
-            try {
-                const response1 = responseBox.value.trim();
-                const promptText = cardPrompt.textContent.trim();
-                const cardId = drawnCard.dataset.cardId;
-
-                if (!response1) {
-                    alert("Please enter a response before saving.");
-                    return;
-                }
-
-                const saveResponse = await fetch("/api/save-response", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        card_id: cardId,
-                        response_text: response1,
-                        prompt_text: promptText,
-                        orientation: drawnCard.alt.includes("Reversed") ? "Reversed" : "Upright",
-                    }),
-                });
-
-                if (saveResponse.ok) {
-                    alert("Response saved successfully!");
-                    // Reset UI
-                    responseBox.value = "";
-                    drawnCard.src = "/assets/facedown_card.jpg";
-                    cardTitle.parentElement.classList.add("hidden");
-                    cardPrompt.parentElement.classList.add("hidden");
-                    responseBox.classList.add("hidden");
-                    saveResponseBtn.classList.add("hidden");
-                } else {
-                    console.error("Error saving response:", saveResponse.statusText);
-                }
-            } catch (error) {
-                console.error("Error saving response:", error);
-            }
-        });
-    });
-</script>
 
 <%- include('partials/footer'); -%>
