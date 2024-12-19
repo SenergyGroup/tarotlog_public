@@ -121,9 +121,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const cardTitleElement = document.getElementById('card-title');
         console.log('Found card-title element:', cardTitleElement);
 
-        console.log('Searching for card-title element...');
-        const cardHeaderElement = document.getElementById('card-header');
-        console.log('Found card-title element:', cardHeaderElement);
+        console.log('Searching for card-header element...');
+        const cardHeaderElement = document.querySelector('.card-header');
+        console.log('Found card-header element:', cardHeaderElement);
 
         const cardPrompt = document.getElementById('card-prompt');
         const responseBox = document.getElementById('response-1');
