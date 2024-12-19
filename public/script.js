@@ -156,16 +156,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // Display card title and prompt
             const cardTitle = `${randomCard.suit}: ${randomCard.card_name} (${randomCard.orientation})`;
-            document.getElementById('card-title').innerText = cardTitle
-            document.querySelector('.card-header').classList.remove('hidden');
-            document.getElementById('card-prompt').innerText = randomCard.description;
-            
+            const cardTitleElement = document.getElementById('card-title');
+            const cardHeader = document.querySelector('.card-header');
+            const cardPrompt = document.getElementById('card-prompt');
+
+            if (cardTitleElement && cardHeader && cardPrompt) {
+                cardTitleElement.innerText = cardTitle;
+                cardHeader.classList.remove('hidden');
+                cardPrompt.innerText = randomCard.description;
+            } else {
+                console.error('Card title, header, or prompt element not found!');
+            }
 
             // Show response text boxes and save button
-            document.getElementById('prompt-section').classList.remove('hidden');
             const responseBox = document.getElementById('response-1');
-            responseBox.classList.remove('hidden');
-            responseBox.classList.add('response-box');
+            const promptSection = document.getElementById('prompt-section');
+            if (responseBox && promptSection) {
+                promptSection.classList.remove('hidden');
+                responseBox.classList.remove('hidden');
+                responseBox.classList.add('response-box');
+            } else {
+                console.error('Response box or prompt section not found!');
+            }
 
             // Slight scroll effect to keep the card visible
             setTimeout(() => {
@@ -248,13 +260,21 @@ document.addEventListener("DOMContentLoaded", () => {
         const cardTitleContainer = document.querySelector('.card-header');
         const promptSection = document.querySelector('.prompt-section');
     
-        cardImage.src = 'https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/image_back.png'; // Reset to facedown image
-        cardImage.alt = 'Facedown Card';
+        if (cardImage) {
+            cardImage.src = 'https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/image_back.png'; // Reset to facedown image
+            cardImage.alt = 'Facedown Card';
+        }
         
-        document.getElementById('response-1').value = '';
+        if (document.getElementById('response-1')) {
+            document.getElementById('response-1').value = '';
+        }
         
-        cardTitleContainer.classList.add('hidden');
-        promptSection.classList.add('hidden');
+        if (cardTitleContainer) {
+            cardTitleContainer.classList.add('hidden');
+        }
+        if (promptSection) {
+            promptSection.classList.add('hidden');
+        }
     }
 
     fetch('/api/draw-card')
