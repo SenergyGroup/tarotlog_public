@@ -135,6 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
             cardTitleElement.innerText = `${card.suit}: ${card.card_name} (${card.orientation})`;
             cardPrompt.innerText = card.orientation === 'Reversed' ? card.meaning_reversed : card.meaning_upright;
 
+            cardTitleElement.classList.remove('hidden');
             promptSection.classList.remove('hidden');
             responseBox.classList.remove('hidden');
             saveButton.classList.remove('hidden');
