@@ -6,10 +6,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const profileCircle = document.querySelector("#profile-circle");
     const dropdownMenu = document.querySelector("#dropdown-menu");
 
-    let drawnCard;
-    let isDrawing = false; // Prevent multiple requests
-
     // Add a spinner element
+    const spinner = document.createElement('div');
     spinner.id = 'spinner';
     spinner.style.display = 'none';
     spinner.style.position = 'absolute';
@@ -32,6 +30,9 @@ document.addEventListener("DOMContentLoaded", () => {
         100% { transform: rotate(360deg); }
     }`;
     document.head.appendChild(style);
+
+    let drawnCard;
+    let isDrawing = false; // Prevent multiple requests
 
     // Add event listener for draw-card-btn
     if (drawCardBtn) {
@@ -185,6 +186,14 @@ document.addEventListener("DOMContentLoaded", () => {
         if (isNaN(cardId)) {
             throw new Error('Card ID is invalid or missing.');
         }
+
+        console.log('Payload being sent to API:', {
+            user_id: user?.id,
+            card_id: cardId,
+            prompt_text: promptText,
+            response_text: response1,
+            orientation: drawnCard?.orientation
+        });
         
         if (!user || !user.id) {  // Use global 'user' object passed from server
             alert('User is not authenticated. Please log in.');
