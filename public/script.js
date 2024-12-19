@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const saveResponseBtn = document.getElementById('save-response-btn');
     const profileCircle = document.querySelector("#profile-circle");
     const dropdownMenu = document.querySelector("#dropdown-menu");
+    const filterDropdown = document.getElementById('filter-dropdown');
 
     // Add a spinner element at the top
     const spinner = document.createElement('div');
@@ -65,7 +66,6 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
         console.error("Profile circle or dropdown menu not found!");
     }
-
 
     // Filtering entries based on dropdown selection
     if (filterDropdown) {
@@ -142,7 +142,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const cardImage = document.getElementById('drawn-card');
             if (!cardImage) {
-                throw new Error('Card image element not found');
+                console.error('Card image element not found');
+                return;
             }
 
             cardImage.src = randomCard.image_data;
@@ -163,7 +164,9 @@ document.addEventListener("DOMContentLoaded", () => {
             if (cardTitleElement && cardHeader && cardPrompt) {
                 cardTitleElement.innerText = cardTitle;
                 cardHeader.classList.remove('hidden');
-                cardPrompt.innerText = randomCard.description;
+                cardPrompt.innerText = randomCard.orientation === 'Reversed' 
+                    ? randomCard.meaning_reversed 
+                    : randomCard.meaning_upright;
             } else {
                 console.error('Card title, header, or prompt element not found!');
             }
@@ -196,9 +199,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     async function saveResponses() {
-        const response1 = document.getElementById('response-1').value.trim();
-        const promptText = document.getElementById('card-prompt').innerText.trim();
-        const cardId = parseInt(document.getElementById('drawn-card').dataset.cardId, 10);
+        const response1 = document.getElementById('response-1')?.value.trim();
+        const promptText = document.getElementById('card-prompt')?.innerText.trim();
+        const cardId = parseInt(document.getElementById('drawn-card')?.dataset.cardId, 10);
         if (isNaN(cardId)) {
             throw new Error('Card ID is invalid or missing.');
         }
@@ -286,4 +289,3 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         .catch(error => console.error('Test Failed:', error));
 });
-
