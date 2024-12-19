@@ -82,13 +82,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            console.log('Payload being sent to API:', {
+            const payload = {
                 user_id: user?.id,
                 card_id: drawnCard.card_id,
                 prompt_text: promptText,
                 response_text: response1,
-                orientation: drawnCard.orientation
-            });
+                orientation: drawnCard.orientation,
+            };
             console.log('Payload to be sent:', payload);
 
             try {
