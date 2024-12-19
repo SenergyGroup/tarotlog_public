@@ -1,3 +1,5 @@
+let drawnCard = null;
+
 document.addEventListener("DOMContentLoaded", () => {
     const API_BASE_URL = 'https://tarotlog-public.onrender.com';
 
@@ -32,7 +34,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }`;
     document.head.appendChild(style);
 
-    let drawnCard;
     let isDrawing = false; // Prevent multiple requests
 
     // Add event listener for draw-card-btn
@@ -49,11 +50,11 @@ document.addEventListener("DOMContentLoaded", () => {
                         throw new Error('Failed to fetch card');
                     }
 
-                    const randomCard = await response.json();
-                    console.log('Fetched Card Data:', randomCard);
+                    const card = await response.json();
+                    console.log('Fetched Card Data:', card);
                     
-                    drawnCard = randomCard;
-                    updateCardUI(randomCard);
+                    drawnCard = card;
+                    updateCardUI(card);
 
                 } catch (error) {
                     console.error('Error drawing card:', error);
@@ -189,11 +190,18 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function updateCardUI(card) {
+        drawnCard = card;
+        
         const cardImage = document.getElementById('drawn-card');
         const cardTitleElement = document.getElementById('card-title');
         const cardPrompt = document.getElementById('card-prompt');
         const responseBox = document.getElementById('response-1');
         const saveButton = document.getElementById('save-response-btn');
+
+        if (!cardImage || !cardTitleElement || !cardPrompt) {
+            console.error('UI elements for card display not found.');
+            return;
+        }
 
         if (cardImage && cardTitleElement && cardPrompt && responseBox && saveButton) {
             cardImage.src = card.image_data;
