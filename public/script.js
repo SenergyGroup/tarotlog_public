@@ -140,40 +140,32 @@ document.addEventListener("DOMContentLoaded", () => {
             // Debugging log
             console.log('Random Card Data:', randomCard);
 
+            // Update UI elements
             const cardImage = document.getElementById('drawn-card');
-            if (!cardImage) {
-                console.error('Card image element not found');
-                return;
-            }
-
-            cardImage.src = randomCard.image_data;
-            cardImage.dataset.cardId = randomCard.card_id; // Store card_id for later
-
-            // Add debugging logs to verify the `randomCard` object before this assignment:
-            console.log('Card Data Received:', randomCard); // Ensure correct `card_id`
-
-            // Apply orientation (upright or reversed)
-            cardImage.style.transform = randomCard.orientation === 'Reversed' ? 'rotate(180deg)' : 'rotate(0deg)';
-
-            // Display card title and prompt
-            const cardTitle = `${randomCard.suit}: ${randomCard.card_name} (${randomCard.orientation})`;
             const cardTitleElement = document.getElementById('card-title');
             const cardHeader = document.querySelector('.card-header');
             const cardPrompt = document.getElementById('card-prompt');
 
-            if (cardTitleElement && cardHeader && cardPrompt) {
-                cardTitleElement.innerText = cardTitle;
-                cardHeader.classList.remove('hidden');
+            if (cardImage && cardTitleElement && cardHeader && cardPrompt) {
+                cardImage.src = randomCard.image_data;
+                cardImage.dataset.cardId = randomCard.card_id; // Set card ID for consistency
+
+                cardImage.style.transform = randomCard.orientation === 'Reversed' ? 'rotate(180deg)' : 'rotate(0deg)';
+
+                cardTitleElement.innerText = `${randomCard.suit}: ${randomCard.card_name} (${randomCard.orientation})`;
                 cardPrompt.innerText = randomCard.orientation === 'Reversed' 
                     ? randomCard.meaning_reversed 
                     : randomCard.meaning_upright;
+
+                cardHeader.classList.remove('hidden');
             } else {
-                console.error('Card title, header, or prompt element not found!');
+                console.error('UI elements for card display not found.');
             }
 
             // Show response text boxes and save button
             const responseBox = document.getElementById('response-1');
             const promptSection = document.getElementById('prompt-section');
+
             if (responseBox && promptSection) {
                 promptSection.classList.remove('hidden');
                 responseBox.classList.remove('hidden');
@@ -182,13 +174,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 console.error('Response box or prompt section not found!');
             }
 
-            // Slight scroll effect to keep the card visible
-            setTimeout(() => {
-                window.scrollTo({
-                    top: cardImage.offsetTop - 50, // Push the view up slightly, but not above screen
-                    behavior: 'smooth',
-                });
-            }, 100);
         } catch (error) {
             console.error('Error drawing card:', error);
             alert(`Failed to draw card: ${error.message}`);
@@ -199,35 +184,27 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     async function saveResponses() {
+        if (!drawnCard) {
+            alert('No card drawn. Please draw a card before saving responses.');
+            return;
+        }
+
         const response1 = document.getElementById('response-1')?.value.trim();
         const promptText = document.getElementById('card-prompt')?.innerText.trim();
-        const cardId = parseInt(document.getElementById('drawn-card')?.dataset.cardId, 10);
-        if (isNaN(cardId)) {
-            throw new Error('Card ID is invalid or missing.');
+        const cardId = drawnCard.card_id; // Use drawnCard as the source of truth
+
+        if (!response1 || !promptText || isNaN(cardId)) {
+            alert('All fields must be filled out.');
+            return;
         }
-        
+
         console.log('Payload being sent to API:', {
             user_id: user?.id,
             card_id: cardId,
             prompt_text: promptText,
             response_text: response1,
-            orientation: drawnCard?.orientation
+            orientation: drawnCard.orientation
         });
-
-        if (!user || !user.id) {  // Use global 'user' object passed from server
-            alert('User is not authenticated. Please log in.');
-            return;
-        }
-
-        if (!response1 || !promptText || !cardId) {
-            alert('All fields must be filled out.');
-            return;
-        }
-
-        if (!drawnCard || !drawnCard.orientation) {
-            alert('Card orientation is missing. Please draw a card again.');
-            return;
-        }
 
         try {
             const response = await fetch(`${API_BASE_URL}/api/save-response`, {
@@ -236,7 +213,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    user_id: user.id,
+                    user_id: user?.id,
                     card_id: cardId,
                     prompt_text: promptText,
                     response_text: response1,
@@ -262,22 +239,24 @@ document.addEventListener("DOMContentLoaded", () => {
         const cardImage = document.getElementById('drawn-card');
         const cardTitleContainer = document.querySelector('.card-header');
         const promptSection = document.querySelector('.prompt-section');
-    
+
         if (cardImage) {
             cardImage.src = 'https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/image_back.png'; // Reset to facedown image
             cardImage.alt = 'Facedown Card';
         }
-        
+
         if (document.getElementById('response-1')) {
             document.getElementById('response-1').value = '';
         }
-        
+
         if (cardTitleContainer) {
             cardTitleContainer.classList.add('hidden');
         }
         if (promptSection) {
             promptSection.classList.add('hidden');
         }
+
+        drawnCard = null; // Clear the state
     }
 
     fetch('/api/draw-card')
