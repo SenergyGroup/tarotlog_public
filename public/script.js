@@ -116,19 +116,26 @@ document.addEventListener("DOMContentLoaded", () => {
         drawnCard = card;
 
         const cardImage = document.getElementById('drawn-card');
+
+        console.log('Searching for card-title element...');
         const cardTitleElement = document.getElementById('card-title');
+        console.log('Found card-title element:', cardTitleElement);
+
+        console.log('Searching for card-title element...');
         const cardHeaderElement = document.getElementById('card-header');
+        console.log('Found card-title element:', cardHeaderElement);
+
         const cardPrompt = document.getElementById('card-prompt');
         const responseBox = document.getElementById('response-1');
         const saveButton = document.getElementById('save-response-btn');
         const promptSection = document.querySelector('.prompt-section');
 
-        if (!cardImage || !cardTitleElement || !cardPrompt) {
+        if (!cardImage || !cardTitleElement || !cardPrompt || !cardHeaderElement) {
             console.error('UI elements for card display not found.');
             return;
         }
 
-        if (cardImage && cardTitleElement && cardPrompt && responseBox && saveButton) {
+        if (cardImage && cardTitleElement && cardHeaderElement && cardPrompt && responseBox && saveButton) {
             cardImage.src = card.image_data;
             cardImage.dataset.cardId = card.card_id;
             cardImage.style.transform = card.orientation === 'Reversed' ? 'rotate(180deg)' : 'rotate(0deg)';

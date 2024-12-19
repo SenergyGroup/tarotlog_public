@@ -69,6 +69,7 @@ body {
   padding-top: 80px;
   padding-bottom: 60px;
   box-sizing: border-box;
+  overflow-x: hidden; 
 }
 
 /* Container styling */
@@ -267,6 +268,12 @@ h1 {
   .save-button:hover {
     background-color: #2f8935;
     transform: scale(1.05);
+}
+
+/* Ensure container widths fit within the screen */
+.container, .app-container, .prompt-section, .entry-list-page {
+  max-width: 100%; /* Ensure no element exceeds screen width */
+  overflow-x: hidden; /* Prevent horizontal overflow */
 }
 
 /* Action buttons */
