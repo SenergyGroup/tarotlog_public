@@ -37,18 +37,87 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Add event listener for draw-card-btn
     if (drawCardBtn) {
-        drawCardBtn.addEventListener('click', () => {
+        drawCardBtn.addEventListener('click', async () => {
             if (!isDrawing) {
                 isDrawing = true;
                 spinner.style.display = 'block';
-                drawCard();
+
+                try {
+                    const response = await fetch(`${API_BASE_URL}/api/draw-card`);
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch card');
+                    }
+
+                    const randomCard = await response.json();
+                    drawnCard = randomCard;
+
+                    console.log('Random Card Data:', randomCard);
+
+                    updateCardUI(randomCard);
+
+                } catch (error) {
+                    console.error('Error drawing card:', error);
+                    alert(`Failed to draw card: ${error.message}`);
+                } finally {
+                    isDrawing = false;
+                    spinner.style.display = 'none';
+                }
             }
         });
     }
 
     // Add event listener for save-response-btn
     if (saveResponseBtn) {
-        saveResponseBtn.addEventListener('click', saveResponses);
+        saveResponseBtn.addEventListener('click', async () => {
+            if (!drawnCard) {
+                alert('No card drawn. Please draw a card before saving responses.');
+                return;
+            }
+
+            const response1 = document.getElementById('response-1')?.value.trim();
+            const promptText = document.getElementById('card-prompt')?.innerText.trim();
+
+            if (!response1 || !promptText) {
+                alert('All fields must be filled out.');
+                return;
+            }
+
+            console.log('Payload being sent to API:', {
+                user_id: user?.id,
+                card_id: drawnCard.card_id,
+                prompt_text: promptText,
+                response_text: response1,
+                orientation: drawnCard.orientation
+            });
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/save-response`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_id: user?.id,
+                        card_id: drawnCard.card_id,
+                        prompt_text: promptText,
+                        response_text: response1,
+                        orientation: drawnCard.orientation
+                    }),
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Backend Error:', errorText);
+                    throw new Error(`Server Error: ${response.status} - ${errorText}`);
+                }
+
+                alert('Responses saved successfully!');
+                resetCardUI();
+            } catch (error) {
+                console.error('Error saving response:', error.message);
+                alert(`Failed to save responses: ${error.message}`);
+            }
+        });
     }
 
     // Profile menu toggle
@@ -124,9 +193,32 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    function updateCardUI(card) {
+        const cardImage = document.getElementById('drawn-card');
+        const cardTitleElement = document.getElementById('card-title');
+        const cardPrompt = document.getElementById('card-prompt');
+        const responseBox = document.getElementById('response-1');
+        const saveButton = document.getElementById('save-response-btn');
+
+        if (cardImage && cardTitleElement && cardPrompt && responseBox && saveButton) {
+            cardImage.src = card.image_data;
+            cardImage.dataset.cardId = card.card_id;
+            cardImage.style.transform = card.orientation === 'Reversed' ? 'rotate(180deg)' : 'rotate(0deg)';
+
+            cardTitleElement.innerText = `${card.suit}: ${card.card_name} (${card.orientation})`;
+            cardPrompt.innerText = card.orientation === 'Reversed' ? card.meaning_reversed : card.meaning_upright;
+
+            responseBox.classList.remove('hidden');
+            saveButton.classList.remove('hidden');
+        } else {
+            console.error('UI elements for card display not found.');
+        }
+    }
+
     // Initial setup to ensure toggling works for preloaded entries
     attachEntryToggleListeners();
 
+    /*
     async function drawCard() {
         try {
             const response = await fetch(`${API_BASE_URL}/api/draw-card`);
@@ -182,7 +274,9 @@ document.addEventListener("DOMContentLoaded", () => {
             spinner.style.display = 'none';
         }
     }
+    */
 
+    /*
     async function saveResponses() {
         if (!drawnCard) {
             alert('No card drawn. Please draw a card before saving responses.');
@@ -234,6 +328,7 @@ document.addEventListener("DOMContentLoaded", () => {
             alert(`Failed to save responses: ${error.message}`);
         }
     }
+    */
 
     function resetCardUI() {
         const cardImage = document.getElementById('drawn-card');
@@ -241,7 +336,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const promptSection = document.querySelector('.prompt-section');
 
         if (cardImage) {
-            cardImage.src = 'https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/image_back.png'; // Reset to facedown image
+            cardImage.src = 'https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/image_back.png';
             cardImage.alt = 'Facedown Card';
         }
 
@@ -256,7 +351,7 @@ document.addEventListener("DOMContentLoaded", () => {
             promptSection.classList.add('hidden');
         }
 
-        drawnCard = null; // Clear the state
+        drawnCard = null;
     }
 
     fetch('/api/draw-card')
