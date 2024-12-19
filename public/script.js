@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const profileCircle = document.querySelector("#profile-circle");
     const dropdownMenu = document.querySelector("#dropdown-menu");
 
-    // Add a spinner element
+    // Add a spinner element at the top
     const spinner = document.createElement('div');
     spinner.id = 'spinner';
     spinner.style.display = 'none';
@@ -68,47 +68,51 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // Filtering entries based on dropdown selection
-    document.getElementById('filter-dropdown').addEventListener('change', async (event) => {
-        const filter = event.target.value || 'most-recent'; // Default to 'most-recent' if empty
+    if (filterDropdown) {
+        filterDropdown.addEventListener('change', async (event) => {
+            const filter = event.target.value || 'most-recent'; // Default to 'most-recent' if empty
 
-        try {
-            const response = await fetch(`/entries?filter=${filter}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${document.cookie.split('=')[1]}` // Adjust for your JWT setup
-                },
-            });
-
-            if (response.ok) {
-                const entries = await response.json();
-
-                const entriesList = document.querySelector('.entries-list');
-                entriesList.innerHTML = ''; // Clear current entries
-
-                entries.forEach(entry => {
-                    entriesList.innerHTML += `
-                        <li class="entry-item">
-                            <div class="entry-summary" data-entry-id="${entry.response_id}">
-                                <span class="entry-date">${new Date(entry.created_at).toLocaleDateString()}</span>
-                                <span class="entry-card">${entry.card_name}</span>
-                            </div>
-                            <div class="entry-details hidden">
-                                <p class="entry-prompt">Prompt: ${entry.prompt_text}</p>
-                                <p class="entry-response">Response: ${entry.response_text}</p>
-                            </div>
-                        </li>`;
+            try {
+                const response = await fetch(`/entries?filter=${filter}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${document.cookie.split('=')[1]}` // Adjust for your JWT setup
+                    },
                 });
 
-                // Reapply event listeners for the toggling feature
-                attachEntryToggleListeners();
-            } else {
-                console.error('Failed to fetch entries:', response.statusText);
+                if (response.ok) {
+                    const entries = await response.json();
+
+                    const entriesList = document.querySelector('.entries-list');
+                    entriesList.innerHTML = ''; // Clear current entries
+
+                    entries.forEach(entry => {
+                        entriesList.innerHTML += `
+                            <li class="entry-item">
+                                <div class="entry-summary" data-entry-id="${entry.response_id}">
+                                    <span class="entry-date">${new Date(entry.created_at).toLocaleDateString()}</span>
+                                    <span class="entry-card">${entry.card_name}</span>
+                                </div>
+                                <div class="entry-details hidden">
+                                    <p class="entry-prompt">Prompt: ${entry.prompt_text}</p>
+                                    <p class="entry-response">Response: ${entry.response_text}</p>
+                                </div>
+                            </li>`;
+                    });
+
+                    // Reapply event listeners for the toggling feature
+                    attachEntryToggleListeners();
+                } else {
+                    console.error('Failed to fetch entries:', response.statusText);
+                }
+            } catch (err) {
+                console.error('Error fetching entries:', err);
             }
-        } catch (err) {
-            console.error('Error fetching entries:', err);
-        }
-    });
+        });
+    } else {
+        console.warn("Filter dropdown not found, skipping filter setup.");
+    }
 
     // Attach event listeners for toggling entry details
     function attachEntryToggleListeners() {
@@ -186,7 +190,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (isNaN(cardId)) {
             throw new Error('Card ID is invalid or missing.');
         }
-
+        
         console.log('Payload being sent to API:', {
             user_id: user?.id,
             card_id: cardId,
@@ -194,7 +198,7 @@ document.addEventListener("DOMContentLoaded", () => {
             response_text: response1,
             orientation: drawnCard?.orientation
         });
-        
+
         if (!user || !user.id) {  // Use global 'user' object passed from server
             alert('User is not authenticated. Please log in.');
             return;
@@ -227,6 +231,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (!response.ok) {
                 const errorText = await response.text();
+                console.error('Backend Error:', errorText);
                 throw new Error(`Server Error: ${response.status} - ${errorText}`);
             }
 
