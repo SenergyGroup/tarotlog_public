@@ -4,7 +4,6 @@
 <script>
     const user = <%- JSON.stringify(user) %>;
 </script>
-<script src="/filter.js"></script>
 <script src="/profile.js"></script>
 
 <div class="entry-list-page">
@@ -24,35 +23,35 @@
     <button id="search-button">Search</button>
   </div>
   
-    <!-- Entries List -->
-    <ul class="entries-list">
-      <% if (entries.length > 0) { %>
-        <% entries.forEach(entry => { %>
-          <li class="entry-item">
-            <div class="entry-summary" data-entry-id="<%= entry.response_id %>">
-              <span class="entry-date"><%= new Date(entry.created_at).toLocaleDateString() %></span>
-              <span class="entry-card"><%= entry.card_name %></span>
-              <span class="entry-orientation"><%= entry.orientation %></span>
-            </div>
-            <div class="entry-details hidden">
-              <p class="entry-prompt">Prompt: <%= entry.prompt_text %></p>
-              <p class="entry-response">Response: <%= entry.response_text %></p>
-            </div>
-          </li>
-        <% }) %>
-      <% } else { %>
-        <li>No entries found.</li>
-      <% } %>
-    </ul>
-  </div>
+  <!-- Entries List -->
+  <ul class="entries-list">
+    <% if (entries.length > 0) { %>
+      <% entries.forEach(entry => { %>
+        <li class="entry-item">
+          <div class="entry-summary" data-entry-id="<%= entry.response_id %>">
+            <span class="entry-date"><%= new Date(entry.created_at).toLocaleDateString() %></span>
+            <span class="entry-card"><%= entry.card_name %></span>
+            <span class="entry-orientation"><%= entry.orientation %></span>
+          </div>
+          <div class="entry-details hidden">
+            <p class="entry-prompt">Prompt: <%= entry.prompt_text %></p>
+            <p class="entry-response">Response: <%= entry.response_text %></p>
+          </div>
+        </li>
+      <% }) %>
+    <% } else { %>
+      <li>No entries found.</li>
+    <% } %>
+  </ul>
+</div>
 
-  <script>
-    document.getElementById('filter-dropdown').addEventListener('change', function () {
-      const selectedFilter = this.value;
-      const currentUrl = window.location.origin + window.location.pathname; // Preserve current URL
-      window.location.href = `${currentUrl}?filter=${selectedFilter}`; // Redirect with query parameter
-    });
-  </script>
+<script>
+  document.getElementById('filter-dropdown').addEventListener('change', function () {
+    const selectedFilter = this.value;
+    const currentUrl = window.location.origin + window.location.pathname; // Preserve current URL
+    window.location.href = `${currentUrl}?filter=${selectedFilter}`; // Redirect with query parameter
+  });
+</script>
 
 <script>
   // Set the dropdown to the current filter value
@@ -60,5 +59,7 @@
   const currentFilter = urlParams.get('filter') || 'most-recent';
   document.getElementById('filter-dropdown').value = currentFilter;
 </script>
+
+<script src="/filter.js"></script>
 
   <%- include('partials/footer'); -%>
