@@ -1,55 +1,50 @@
 <%- include('partials/header'); -%>
 
+<script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+<script>
+    const user = <%- JSON.stringify(user) %>;
+</script>
+<script src="/profile.js"></script>
+
 <div class="data-container">
     <h1 class="page-title">Your Journal Stats</h1>
+    <p>*Mock statistics*</p>
 
     <!-- Top 3 Cards Pulled Section -->
     <div class="stat-section">
         <h2>Top 3 Cards Pulled</h2>
         <ul class="top-cards">
-            <!-- <% data.topCards.forEach(card => { %> -->
-            <li>
-                <span class="card-name">Placeholder Card 1 (Upright)</span>
-                <span class="card-count">Pulled: 10 times</span>
-            </li>
-            <li>
-                <span class="card-name">Placeholder Card 2 (Reversed)</span>
-                <span class="card-count">Pulled: 8 times</span>
-            </li>
-            <li>
-                <span class="card-name">Placeholder Card 3 (Upright)</span>
-                <span class="card-count">Pulled: 6 times</span>
-            </li>
-            <!-- <% }); %> -->
+            <% data.topCards.forEach(card => { %>
+                <li>
+                    <span class="card-name"><%= card.card_name %> (<%= card.orientation %>)</span>
+                    <span class="card-count">Pulled: <%= card.count %> times</span>
+                </li>
+            <% }); %>
         </ul>
     </div>
 
     <!-- Total Entries Created -->
     <div class="stat-section">
         <h2>Total Entries</h2>
-        <p><strong>20</strong> entries created</p>
-        <!-- <p><strong><%= data.totalEntries %></strong> entries created</p> -->
+        <p><strong><%= data.totalEntries %></strong> entries created</p>
     </div>
 
     <!-- Longest Streak -->
     <div class="stat-section">
         <h2>Longest Streak</h2>
-        <p><strong>5</strong> days of continuous journaling</p>
-        <!-- <p><strong><%= data.longestStreak %></strong> days of continuous journaling</p> -->
+        <p><strong><%= data.longestStreak %></strong> days of continuous journaling</p>
     </div>
 
     <!-- Total Words Typed -->
     <div class="stat-section">
         <h2>Total Words Typed</h2>
-        <p><strong>1,200</strong> words in your journal</p>
-        <!-- <p><strong><%= data.totalWords %></strong> words in your journal</p> -->
+        <p><strong><%= data.totalWords %></strong> words in your journal</p>
     </div>
 
     <!-- Top Theme Section -->
     <div class="stat-section">
         <h2>Top Theme</h2>
-        <p>Your most frequent journaling theme is <strong>Self-Reflection</strong></p>
-        <!-- <p>Your most frequent journaling theme is <strong><%= data.topTheme %></strong></p> -->
+        <p>Your most frequent journaling theme is <strong><%= data.topTheme %></strong></p>
     </div>
 </div>
 

@@ -102,7 +102,7 @@ app.post('/api/save-response', async (req, res) => {
 });
 
 const dataController = require('./controllers/dataController'); 
-
+const storeController = require('./controllers/storeController');
 
 //EJS Routes
 app.get('/', (req, res) => res.render('home'));
@@ -114,6 +114,7 @@ app.get('/tarot', (req, res) => {
 app.use('/auth', authRoutes);
 app.use('/entries', entriesController);
 app.use('/data', dataController);
+app.get('/store', storeController.store_get);
 
 // Global Error Handler
 app.use((err, req, res, next) => {
