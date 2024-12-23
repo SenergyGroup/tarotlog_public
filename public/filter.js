@@ -1,26 +1,47 @@
 // Filter-related functionality
 const filterDropdown = document.getElementById('filter-dropdown');
+const searchBar = document.getElementById('search-bar'); 
+const searchButton = document.getElementById('search-button'); 
 
-// Filtering entries based on dropdown selection
+
 if (filterDropdown) {
-    filterDropdown.addEventListener('change', async (event) => {
-        const filter = event.target.value || 'most-recent'; // Default to 'most-recent' if empty
+    filterDropdown.addEventListener('change', fetchAndRenderEntries);
+} else {
+    console.warn("Filter dropdown not found, skipping filter setup.");
+}
 
-        try {
-            const response = await fetch(`/entries?filter=${filter}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${document.cookie.split('=')[1]}` // Adjust for your JWT setup
-                },
-            });
+if (searchButton) {
+    searchButton.addEventListener('click', fetchAndRenderEntries);
+} else {
+    console.warn("Search button not found, skipping search setup.");
+}
 
-            if (response.ok) {
-                const entries = await response.json();
+async function fetchAndRenderEntries() {
+    const filter = filterDropdown?.value || 'most-recent'; // Default to 'most-recent' if dropdown is missing
+    const searchQuery = searchBar?.value.trim(); // Get search query, if any
 
-                const entriesList = document.querySelector('.entries-list');
-                entriesList.innerHTML = ''; // Clear current entries
+    // Construct URL with filter and search parameters
+    let url = `/entries?filter=${filter}`;
+    if (searchQuery) {
+        url += `&search=${encodeURIComponent(searchQuery)}`;
+    }
 
+    try {
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${document.cookie.split('=')[1]}` // Adjust for your JWT setup
+            },
+        });
+
+        if (response.ok) {
+            const entries = await response.json();
+
+            const entriesList = document.querySelector('.entries-list');
+            entriesList.innerHTML = ''; // Clear current entries
+
+            if (entries.length > 0) {
                 entries.forEach(entry => {
                     entriesList.innerHTML += `
                         <li class="entry-item">
@@ -34,18 +55,18 @@ if (filterDropdown) {
                             </div>
                         </li>`;
                 });
-
-                // Reapply event listeners for the toggling feature
-                attachEntryToggleListeners();
             } else {
-                console.error('Failed to fetch entries:', response.statusText);
+                entriesList.innerHTML = '<li>No entries found.</li>';
             }
-        } catch (err) {
-            console.error('Error fetching entries:', err);
+
+            // Reapply event listeners for the toggling feature
+            attachEntryToggleListeners();
+        } else {
+            console.error('Failed to fetch entries:', response.statusText);
         }
-    });
-} else {
-    console.warn("Filter dropdown not found, skipping filter setup.");
+    } catch (err) {
+        console.error('Error fetching entries:', err);
+    }
 }
 
 // Attach event listeners for toggling entry details
