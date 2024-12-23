@@ -101,6 +101,8 @@ app.post('/api/save-response', async (req, res) => {
   }
 });
 
+const dataController = require('./controllers/dataController'); 
+
 
 //EJS Routes
 app.get('/', (req, res) => res.render('home'));
@@ -111,6 +113,7 @@ app.get('/tarot', (req, res) => {
 // Route files
 app.use('/auth', authRoutes);
 app.use('/entries', entriesController);
+app.use('/data', dataController);
 
 // Global Error Handler
 app.use((err, req, res, next) => {
