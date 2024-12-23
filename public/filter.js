@@ -52,11 +52,16 @@ if (filterDropdown) {
 function attachEntryToggleListeners() {
     document.querySelectorAll('.entry-summary').forEach(summary => {
         summary.addEventListener('click', () => {
+            console.log('Toggling entry details for:', summary);
             const details = summary.nextElementSibling;
-            details.classList.toggle('hidden');
+            if (details) {
+                details.classList.toggle('hidden');
+            } else {
+                console.warn('No sibling found for:', summary);
+            }
         });
     });
 }
 
 // Initial setup to ensure toggling works for preloaded entries
-attachEntryToggleListeners();
+document.addEventListener('DOMContentLoaded', attachEntryToggleListeners);
