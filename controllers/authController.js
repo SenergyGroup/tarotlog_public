@@ -85,49 +85,50 @@ const nodemailer = require('nodemailer');
 // Generate token
 const generateToken = () => crypto.randomBytes(32).toString('hex');
 
-exports.forgotPassword_post = async (req, res) => {
-    const { email } = req.body;
-    try {
-        const user = await User.findOne({ where: { email } });
-        if (!user) return res.status(400).send('No user with this email found.');
+const forgotPassword_post = async (req, res) => {
+  const { email } = req.body;
+  try {
+      const user = await User.findOne({ where: { email } });
+      if (!user) return res.status(400).send('No user with this email found.');
 
-        const token = generateToken();
-        user.resetToken = token;
-        user.tokenExpiration = Date.now() + 3600000; // 1-hour expiration
-        await user.save();
+      const token = generateToken();
+      user.resetToken = token;
+      user.tokenExpiration = Date.now() + 3600000; // 1-hour expiration
+      await user.save();
 
-        const transporter = nodemailer.createTransport({
-            service: 'Gmail',
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS,
-            },
-        });
+      const transporter = nodemailer.createTransport({
+          service: 'Gmail',
+          auth: {
+              user: process.env.EMAIL_USER,
+              pass: process.env.EMAIL_PASS,
+          },
+      });
 
-        await transporter.sendMail({
-            from: 'aaronpreinke@gmail.com',
-            to: email,
-            subject: 'Password Reset Request',
-            html: `<p>You requested a password reset</p>
-                   <p>If you did not request a password reset, please ignore this email. </p>
-                   <p>Click <a href="http://${req.headers.host}/auth/reset-password/${token}">here</a> to reset your password.</p>`,
-        });
+      await transporter.sendMail({
+          from: process.env.EMAIL_USER,
+          to: email,
+          subject: 'Password Reset Request',
+          html: `<p>You requested a password reset</p>
+                 <p>If you did not request a password reset, please ignore this email. </p>
+                 <p>Click <a href="http://${req.headers.host}/auth/reset-password/${token}">here</a> to reset your password.</p>`,
+      });
 
-        res.send('Password reset link sent to your email.');
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Error sending email.');
-    }
+      res.send('Password reset link sent to your email.');
+  } catch (err) {
+      console.error(err);
+      res.status(500).send('Error sending email.');
+  }
 };
 
-exports.resetPassword_get = async (req, res) => {
+
+const resetPassword_get = async (req, res) => {
   const { token } = req.params;
   const user = await User.findOne({ where: { resetToken: token, tokenExpiration: { [Op.gt]: Date.now() } } });
   if (!user) return res.status(400).send('Token invalid or expired.');
   res.render('resetPassword', { token });
 };
 
-exports.resetPassword_post = async (req, res) => {
+const resetPassword_post = async (req, res) => {
   const { token, password } = req.body;
   try {
       const user = await User.findOne({ where: { resetToken: token, tokenExpiration: { [Op.gt]: Date.now() } } });
