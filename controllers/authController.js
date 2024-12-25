@@ -145,6 +145,18 @@ exports.resetPassword_post = async (req, res) => {
   }
 };
 
+const forgotPassword_get = (req, res) => {
+  res.render('forgotPassword'); // Ensure this view exists
+};
 
-
-module.exports = { signup_get, login_get, signup_post, login_post, logout };
+module.exports = {
+  signup_get,
+  login_get,
+  signup_post,
+  login_post,
+  logout,
+  forgotPassword_get,
+  forgotPassword_post,
+  resetPassword_get,
+  resetPassword_post,
+};
