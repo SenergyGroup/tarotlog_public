@@ -12,4 +12,10 @@ router.get('/tarot', (req, res) => {
   });
 router.get('/logout', authConroller.logout);
 
+router.get('/forgot-password', authController.forgotPassword_get);
+router.post('/forgot-password', authController.forgotPassword_post);
+router.get('/reset-password/:token', authController.resetPassword_get);
+router.post('/reset-password', authController.resetPassword_post);
+
+
 module.exports = router

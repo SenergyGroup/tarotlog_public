@@ -35,10 +35,18 @@ const User = sequelize.define('User', {
         len: {
           args: [6, 100], // Minimum length of 6 characters
           msg: 'Minimum password length is 6 characters'
-        }
+        },
       },
       field: 'password_hash'
-    }
+    },
+    resetToken: {
+        type: DataTypes.STRING,
+        allowNull: true, // Optional field for storing the password reset token
+    },
+    tokenExpiration: {
+        type: DataTypes.DATE,
+        allowNull: true, // Optional field for storing the token's expiration time
+    },
 }, {
     tableName: 'users', 
     timestamps: true,

@@ -7,6 +7,8 @@ const { sequelize } = require('./config/database');
 const authRoutes = require('./routes/authRoutes');
 const entriesController = require('./controllers/entriesController');
 const { checkUser } = require('./middleware/authMiddleware');
+const cleanupExpiredTokens = require('./tasks/cleanupExpiredTokens');
+
 
 // Neon Database Backend and API
 const app = express();
@@ -121,6 +123,10 @@ app.use((err, req, res, next) => {
   console.error('Unhandled error:', err.stack);
   res.status(500).send('Something broke!');
 });
+
+// Runing cleanup handler
+cleanupExpiredTokens();
+
 
 
 // Start the server
