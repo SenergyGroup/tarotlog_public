@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const { Op } = require('sequelize');
 
 // JWT function
 const maxAge = 7 * 24 * 60 * 60;
@@ -131,7 +132,12 @@ const resetPassword_get = async (req, res) => {
 const resetPassword_post = async (req, res) => {
   const { token, password } = req.body;
   try {
-      const user = await User.findOne({ where: { resetToken: token, tokenExpiration: { [Op.gt]: Date.now() } } });
+      const user = await User.findOne({ 
+        where: { 
+          resetToken: token, 
+          tokenExpiration: { [Op.gt]: Date.now() },
+        },
+      });
       if (!user) return res.status(400).send('Token invalid or expired.');
 
       user.password = password; // Will trigger bcrypt hashing via model hooks
