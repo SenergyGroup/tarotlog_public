@@ -1,5 +1,11 @@
 <%- include('partials/header'); -%>
 
+<% if (req.query.resetSuccess) { %>
+    <div class="alert alert-success">
+        Password reset successfully. You can now log in.
+    </div>
+<% } %>
+
 <form action="/auth/login" method="POST">
     <h1>Log in</h1>
     <div class="username error"></div>
@@ -11,7 +17,7 @@
     <div class="password error"></div>
     <button>Log in</button>
 </form>
-
+<br>
 <a href="/auth/forgot-password" class="forgot-password-link">Forgot Password?</a>
 
 

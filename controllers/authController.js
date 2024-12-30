@@ -90,7 +90,10 @@ const forgotPassword_post = async (req, res) => {
   const { email } = req.body;
   try {
       const user = await User.findOne({ where: { email } });
-      if (!user) return res.status(400).send('No user with this email found.');
+      if (!user) {
+        console.error('No user found with this email:', email);
+        return res.status(400).send('No user with this email found.');
+      }
 
       const token = generateToken();
       user.resetToken = token;
@@ -106,15 +109,22 @@ const forgotPassword_post = async (req, res) => {
       });
 
       await transporter.sendMail({
-          from: process.env.EMAIL_USER,
+          from: `"TarotLog" <${process.env.EMAIL_USER}>`,
           to: email,
           subject: 'Password Reset Request',
-          html: `<p>You requested a password reset</p>
-                 <p>If you did not request a password reset, please ignore this email. </p>
-                 <p>Click <a href="http://${req.headers.host}/auth/reset-password/${token}">here</a> to reset your password.</p>`,
+          html:  `
+          <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+              <h2 style="color: #4CAF50;">TarotLog Password Reset</h2>
+              <p>Hello,</p>
+              <p>You requested a password reset. Click the button below to reset your password:</p>
+              <a href="http://${req.headers.host}/auth/reset-password/${token}" style="display: inline-block; padding: 10px 20px; margin: 10px 0; color: white; background-color: #4CAF50; text-decoration: none; border-radius: 5px;">Reset Password</a>
+              <p>If you didn’t request this, please ignore this email. This link will expire in 1 hour.</p>
+              <p>Thanks,<br>The TarotLog Team</p>
+          </div>
+      `,
       });
 
-      res.send('Password reset link sent to your email.');
+      res.redirect('/auth/forgot-password?success=true');
   } catch (err) {
       console.error(err);
       res.status(500).send('Error sending email.');
@@ -145,7 +155,7 @@ const resetPassword_post = async (req, res) => {
       user.tokenExpiration = null;
       await user.save();
 
-      res.send('Password reset successful. You can now log in.');
+      res.redirect('/auth/login?resetSuccess=true');
   } catch (err) {
       console.error(err);
       res.status(500).send('Error resetting password.');
