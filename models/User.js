@@ -42,10 +42,12 @@ const User = sequelize.define('User', {
     resetToken: {
         type: DataTypes.STRING,
         allowNull: true, // Optional field for storing the password reset token
+        field: 'resettoken'
     },
     tokenExpiration: {
         type: DataTypes.DATE,
         allowNull: true, // Optional field for storing the token's expiration time
+        field: 'tokenexpiration'
     },
 }, {
     tableName: 'users', 
