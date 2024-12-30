@@ -19,7 +19,7 @@ const signup_get = (req, res) => {
 
 // Render login page
 const login_get = (req, res) => {
-  res.render('login');
+  res.render('login', { resetSuccess: req.query.resetSuccess });
 };
 
 // Handle signup
@@ -134,9 +134,24 @@ const forgotPassword_post = async (req, res) => {
 
 const resetPassword_get = async (req, res) => {
   const { token } = req.params;
-  const user = await User.findOne({ where: { resetToken: token, tokenExpiration: { [Op.gt]: Date.now() } } });
-  if (!user) return res.status(400).send('Token invalid or expired.');
-  res.render('resetPassword', { token });
+
+    try {
+        const user = await User.findOne({
+            where: {
+                resetToken: token,
+                tokenExpiration: { [Op.gt]: Date.now() }, // Check if token is still valid
+            },
+        });
+
+        if (!user) {
+            return res.status(400).send('Token is invalid or expired.');
+        }
+
+        res.render('resetPassword', { token }); // Pass the token to the view
+    } catch (err) {
+        console.error('Error during reset password:', err);
+        res.status(500).send('Internal Server Error');
+    }
 };
 
 const resetPassword_post = async (req, res) => {
@@ -163,7 +178,7 @@ const resetPassword_post = async (req, res) => {
 };
 
 const forgotPassword_get = (req, res) => {
-  res.render('forgotPassword'); // Ensure this view exists
+  res.render('forgotPassword', { success: req.query.success });
 };
 
 module.exports = {
