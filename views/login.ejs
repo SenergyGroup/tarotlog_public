@@ -1,7 +1,7 @@
 <%- include('partials/header'); -%>
 
 <% if (resetSuccess) { %>
-    <div class="alert alert-success show">
+    <div class="alert alert-success show" data-timeout="4000">
         Password reset successfully. You can now log in.
     </div>
 <% } %>
@@ -83,6 +83,22 @@ const form = document.querySelector('form');
             console.log(err)
         }
     })
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Select all alerts with the `data-timeout` attribute
+        const alerts = document.querySelectorAll('.alert[data-timeout]');
+
+        alerts.forEach(alert => {
+            const timeout = parseInt(alert.getAttribute('data-timeout'), 10) || 4000; // Default to 5000ms if not set
+
+            setTimeout(() => {
+                alert.classList.remove('show'); // Remove the `show` class to hide the alert
+                alert.style.display = 'none'; // Optionally, set `display: none` to remove it from the layout
+            }, timeout);
+        });
+    });
 </script>
 
 <%- include('partials/footer'); -%>

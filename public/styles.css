@@ -601,6 +601,16 @@ form div {
     display: block;
 }
 
+.alert {
+  opacity: 1;
+  transition: opacity 0.5s ease, display 0.5s ease;
+}
+
+.alert:not(.show) {
+  opacity: 0;
+  pointer-events: none; /* Prevent interaction while hidden */
+}
+
 .overlay {
     display: none; /* Hidden by default */
     position: fixed;
