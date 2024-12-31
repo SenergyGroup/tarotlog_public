@@ -130,6 +130,27 @@ document.addEventListener("DOMContentLoaded", () => {
         const saveButton = document.getElementById('save-response-btn');
         const promptSection = document.querySelector('.prompt-section');
 
+        // Clear any existing meanings
+        const existingMeanings = document.querySelector('.meanings-container');
+        if (existingMeanings) {
+            existingMeanings.remove();
+        }
+
+        const meaningsContainer = document.createElement('div');
+        meaningsContainer.className = 'meanings-container';
+
+        if (card.meanings) {
+            card.meanings.forEach(meaning => {
+            const bubble = document.createElement('div');
+            bubble.className = 'meaning-bubble';
+            bubble.textContent = meaning.trim();
+            meaningsContainer.appendChild(bubble);
+            });
+        }
+
+        // Append meaningsContainer after cardPrompt
+        cardPrompt.insertAdjacentElement('afterend', meaningsContainer);
+
         if (!cardImage || !cardTitleElement || !cardPrompt || !cardHeaderElement) {
             console.error('UI elements for card display not found.');
             return;

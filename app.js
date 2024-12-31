@@ -64,6 +64,7 @@ app.get('/api/draw-card', async (req, res) => {
       ...card,
       orientation: isReversed ? 'Reversed' : 'Upright',
       description: isReversed ? card.description_reversed : card.description_upright,
+      meanings: isReversed ? card.meaning_reversed.split(',') : card.meaning_upright.split(','),
     };
 
     res.json(cardWithOrientation);
