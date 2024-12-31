@@ -247,6 +247,18 @@ h1 {
   border-radius: 20px;
   font-size: 0.9rem;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.meaning-bubble:hover {
+  background-color: #555;
+}
+
+.meaning-bubble.selected {
+  background-color: #6c63ff;
+  color: white;
+  box-shadow: 0 0 10px #6c63ff;
 }
 
 /* Style for the response text boxes */

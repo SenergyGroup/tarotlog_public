@@ -76,7 +76,7 @@ app.get('/api/draw-card', async (req, res) => {
 
 // Route to save a response
 app.post('/api/save-response', async (req, res) => {
-  const { user_id, card_id, prompt_text, response_text, orientation } = req.body;
+  const { user_id, card_id, prompt_text, response_text, orientation, selected_meanings } = req.body;
   console.log('Received Payload:', req.body);
 
   if (!user_id || !card_id || !prompt_text || !response_text || !orientation) {
@@ -92,9 +92,9 @@ app.post('/api/save-response', async (req, res) => {
     }
 
     const result = await pool.query(
-      `INSERT INTO responses (user_id, card_id, prompt_text, response_text, created_at, updated_at, orientation)
-             VALUES ($1, $2, $3, $4, NOW(), NOW(),  $5) RETURNING *`,
-            [user_id, card_id, prompt_text, response_text, orientation]
+      `INSERT INTO responses (user_id, card_id, prompt_text, response_text, created_at, updated_at, orientation, selected_meanings)
+             VALUES ($1, $2, $3, $4, NOW(), NOW(),  $5, $6) RETURNING *`,
+            [user_id, card_id, prompt_text, response_text, orientation, selected_meanings]
     );
 
     res.json(result.rows[0]);

@@ -79,12 +79,20 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
+            // Collect selected meanings
+            const selectedMeanings = Array.from(document.querySelectorAll('.meaning-bubble.selected')).map(bubble => bubble.textContent.trim());
+
+            if (selectedMeanings.length === 0) {
+                console.warn('No meanings selected, defaulting to empty array.');
+            }
+
             const payload = {
                 user_id: user?.id,
                 card_id: drawnCard.card_id,
                 prompt_text: promptText,
                 response_text: response1,
                 orientation: drawnCard.orientation,
+                selected_meanings: selectedMeanings,
             };
             console.log('Payload to be sent:', payload);
 
@@ -139,11 +147,26 @@ document.addEventListener("DOMContentLoaded", () => {
         const meaningsContainer = document.createElement('div');
         meaningsContainer.className = 'meanings-container';
 
+        // Track selected meanings
+        const selectedMeanings = new Set();
+
         if (card.meanings) {
             card.meanings.forEach(meaning => {
             const bubble = document.createElement('div');
             bubble.className = 'meaning-bubble';
             bubble.textContent = meaning.trim();
+
+            // Add click listener to toggle selection
+            bubble.addEventListener('click', () => {
+                if (selectedMeanings.has(meaning.trim())) {
+                selectedMeanings.delete(meaning.trim());
+                bubble.classList.remove('selected');
+                } else {
+                selectedMeanings.add(meaning.trim());
+                bubble.classList.add('selected');
+                }
+            });
+
             meaningsContainer.appendChild(bubble);
             });
         }
