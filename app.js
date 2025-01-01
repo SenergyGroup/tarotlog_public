@@ -1,3 +1,4 @@
+const OpenAI = require("openai");
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -8,13 +9,17 @@ const authRoutes = require('./routes/authRoutes');
 const entriesController = require('./controllers/entriesController');
 const { checkUser } = require('./middleware/authMiddleware');
 const cleanupExpiredTokens = require('./tasks/cleanupExpiredTokens');
-const { Configuration, OpenAIApi } = require('openai');
 
 
 
 // Neon Database Backend and API
 const app = express();
 const port = process.env.PORT || 3000;
+
+//GPT API
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -106,28 +111,31 @@ app.post('/api/save-response', async (req, res) => {
   }
 });
 
-//GPT API
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-const openai = new OpenAIApi(configuration);
 
 app.post('/api/generate-prompt', async (req, res) => {
   const { cardName, orientation, meanings } = req.body;
 
+  console.log('Received payload:', { cardName, orientation, meanings });
+
   if (!cardName || !orientation || !meanings) {
+    console.error('Missing required fields:', { cardName, orientation, meanings });
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
   const prePrompt = `
-    You are a wise and intuitive tarot guide, specializing in creating journaling prompts that inspire deep self-reflection. Your task is to provide users with thoughtful, open-ended prompts based on the tarot card they draw.
-    For each tarot card, you will:
-      1. Interpret the card's name, orientation (upright or reversed), and symbolic meanings.
-      2. Create a unique journaling prompt that:
-        - Encourages introspection and personal growth.
-        - Directly reflects the card's symbolism and emotional undertones.
-        - Feels supportive, mystical, and thought-provoking.
-    Keep prompts concise, specific to the card's themes, and avoid generic questions. Ensure they engage users in meaningful exploration of their emotions and experiences.
+    You are a tarot guide. Your task is to create a journaling prompt and a short description based on a tarot card drawn. 
+
+    For each card:
+    1. Write a 3-4 sentence description explaining the card's meaning and symbolism, considering its orientation (upright or reversed).
+    2. Create a journaling prompt that:
+      - Uses simple, clear language.
+      - Directly relates to the card's themes and orientation.
+      - Encourages personal reflection and growth.
+      - Has a tone that is supportive, thoughtful, and inspiring.
+
+    Output should follow this structure:
+    1. A short description of the card's meaning (3-4 sentences).
+    2. The journaling prompt, starting with "Journaling Prompt:" on a new line.
   `;
 
   const dynamicPrompt = `
@@ -138,15 +146,29 @@ app.post('/api/generate-prompt', async (req, res) => {
   const fullPrompt = `${prePrompt}\n\n${dynamicPrompt}`;
 
   try {
-    const response = await openai.createChatCompletion({
+    console.log('Calling OpenAI API with prompt:', fullPrompt);
+    const response = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
-      messages: [{ role: 'user', content: fullPrompt }],
+      messages: [
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: fullPrompt,
+            },
+          ],
+        },
+      ],
     });
 
-    const aiPrompt = response.data.choices[0].message.content.trim();
+    console.log('OpenAI API Response:', response);
+    const choice = response.choices[0];
+    const aiPrompt = choice?.message?.content?.trim() || 'No journaling prompt could be generated.';
+
     res.json({ aiPrompt });
   } catch (error) {
-    console.error('Error generating prompt:', error);
+    console.error('Error generating prompt:', error.response?.data || error.message);
     res.status(500).json({ error: 'Failed to generate prompt' });
   }
 });

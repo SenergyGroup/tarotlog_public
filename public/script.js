@@ -1,6 +1,7 @@
 let drawnCard = null;
 
 document.addEventListener("DOMContentLoaded", () => {
+    //const API_BASE_URL = 'http://localhost:3000';
     const API_BASE_URL = 'https://tarotlog-public.onrender.com';
 
     const drawCardBtn = document.getElementById('draw-card-btn');
