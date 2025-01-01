@@ -49,7 +49,35 @@ sequelize.sync({ force: false }) // Set force to true to drop and recreate table
 
 // Route to draw a random card
 app.get('/api/draw-card', async (req, res) => {
+  const userId = req.user.id;
+  const today = new Date().toISOString().split('T')[0];
+
   try {
+    // Check current draw count
+    const { rows } = await pool.query(
+      'SELECT draw_count FROM user_draws WHERE user_id = $1 AND draw_date = $2',
+      [userId, today]
+    );
+
+    let drawCount = rows[0]?.draw_count || 0;
+
+    if (drawCount >= 5) {
+        return res.status(403).json({ error: 'Daily card draw limit reached.' });
+    }
+
+    // Increment draw count
+    if (rows.length === 0) {
+        await pool.query(
+            'INSERT INTO user_draws (user_id, draw_date, draw_count) VALUES ($1, $2, 1)',
+            [userId, today]
+        );
+    } else {
+        await pool.query(
+            'UPDATE user_draws SET draw_count = draw_count + 1 WHERE user_id = $1 AND draw_date = $2',
+            [userId, today]
+        );
+    }
+
     const result = await pool.query(
       'SELECT * FROM tarot_cards ORDER BY RANDOM() LIMIT 1'
     );
