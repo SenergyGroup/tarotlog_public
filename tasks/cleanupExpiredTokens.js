@@ -2,12 +2,12 @@ const cron = require('node-cron');
 const { User } = require('../models/User');
 const { Op } = require('sequelize');
 
-const batchSize = 1000;
 
 const cleanupExpiredTokens = () => {
     cron.schedule('0 0 * * *', async () => { // Every day at midnight
         console.log('Running cleanup for expired tokens...');
         try {
+            const batchSize = 1000;
             let rowsUpdated;
             do {
                 const [result] = await User.update(
