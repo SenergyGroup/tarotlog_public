@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     const card = await response.json();
                     console.log('Fetched Card Data:', card);
 
-                    updateCardUI(card);
+                    await updateCardUI(card);
 
                 } catch (error) {
                     console.error('Error drawing card:', error);
