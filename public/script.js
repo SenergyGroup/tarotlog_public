@@ -120,7 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    function updateCardUI(card) {
+    async function updateCardUI(card) {
         drawnCard = card;
 
         const cardImage = document.getElementById('drawn-card');
@@ -137,6 +137,36 @@ document.addEventListener("DOMContentLoaded", () => {
         const responseBox = document.getElementById('response-1');
         const saveButton = document.getElementById('save-response-btn');
         const promptSection = document.querySelector('.prompt-section');
+
+        // Get meanings based on orientation
+        const meanings = card.orientation === 'Reversed'
+            ? card.meaning_reversed.split(',').map(meaning => meaning.trim())
+            : card.meaning_upright.split(',').map(meaning => meaning.trim());
+
+        // Call the backend to generate the AI prompt
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/generate-prompt`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                cardName: card.card_name,
+                orientation: card.orientation,
+                meanings: meanings,
+            }),
+            });
+
+            if (!response.ok) {
+            throw new Error('Failed to generate AI prompt');
+            }
+
+            const data = await response.json();
+            cardPrompt.innerText = data.aiPrompt;
+        } catch (error) {
+            console.error('Error fetching AI-generated prompt:', error);
+            cardPrompt.innerText = 'An error occurred while generating your journaling prompt. Please try again.';
+        }
 
         // Clear any existing meanings
         const existingMeanings = document.querySelector('.meanings-container');
@@ -185,7 +215,6 @@ document.addEventListener("DOMContentLoaded", () => {
             cardImage.style.transform = card.orientation === 'Reversed' ? 'rotate(180deg)' : 'rotate(0deg)';
 
             cardTitleElement.innerText = `${card.suit}: ${card.card_name} (${card.orientation})`;
-            cardPrompt.innerText = card.orientation === 'Reversed' ? card.meaning_reversed : card.meaning_upright;
 
             cardHeaderElement.classList.remove('hidden');
             cardTitleElement.classList.remove('hidden');

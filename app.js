@@ -8,6 +8,8 @@ const authRoutes = require('./routes/authRoutes');
 const entriesController = require('./controllers/entriesController');
 const { checkUser } = require('./middleware/authMiddleware');
 const cleanupExpiredTokens = require('./tasks/cleanupExpiredTokens');
+const { Configuration, OpenAIApi } = require('openai');
+
 
 
 // Neon Database Backend and API
@@ -101,6 +103,51 @@ app.post('/api/save-response', async (req, res) => {
   } catch (error) {
     console.error('Error saving response:', error);
     res.status(500).json({ error: error.message || 'Database error' });
+  }
+});
+
+//GPT API
+const configuration = new Configuration({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+const openai = new OpenAIApi(configuration);
+
+app.post('/api/generate-prompt', async (req, res) => {
+  const { cardName, orientation, meanings } = req.body;
+
+  if (!cardName || !orientation || !meanings) {
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
+
+  const prePrompt = `
+    You are a wise and intuitive tarot guide, specializing in creating journaling prompts that inspire deep self-reflection. Your task is to provide users with thoughtful, open-ended prompts based on the tarot card they draw.
+    For each tarot card, you will:
+      1. Interpret the card's name, orientation (upright or reversed), and symbolic meanings.
+      2. Create a unique journaling prompt that:
+        - Encourages introspection and personal growth.
+        - Directly reflects the card's symbolism and emotional undertones.
+        - Feels supportive, mystical, and thought-provoking.
+    Keep prompts concise, specific to the card's themes, and avoid generic questions. Ensure they engage users in meaningful exploration of their emotions and experiences.
+  `;
+
+  const dynamicPrompt = `
+    Card Drawn: ${cardName} (${orientation})
+    Meanings: ${meanings.join(', ')}
+  `;
+
+  const fullPrompt = `${prePrompt}\n\n${dynamicPrompt}`;
+
+  try {
+    const response = await openai.createChatCompletion({
+      model: 'gpt-4o-mini',
+      messages: [{ role: 'user', content: fullPrompt }],
+    });
+
+    const aiPrompt = response.data.choices[0].message.content.trim();
+    res.json({ aiPrompt });
+  } catch (error) {
+    console.error('Error generating prompt:', error);
+    res.status(500).json({ error: 'Failed to generate prompt' });
   }
 });
 
