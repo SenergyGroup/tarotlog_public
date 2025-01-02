@@ -75,7 +75,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function attachEntryToggleListeners() {
         document.querySelectorAll('.entry-summary').forEach(summary => {
             summary.addEventListener('click', () => {
-                console.log('Toggling entry details for:', summary);
                 const details = summary.nextElementSibling;
                 if (details) {
                     details.classList.toggle('hidden');

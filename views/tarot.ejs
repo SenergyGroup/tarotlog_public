@@ -22,9 +22,50 @@
     
     <div class="prompt-section hidden">
         <p id="card-prompt" class="prompt-text"></p>
+
+        <!-- Mood Input Section -->
+        <div class="mood-slider-container">
+            <label for="mood-slider">Mood:</label>
+            <div class="slider-wrapper">
+                <span class="slider-icon" id="sad-icon">😞</span>
+                <input type="range" id="mood-slider" name="mood" min="1" max="5" value="3">
+                <span class="slider-icon" id="happy-icon">😊</span>
+            </div>
+            <p id="mood-display">Mood: 😐 (3)</p>
+        </div>
+        
+
         <textarea id="response-1" class="response-box" placeholder="Your answer to the prompt..."></textarea>
         <button id="save-response-btn" class="save-button">Save Response</button>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const moodSlider = document.getElementById("mood-slider");
+        const moodDisplay = document.getElementById("mood-display");
+
+        const moodMap = {
+            1: "😞",
+            2: "😒",
+            3: "😐",
+            4: "🙂",
+            5: "😊",
+        };
+
+        const updateMoodDisplay = (value) => {
+            const moodIcon = moodMap[value] || "😐"; // Default to neutral
+            moodDisplay.textContent = `${moodIcon} (${value})`;
+        };
+
+        // Initial mood display
+        updateMoodDisplay(moodSlider.value);
+
+        // Update mood display on slider change
+        moodSlider.addEventListener("input", () => {
+            updateMoodDisplay(moodSlider.value);
+        });
+    });
+</script>
 
 <%- include('partials/footer'); -%>

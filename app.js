@@ -111,10 +111,10 @@ app.get('/api/draw-card', async (req, res) => {
 
 // Route to save a response
 app.post('/api/save-response', async (req, res) => {
-  const { user_id, card_id, prompt_text, response_text, orientation, selected_meanings } = req.body;
+  const { user_id, card_id, prompt_text, response_text, orientation, selected_meanings, mood } = req.body;
   console.log('Received Payload:', req.body);
 
-  if (!user_id || !card_id || !prompt_text || !response_text || !orientation) {
+  if (!user_id || !card_id || !prompt_text || !response_text || !orientation || mood === undefined) {
     console.error('Missing required fields:', req.body);
     return res.status(400).json({ error: 'All fields are required' });
   }
@@ -127,9 +127,9 @@ app.post('/api/save-response', async (req, res) => {
     }
 
     const result = await pool.query(
-      `INSERT INTO responses (user_id, card_id, prompt_text, response_text, created_at, updated_at, orientation, selected_meanings)
-             VALUES ($1, $2, $3, $4, NOW(), NOW(),  $5, $6) RETURNING *`,
-            [user_id, card_id, prompt_text, response_text, orientation, selected_meanings]
+      `INSERT INTO responses (user_id, card_id, prompt_text, response_text, created_at, updated_at, orientation, selected_meanings, mood)
+             VALUES ($1, $2, $3, $4, NOW(), NOW(),  $5, $6, $7) RETURNING *`,
+            [user_id, card_id, prompt_text, response_text, orientation, selected_meanings, mood]
     );
 
     res.json(result.rows[0]);
@@ -148,6 +148,12 @@ app.post('/api/generate-prompt', async (req, res) => {
   if (!cardName || !orientation || !meanings) {
     console.error('Missing required fields:', { cardName, orientation, meanings });
     return res.status(400).json({ error: 'Missing required fields' });
+  }
+
+  // Check if the app is in testing mode
+  if (process.env.TEST_MODE === 'true') {
+    console.log('TEST_MODE enabled. Returning a static testing prompt.');
+    return res.json({ aiPrompt: 'This is a testing prompt for debugging purposes.' });
   }
 
   const prePrompt = `
@@ -223,7 +229,8 @@ app.use((err, req, res, next) => {
 });
 
 // Runing cleanup handler
-cleanupExpiredTokens();
+// Need to fix bug on cleanup
+//cleanupExpiredTokens();
 
 
 

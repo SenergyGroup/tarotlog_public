@@ -1,9 +1,10 @@
 let drawnCard = null;
 
 document.addEventListener("DOMContentLoaded", () => {
-    //const API_BASE_URL = 'http://localhost:3000';
-    const API_BASE_URL = 'https://tarotlog-public.onrender.com';
+    const API_BASE_URL = 'http://localhost:3000';
+    //const API_BASE_URL = 'https://tarotlog-public.onrender.com';
 
+    const moodSlider = document.getElementById("mood-slider");
     const drawCardBtn = document.getElementById('draw-card-btn');
     const saveResponseBtn = document.getElementById('save-response-btn');
 
@@ -74,6 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const response1 = document.getElementById('response-1')?.value.trim();
             const promptText = document.getElementById('card-prompt')?.innerText.trim();
+            const moodValue = moodSlider.value;
 
             if (!response1 || !promptText) {
                 console.warn('Missing fields:', { response1, promptText });
@@ -94,6 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 response_text: response1,
                 orientation: drawnCard.orientation,
                 selected_meanings: selectedMeanings,
+                mood: parseInt(moodValue, 10),
             };
             console.log('Payload to be sent:', payload);
 
