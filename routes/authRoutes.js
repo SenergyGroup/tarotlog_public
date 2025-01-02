@@ -17,4 +17,8 @@ router.post('/forgot-password', authController.forgotPassword_post);
 router.get('/reset-password/:token', authController.resetPassword_get);
 router.post('/reset-password', authController.resetPassword_post);
 
+router.get('/settings', (req, res) => {
+    res.render('settings', { user: res.locals.user });
+});
+
 module.exports = router

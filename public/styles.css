@@ -171,7 +171,7 @@ h1 {
 }
 
  .card-image:hover {
-    transform: scale(1.05);
+    transform: scale(1.02);
   }
 
 /* Hide the card by default */
@@ -724,6 +724,135 @@ form div {
 
 .overlay.show {
     display: block;
+}
+
+/* Settings Page */
+.settings-container {
+  display: flex;
+  flex-direction: row;
+  min-width: 90%;
+  min-height: 90%;
+  margin: 2rem auto;
+  padding: 20px;
+  background-color: #2e2e2e;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+  gap: 1.5rem;
+}
+
+.settings-nav {
+  flex: 1;
+  /*margin-right: 20px;*/
+}
+
+.settings-nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.settings-nav li {
+  cursor: pointer;
+  padding: 0.75rem;
+  background-color: #444;
+  color: #fff;
+  margin-bottom: 0.5rem;
+  border-radius: 8px;
+  text-align: center;
+  transition: background-color 0.3s ease, transform 0.2s;
+}
+
+.settings-nav li:hover {
+  background-color: #584ce0;
+  transform: scale(1.01);
+}
+
+.settings-nav li.active {
+  background-color: #6c63ff;
+  font-weight: bold;
+}
+
+.settings-content {
+  flex: 3;
+  background-color: #1f1f1f;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.settings-section {
+  display: none;
+  animation: fadeIn 0.3s ease;
+}
+
+.settings-section.active {
+  display: block;
+}
+
+/* Settings Form Styles */
+/* Settings Form Styles */
+.settings-content form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; /* Space between inputs */
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.settings-content form label {
+  font-weight: bold;
+  color: #e0e0e0; /* Light text color */
+}
+
+.settings-content form input,
+.settings-content form select {
+  padding: 0.75rem;
+  border: 1px solid #555;
+  border-radius: 4px;
+  background-color: #3b3b3b;
+  color: #fff;
+  transition: border 0.3s ease;
+}
+
+.settings-content form input:focus,
+.settings-content form select:focus {
+  border-color: #6c63ff; /* Highlight on focus */
+  outline: none;
+}
+
+.settings-content form button {
+  padding: 0.75rem;
+  background-color: #6c63ff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s;
+}
+
+.settings-content form button:hover {
+  background-color: #584ce0;
+  transform: scale(1.01);
+}
+
+/* Additional Styling for Settings Header */
+.settings-container h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #f2c14e;
+  text-align: center;
+}
+
+/* Fade-in Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Mobile responsiveness */

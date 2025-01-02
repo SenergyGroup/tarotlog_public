@@ -1,0 +1,114 @@
+<%- include('partials/header'); -%>
+<script src="/profile.js"></script>
+
+<div class="settings-container">
+    <nav class="settings-nav">
+        <ul>
+            <li data-section="general" class="active">General</li>
+            <li data-section="notifications">Notifications</li>
+            <li data-section="billing">Billing</li>
+            <li data-section="login-security">Login & Security</li>
+        </ul>
+    </nav>
+    <div class="settings-content">
+        <div id="general" class="settings-section active">
+            <h2>General Settings</h2>
+            <form action="/settings/general" method="POST">
+                <!-- Profile Pic Selection -->
+                <label for="profile-pic">Upload Profile Picture:</label>
+                <input type="file" id="profile-pic" name="profile_pic" accept="image/*">
+                
+                <!-- Card Back Selection -->
+                <label for="card-back">Card Back:</label>
+                <select id="card-back" name="card_back">
+                    <option value="default">Default</option>
+                </select>
+        
+                <!-- Active Card Theme -->
+                <label for="card-theme">Active Card Theme:</label>
+                <select id="card-theme" name="card_theme">
+                    <option value="default">Default</option>
+                </select>
+        
+                <!-- Focus Area -->
+                <label for="focus">Focus for Journaling:</label>
+                <select id="focus" name="focus">
+                    <option value="self_growth">Self Growth</option>
+                    <option value="career">Career</option>
+                    <option value="romance">Romance</option>
+                    <option value="spirituality">Spirituality</option>
+                </select>
+        
+                <button type="submit">Save Changes</button>
+            </form>
+        </div>
+        <div id="notifications" class="settings-section">
+            <h2>Notifications Settings</h2>
+            <form action="/settings/notifications" method="POST">
+                <!-- Daily Reminders -->
+                <label for="daily-reminders">Daily Reminders:</label>
+                <select id="daily-reminders" name="daily_reminders">
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                </select>
+        
+                <!-- Reminder Time -->
+                <label for="reminder-time">Reminder Time:</label>
+                <input type="time" id="reminder-time" name="reminder_time">
+        
+                <button type="submit">Save Changes</button>
+            </form>
+        </div>
+        <div id="billing" class="settings-section">
+            <h2>Billing Settings</h2>
+            <h2>Billing</h2>
+            <p>You are currently a <strong>premium user</strong>. Enjoy all features while we are in the testing phase!</p>
+        </div>
+        <div id="login-security" class="settings-section">
+            <h2>Login & Security</h2>
+            <form action="/settings/security" method="POST">
+                <!-- Username -->
+                <label for="username">Change Username:</label>
+                <input type="text" id="username" name="username" placeholder="New Username">
+        
+                <!-- Email -->
+                <label for="email">Change Email:</label>
+                <input type="email" id="email" name="email" placeholder="New Email">
+        
+                <!-- Password -->
+                <label for="password">Change Password:</label>
+                <input type="password" id="password" name="password" placeholder="New Password">
+
+                <!-- Download Data Button -->
+                <button type="button" onclick="location.href='/settings/download-data'">Download My Data</button>
+
+                <!-- Delete Account Button -->
+                <button type="button" onclick="location.href='/settings/deactivate'">Deactivate My Account</button>
+                <p><strong>Warning!</strong> Deleting your account deletes all of your data.</p>
+        
+                <button type="submit">Save Changes</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const navItems = document.querySelectorAll('.settings-nav li');
+        const sections = document.querySelectorAll('.settings-section');
+
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                // Remove active class from all
+                navItems.forEach(nav => nav.classList.remove('active'));
+                sections.forEach(section => section.classList.remove('active'));
+
+                // Add active class to selected
+                item.classList.add('active');
+                document.getElementById(item.dataset.section).classList.add('active');
+            });
+        });
+    });
+</script>
+
+<%- include('partials/footer'); -%>
