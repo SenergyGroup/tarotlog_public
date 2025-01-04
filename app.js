@@ -9,6 +9,7 @@ const authRoutes = require('./routes/authRoutes');
 const entriesController = require('./controllers/entriesController');
 const { checkUser } = require('./middleware/authMiddleware');
 const cleanupExpiredTokens = require('./tasks/cleanupExpiredTokens');
+const { encrypt } = require('./utils/encryption');
 
 
 
@@ -126,10 +127,12 @@ app.post('/api/save-response', async (req, res) => {
         return res.status(400).json({ error: 'Invalid card ID' });
     }
 
+    const encryptedResponse = encrypt(response_text);
+
     const result = await pool.query(
       `INSERT INTO responses (user_id, card_id, prompt_text, response_text, created_at, updated_at, orientation, selected_meanings, mood)
              VALUES ($1, $2, $3, $4, NOW(), NOW(),  $5, $6, $7) RETURNING *`,
-            [user_id, card_id, prompt_text, response_text, orientation, selected_meanings, mood]
+            [user_id, card_id, prompt_text, encryptedResponse, orientation, selected_meanings, mood]
     );
 
     res.json(result.rows[0]);

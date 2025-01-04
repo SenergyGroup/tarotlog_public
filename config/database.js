@@ -1,5 +1,6 @@
 const { Sequelize } = require('sequelize');
 const { Pool } = require('pg');
+require('dotenv').config();
 
 // Initialize Sequelize
 const sequelize = new Sequelize(process.env.DATABASE_URL, {

@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { pool } = require('../config/database'); // PostgreSQL connection pool
 const { checkUser: authenticateToken } = require('../middleware/authMiddleware');
-
+const { decrypt } = require('../utils/encryption');
 
 
 // Fetch entries for logged-in user with optional filters
@@ -12,11 +12,8 @@ router.get('/', authenticateToken, async (req, res) => {
         const filter = req.query.filter || 'most-recent'; // Get the filter parameter from query string
         const searchQuery = req.query.search ? `%${req.query.search}%` : null;
 
-        let query;
-        let params = [userId];
-
         // Default query: Most Recent
-        query = `
+        let query = `
             SELECT 
                 r.response_id, r.prompt_text, r.response_text, r.created_at, r.orientation,
                 t.card_name, r.mood
@@ -24,6 +21,8 @@ router.get('/', authenticateToken, async (req, res) => {
             JOIN tarot_cards t ON r.card_id = t.card_id 
             WHERE r.user_id = $1
         `;
+
+        let params = [userId];
 
         // Add search condition if provided
         if (searchQuery) {
@@ -43,32 +42,39 @@ router.get('/', authenticateToken, async (req, res) => {
         // Execute query
         const { rows } = await pool.query(query, params);
 
-        // Process rows to parse the prompt text
-        rows.forEach(row => {
-            const cleanedPrompt = row.prompt_text.replace(/\s+/g, ' ').trim();
-
-            // Check for "Journaling Prompt:" in the cleaned string
-            const promptIndex = cleanedPrompt.indexOf('Journaling Prompt: ');
-            if (promptIndex !== -1) {
-                // Extract everything after "Journaling Prompt: "
-                row.parsed_prompt_text = cleanedPrompt.substring(promptIndex + 'Journaling Prompt: '.length).trim();
-            } else {
-                // Default to the full text if no "Journaling Prompt:" found
-                row.parsed_prompt_text = cleanedPrompt;
+        const decryptedRows = rows.map(row => {
+            try {
+                return {
+                    ...row,
+                    response_text: decrypt(row.response_text) // Decrypt all response_text
+                };
+            } catch (err) {
+                console.error(`Failed to decrypt response_text for response_id ${row.response_id}:`, err);
+                return {
+                    ...row,
+                    response_text: '[Error decrypting response]'
+                };
             }
         });
 
-        if (rows.length === 0) {
+        // Process rows to parse the prompt text
+        decryptedRows.forEach(row => {
+            const cleanedPrompt = row.prompt_text.replace(/\s+/g, ' ').trim();
+            const promptIndex = cleanedPrompt.indexOf('Journaling Prompt: ');
+            row.parsed_prompt_text = promptIndex !== -1
+                ? cleanedPrompt.substring(promptIndex + 'Journaling Prompt: '.length).trim()
+                : cleanedPrompt;
+        });
+
+        if (decryptedRows.length === 0) {
             console.log('No entries found for user:', userId);
             return res.render('entries', { entries: [], user: req.user });
         }
 
         if (req.headers['content-type'] === 'application/json') {
-            // Respond with JSON if the request comes from fetch
-            return res.json(rows);
+            return res.json(decryptedRows);
         } else {
-            // Render HTML for regular browser requests
-            return res.render('entries', { entries: rows, user: req.user });
+            return res.render('entries', { entries: decryptedRows, user: req.user });
         }
 
     } catch (err) {
