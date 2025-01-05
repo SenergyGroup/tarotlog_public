@@ -34,8 +34,9 @@
             <span class="entry-orientation"><%= entry.orientation %></span>
           </div>
           <div class="entry-details hidden">
-            <p class="entry-prompt">Prompt: <%= entry.parsed_prompt_text %></p>
-            <p class="entry-response">Response: <%= entry.response_text %></p>
+            <p class="entry-prompt"><strong>Prompt:</strong> <%= entry.parsed_prompt_text %></p>
+            <br>
+            <p class="entry-response"><strong>Response:</strong> <%= entry.response_text %></p>
           </div>
         </li>
       <% }) %>
@@ -43,6 +44,18 @@
       <li>No entries found.</li>
     <% } %>
   </ul>
+</div>
+
+<div class="pagination">
+  <% if (currentPage > 1) { %>
+      <a href="?page=<%= currentPage - 1 %>&filter=<%= filter %>">&laquo; Previous</a>
+  <% } %>
+  <% for (let i = 1; i <= totalPages; i++) { %>
+      <a href="?page=<%= i %>&filter=<%= filter %>" class="<%= i === currentPage ? 'active' : '' %>"><%= i %></a>
+  <% } %>
+  <% if (currentPage < totalPages) { %>
+      <a href="?page=<%= currentPage + 1 %>&filter=<%= filter %>">Next &raquo;</a>
+  <% } %>
 </div>
 
 <script>
@@ -61,5 +74,29 @@
 </script>
 
 <script src="/filter.js"></script>
+
+<style>
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+.pagination a {
+    text-decoration: none;
+    padding: 10px;
+    border: 1px solid #444;
+    border-radius: 5px;
+    color: #f2c14e;
+}
+.pagination a.active {
+    background-color: #f2c14e;
+    color: #1c1c1c;
+}
+.pagination a:hover {
+    background-color: #444;
+    color: #f2c14e;
+}
+</style>
 
   <%- include('partials/footer'); -%>

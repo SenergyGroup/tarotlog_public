@@ -12,6 +12,10 @@ router.get('/', authenticateToken, async (req, res) => {
         const filter = req.query.filter || 'most-recent'; // Get the filter parameter from query string
         const searchQuery = req.query.search ? `%${req.query.search}%` : null;
 
+        const page = parseInt(req.query.page) || 1; // Get the page number, default to 1
+        const limit = 10; // Number of entries per page
+        const offset = (page - 1) * limit; // Calculate offset
+
         // Default query: Most Recent
         let query = `
             SELECT 
@@ -21,12 +25,18 @@ router.get('/', authenticateToken, async (req, res) => {
             JOIN tarot_cards t ON r.card_id = t.card_id 
             WHERE r.user_id = $1
         `;
+        let countQuery = `
+            SELECT COUNT(*) AS total_entries
+            FROM responses r 
+            WHERE r.user_id = $1
+        `;
 
         let params = [userId];
 
         // Add search condition if provided
         if (searchQuery) {
             query += ` AND (r.prompt_text ILIKE $2 OR r.response_text ILIKE $2)`;
+            countQuery += ` AND (r.prompt_text ILIKE $2 OR r.response_text ILIKE $2)`;
             params.push(searchQuery);
         }
 
@@ -38,11 +48,21 @@ router.get('/', authenticateToken, async (req, res) => {
         } else {
             query += ` ORDER BY r.created_at DESC`;
         }
-       
-        // Execute query
-        const { rows } = await pool.query(query, params);
 
-        const decryptedRows = rows.map(row => {
+        // Add pagination
+        query += ` LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+        params.push(limit, offset);
+       
+        // Execute queries
+        const [entriesResult, countResult] = await Promise.all([
+            pool.query(query, params),
+            pool.query(countQuery, params.slice(0, params.length - 2))
+        ]);
+
+        const totalEntries = parseInt(countResult.rows[0].total_entries);
+        const totalPages = Math.ceil(totalEntries / limit);
+
+        const decryptedRows = entriesResult.rows.map(row => {
             try {
                 return {
                     ...row,
@@ -66,20 +86,31 @@ router.get('/', authenticateToken, async (req, res) => {
                 : cleanedPrompt;
         });
 
-        if (decryptedRows.length === 0) {
-            console.log('No entries found for user:', userId);
-            return res.render('entries', { entries: [], user: req.user });
-        }
-
-        if (req.headers['content-type'] === 'application/json') {
-            return res.json(decryptedRows);
+        if (req.headers['accept'] && req.headers['accept'].includes('application/json')) {
+            // Return JSON response for API requests
+            return res.json({
+                entries: decryptedRows,
+                currentPage: page,
+                totalPages,
+                filter
+            });
         } else {
-            return res.render('entries', { entries: decryptedRows, user: req.user });
+            // Render the entries page for standard requests
+            return res.render('entries', {
+                entries: decryptedRows,
+                user: req.user,
+                currentPage: page,
+                totalPages,
+                filter
+            });
         }
 
     } catch (err) {
         console.error('Error fetching entries:', err.stack);
-        res.status(500).send('Internal Server Error');
+        if (req.headers['accept'] && req.headers['accept'].includes('application/json')) {
+            return res.status(500).json({ error: 'Internal Server Error', details: err.message });
+        }
+        res.status(500).send('<h1>Internal Server Error</h1>');
     }
 });
 

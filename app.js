@@ -88,9 +88,6 @@ app.get('/api/draw-card', async (req, res) => {
     if (!card || !card.card_id) {
       throw new Error('Card ID missing in database response.');
     }
-
-    // Debugging log for validation
-    console.log('Fetched Card:', card);
     
     // Randomly determine orientation
     const isReversed = Math.random() < 0.5; // 50% chance for reversed
@@ -113,7 +110,6 @@ app.get('/api/draw-card', async (req, res) => {
 // Route to save a response
 app.post('/api/save-response', async (req, res) => {
   const { user_id, card_id, prompt_text, response_text, orientation, selected_meanings, mood } = req.body;
-  console.log('Received Payload:', req.body);
 
   if (!user_id || !card_id || !prompt_text || !response_text || !orientation || mood === undefined) {
     console.error('Missing required fields:', req.body);
@@ -145,8 +141,6 @@ app.post('/api/save-response', async (req, res) => {
 
 app.post('/api/generate-prompt', async (req, res) => {
   const { cardName, orientation, meanings } = req.body;
-
-  console.log('Received payload:', { cardName, orientation, meanings });
 
   if (!cardName || !orientation || !meanings) {
     console.error('Missing required fields:', { cardName, orientation, meanings });
@@ -199,7 +193,6 @@ app.post('/api/generate-prompt', async (req, res) => {
       ],
     });
 
-    console.log('OpenAI API Response:', response);
     const choice = response.choices[0];
     const aiPrompt = choice?.message?.content?.trim() || 'No journaling prompt could be generated.';
 

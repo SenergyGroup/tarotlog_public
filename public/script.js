@@ -46,14 +46,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 spinner.style.display = 'block';
 
                 try {
-                    console.log("Starting card draw...");
                     const response = await fetch(`${API_BASE_URL}/api/draw-card`);
                     if (!response.ok) {
                         throw new Error('Failed to fetch card');
                     }
 
                     const card = await response.json();
-                    console.log('Fetched Card Data:', card);
 
                     await updateCardUI(card);
 
@@ -88,10 +86,6 @@ document.addEventListener("DOMContentLoaded", () => {
             // Collect selected meanings
             const selectedMeanings = Array.from(document.querySelectorAll('.meaning-bubble.selected')).map(bubble => bubble.textContent.trim());
 
-            if (selectedMeanings.length === 0) {
-                console.warn('No meanings selected, defaulting to empty array.');
-            }
-
             const payload = {
                 user_id: user?.id,
                 card_id: drawnCard.card_id,
@@ -101,7 +95,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 selected_meanings: selectedMeanings,
                 mood: parseInt(moodValue, 10),
             };
-            console.log('Payload to be sent:', payload);
 
             try {
                 const response = await fetch(`${API_BASE_URL}/api/save-response`, {
@@ -131,14 +124,8 @@ document.addEventListener("DOMContentLoaded", () => {
         drawnCard = card;
 
         const cardImage = document.getElementById('drawn-card');
-
-        console.log('Searching for card-title element...');
         const cardTitleElement = document.getElementById('card-title');
-        console.log('Found card-title element:', cardTitleElement);
-
-        console.log('Searching for card-header element...');
         const cardHeaderElement = document.querySelector('.card-header');
-        console.log('Found card-header element:', cardHeaderElement);
 
         const cardPrompt = document.getElementById('card-prompt');
         const responseBox = document.getElementById('response-1');
