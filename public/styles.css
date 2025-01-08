@@ -261,6 +261,110 @@ h1 {
   box-shadow: 0 0 10px #6c63ff;
 }
 
+/* Open Journal Section */
+.open-journal-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  background-color: #252525;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  max-width: 85%;
+  min-width: 85%;
+  margin: 1rem auto;
+}
+
+.open-journal-section label {
+  font-size: 1.2rem;
+  color: #f2c14e;
+  margin-bottom: 0.5rem;
+}
+
+.open-journal-section input[type="text"] {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #444;
+  border-radius: 5px;
+  background-color: #1a1a1a;
+  color: #f2c14e;
+  font-size: 1rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+#journal-title {
+  width: 50%; /* Adjusted to 25% of the page width */
+  padding: 0.75rem;
+  border: 1px solid #444;
+  border-radius: 5px;
+  background-color: #1a1a1a;
+  color: #f2c14e;
+  font-size: 1rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+#journal-title:focus {
+  border-color: #6c63ff;
+  outline: none;
+  box-shadow: 0 0 10px #6c63ff;
+}
+
+/* Style for the response text boxes */
+.open-journal-response-box {
+  width: 100%;
+  height: 400px;
+  padding: 1rem;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  border: 1px solid #444;
+  background-color: #1a1a1a;
+  color: #f2c14e;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  transition: box-shadow 0.3s ease;
+  resize: none;
+}
+
+.sleek-card-container {
+  background: #2c2c2c;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 20px;
+  max-width: 400px;
+  margin: 20px auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  color: #fff;
+}
+
+.sleek-card-container.hidden {
+  display: none;
+}
+
+.card-header h2 {
+  margin: 0;
+  font-size: 1.5em;
+  color: #f0f0f0;
+  text-transform: uppercase;
+}
+
+.card-content img {
+  width: 100%;
+  max-width: 200px;
+  height: auto;
+  margin: 10px 0;
+  border-radius: 4px;
+}
+
+.card-content p {
+  text-align: left;
+  font-size: 1em;
+  line-height: 1.6;
+  margin: 10px 0;
+  color: #ddd;
+}
+
+
 /* Mood Section */
 /* Mood Slider */
 .mood-slider-container {
@@ -335,8 +439,8 @@ h1 {
 /* Style for the response text boxes */
 .response-box {
     width: 100%;
-    max-width: 500px;
-    height: 150px;
+    max-width: 600px;
+    height: 250px;
     padding: 1rem;
     font-size: 1.1rem;
     border-radius: 8px;
@@ -884,6 +988,11 @@ form div {
   .prompt-section {
       padding: 1rem; /* Adjust padding for smaller screens */
   }
+
+  .entries-list {
+      max-width: 85%;
+      min-width: 85%;
+  }
 }
 
 @media (max-width: 480px) {
@@ -905,5 +1014,10 @@ form div {
 
   .prompt-section {
       padding: 0.5rem; /* Further adjusted for very small screens */
+  }
+
+  .entries-list {
+      max-width: 90%;
+      min-width: 90%;
   }
 }

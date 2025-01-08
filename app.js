@@ -203,6 +203,185 @@ app.post('/api/generate-prompt', async (req, res) => {
   }
 });
 
+
+// Route to handle API response and fetch card details
+app.post("/get-tarot-card", async (req, res) => {
+  try {
+    console.log("[INFO] Received request to /get-tarot-card");
+
+    const userId = req.user?.id; // Use optional chaining to handle cases where req.user might be undefined
+    if (!userId) {
+      console.error("[ERROR] User is not authenticated.");
+      return res.status(401).json({ error: "User not authenticated" });
+    }
+
+    const { journalEntry, mood, title } = req.body;
+    if (!journalEntry || !mood || !title) {
+      console.error("[ERROR] Missing required fields in request body.");
+      return res.status(400).json({ error: "All fields are required" });
+    }
+
+    console.log("[INFO] Journal entry received:", journalEntry);
+
+    // Generate a response from OpenAI
+    const prompt = `
+      You are a tarot guide. Based on the journal entry below, recommend the tarot card that aligns most. Please use upright and reverse meanings in your classifcation. Once you have a result, respond with exactly the format as follows with no bullets or textual accents, just plain text:
+      - [card_name]
+      - orientation of card (upright or reversed)
+      - A small paragraph on your reasoning
+      Exceptions:
+      - For Major Arcana card that most align still do: [card_name]
+      - For Lesser Arcana card that most aligns do: [number(digit, not spelled out unless an ace)_of_suit]
+      Examples:
+      - If the card was a Major Arcana: the_fool then a new line upright then a new line with your small paragraph reasoning.
+      - If the card was a Lesser Arcana: 2_of_wands then a new line reversed then a new line with your small paragraph reasoning.
+      User's journal entry: ${journalEntry}
+    `;
+
+    console.log("[INFO] Generated OpenAI prompt:", prompt);
+    let responseText;
+
+    try {
+      console.log("[INFO] Calling OpenAI API...");
+      const openAIResponse = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "text",
+                text: prompt,
+              },
+            ],
+          },
+        ],
+      });
+      console.log("[INFO] OpenAI raw response:", openAIResponse);
+
+      responseText = openAIResponse.choices?.[0]?.message?.content;
+      console.log("[INFO] OpenAI response received:", responseText);
+
+      if (!responseText) {
+        console.error("[ERROR] OpenAI response did not include valid content:", openAIResponse.data?.choices?.[0]?.message);
+        throw new Error("Empty response from OpenAI.");
+      }
+    } catch (error) {
+      console.error("[ERROR] Failed to fetch response from OpenAI API:", error.response?.data || error.message);
+      return res.status(500).json({ error: "Failed to generate tarot card recommendation." });
+    }
+
+    // Define normalization functions
+    const normalizeCardName = (cardName) => {
+      return cardName.trim().replace(/^- /, '').toLowerCase();
+    };
+
+    const normalizeOrientation = (orientation) => {
+      return orientation.trim().replace(/^- /, '').toLowerCase();
+    };
+
+    const normalizeReasoning = (reasoning) => {
+      return reasoning.trim().replace(/^- /, '');
+    };
+
+    // Parse the OpenAI response
+    console.log("[INFO] Parsing OpenAI response...");
+    const parseResponse = (responseText) => {
+      const lines = responseText.split("\n").map((line) => line.trim());
+      return {
+        search_name: lines[0],
+        orientation: lines[1],
+        reasoning: lines.slice(2).join(" "),
+      };
+    };
+
+    let { search_name, orientation, reasoning } = parseResponse(responseText);
+
+    if (!search_name || !orientation || !reasoning) {
+      console.error("[ERROR] Parsed response is invalid:", { search_name, orientation, reasoning });
+      return res.status(400).json({ error: "Invalid response from OpenAI" });
+    }
+
+    // Normalize the parsed values
+    const normalizedSearchName = normalizeCardName(search_name);
+    const normalizedOrientation = normalizeOrientation(orientation);
+    const normalizedReasoning = normalizeReasoning(reasoning);
+
+    console.log("[INFO] Parsed response:", { normalizedSearchName, normalizedOrientation, normalizedReasoning });
+
+    // Query the database for the card
+    console.log("[INFO] Querying database for card:", normalizedSearchName);
+    
+    try {
+      const query = `
+        SELECT * FROM tarot_cards
+        WHERE search_name = $1
+      `;
+
+      const result = await pool.query(query, [normalizedSearchName]);
+
+      if (result.rows.length === 0) {
+        console.error("[ERROR] No card found in database for card_name:", normalizedSearchName);
+        return res.status(404).json({ error: "Card not found in database" });
+      }
+
+    const card = result.rows[0];
+    console.log("[INFO] Card fetched from database:", card);
+
+    // Insert the journal entry into the responses table
+    try {
+      const encryptedResponse = encrypt(journalEntry);
+      
+      const insertQuery = `
+        INSERT INTO responses (
+          user_id, card_id, prompt_text, response_text, created_at, updated_at, orientation, selected_meanings, mood
+        ) VALUES ($1, $2, $3, $4, NOW(), NOW(), $5, $6, $7)
+        RETURNING *;
+      `;
+      const insertValues = [
+        userId,
+        card.card_id,
+        title, // prompt_text is the title of their prompt
+        encryptedResponse, // response_text is the journal entry
+        normalizedOrientation, // From OpenAI response
+        null, // selected_meanings is null for now
+        mood, // Captured from the request body
+      ];
+
+      const insertResult = await pool.query(insertQuery, insertValues);
+      console.log("[INFO] Journal entry saved:", insertResult.rows[0]);
+    } catch (error) {
+      console.error("[ERROR] Failed to save journal entry:", error.message);
+      return res.status(500).json({ error: "Failed to save journal entry." });
+    }
+
+    // Send the response to the frontend
+    res.json({
+      card_name: card.card_name,
+      orientation: normalizedOrientation,
+      reasoning: normalizedReasoning,
+      image_data: card.image_data,
+    });
+
+    console.log("[INFO] Response sent to frontend:", {
+      card_name: card.card_name,
+      orientation: normalizedOrientation,
+      reasoning: normalizedReasoning,
+      image_data: card.image_data,
+    });
+
+    } catch (error) {
+      console.error("[ERROR] Database query failed:", error.message);
+      return res.status(500).json({ error: "Database error" });
+    }
+
+  } catch (error) {
+    console.error("[FATAL ERROR] An unexpected error occurred:", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
 const dataController = require('./controllers/dataController'); 
 const storeController = require('./controllers/storeController');
 
@@ -211,6 +390,7 @@ app.get('/', (req, res) => res.render('home'));
 app.get('/tarot', (req, res) => {
   res.render('tarot', { user: res.locals.user });
 });
+app.get('/open-journal', (req, res) => res.render('openJournal'));
 
 // Route files
 app.use('/auth', authRoutes);

@@ -1,0 +1,150 @@
+<%- include('partials/header'); -%>
+
+<script src="/profile.js"></script>
+
+<div class="app-container">
+  <h1 class="page-title">Open Journal</h1>
+
+    <div class="open-journal-section">
+        <div class="card-container hidden sleek-card-container">
+            <div class="card-header">
+            <h2 id="card-name">Card: </h2>
+            </div>
+            <div class="card-content">
+            <img id="tarot-image" src="" alt="Tarot Card Image">
+            <p id="reasoning"></p>
+            </div>
+        </div>
+        
+        <input type="text" id="journal-title" name="title" placeholder="Journal title" required>
+    
+        <textarea id="response-2" class="open-journal-response-box" placeholder="Let your thoughts run free"></textarea>
+        
+        <!-- Mood Input Section -->
+        <div class="mood-slider-container">
+            <label for="mood-slider">Mood:</label>
+            <div class="slider-wrapper">
+                <span class="slider-icon" id="sad-icon">😞</span>
+                <input type="range" id="mood-slider" name="mood" min="1" max="5" value="3">
+                <span class="slider-icon" id="happy-icon">😊</span>
+            </div>
+            <p id="mood-display">Mood: 😐 (3)</p>
+        </div>
+        
+        <button id="save-response-btn" class="save-button">Save Response</button>
+    </div>
+</div>
+
+<script>
+    document.getElementById("save-response-btn").addEventListener("click", async () => {
+        const journalEntry = document.getElementById("response-2").value;
+        const mood = document.getElementById("mood-slider").value;
+        const title = document.getElementById("journal-title").value;
+
+        if (!journalEntry) {
+            alert("Please enter your journal entry.");
+            return;
+        }
+
+        const saveButton = document.getElementById("save-response-btn");
+        saveButton.disabled = true;
+        saveButton.innerText = "Saving...";
+
+        try {
+            const response = await fetch("/get-tarot-card", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ journalEntry, mood, title }),
+            });
+
+            if (!response.ok) throw new Error("Failed to fetch tarot card");
+
+            const data = await response.json();
+
+            console.log("Received data from backend:", data);
+
+            // Update the UI with the card details
+            document.getElementById("card-name").innerText = `Card: ${data.card_name}`;
+            document.getElementById("reasoning").innerText = data.reasoning;
+
+            const image = document.getElementById("tarot-image");
+            image.src = data.image_data;
+            image.alt = `${data.card_name} Tarot Card`;
+
+            // Unhide card details
+            document.querySelector(".card-container").classList.remove("hidden");
+
+            resetOpenJournalUI();
+        } catch (error) {
+            console.error("Error:", error);
+            alert(`Failed to fetch tarot card. ${error.message}`);
+        } finally {
+            saveButton.disabled = false;
+            saveButton.innerText = "Save Response";
+        }
+    });
+
+    function resetOpenJournalUI() {
+        const journalTitle = document.getElementById("journal-title");
+        const moodSliderContainer = document.querySelector(".mood-slider-container");
+        const journalEntry = document.getElementById("response-2");
+        const saveButton = document.getElementById("save-response-btn");
+        const cardContainer = document.querySelector(".card-container");
+
+        // Hide the journal title input field
+        if (journalTitle) {
+            journalTitle.classList.add("hidden");
+        }
+
+        // Hide the mood slider container
+        if (moodSliderContainer) {
+            moodSliderContainer.classList.add("hidden");
+        }
+
+        // Hide the journal entry text area
+        if (journalEntry) {
+            journalEntry.classList.add("hidden");
+        }
+
+        // Hide the save button
+        if (saveButton) {
+            saveButton.classList.add("hidden");
+        }
+
+        // Ensure the card container is visible
+        if (cardContainer) {
+            cardContainer.classList.remove("hidden");
+        }
+    }
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const moodSlider = document.getElementById("mood-slider");
+        const moodDisplay = document.getElementById("mood-display");
+
+        const moodMap = {
+            1: "😞",
+            2: "😒",
+            3: "😐",
+            4: "🙂",
+            5: "😊",
+        };
+
+        const updateMoodDisplay = (value) => {
+            const moodIcon = moodMap[value] || "😐"; // Default to neutral
+            moodDisplay.textContent = `${moodIcon} (${value})`;
+        };
+
+        // Initial mood display
+        updateMoodDisplay(moodSlider.value);
+
+        // Update mood display on slider change
+        moodSlider.addEventListener("input", () => {
+            updateMoodDisplay(moodSlider.value);
+        });
+    });
+</script>
+  
+
+<%- include('partials/footer'); -%>
