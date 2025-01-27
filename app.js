@@ -63,7 +63,8 @@ app.get('/api/draw-card', async (req, res) => {
     let drawCount = rows[0]?.draw_count || 0;
 
     if (drawCount >= 5) {
-        return res.status(403).json({ error: 'Daily card draw limit reached.' });
+      alert(`You have reached your daily card draw limit.`);
+      return res.status(403).json({ error: 'Daily card draw limit reached.' });
     }
 
     // Increment draw count
@@ -215,13 +216,53 @@ app.post("/get-tarot-card", async (req, res) => {
       return res.status(401).json({ error: "User not authenticated" });
     }
 
+    const today = new Date().toISOString().split('T')[0];
+
+    // Check the request count for the user for today
+    const rateLimitQuery = `
+      SELECT request_count 
+      FROM user_requests 
+      WHERE user_id = $1 AND request_date = $2
+    `;
+    console.log(`[INFO] Executing rate limit query: ${rateLimitQuery}, user_id: ${userId}, request_date: ${today}`);
+    const { rows } = await pool.query(rateLimitQuery, [userId, today]);
+    console.log(`[INFO] Query result: ${JSON.stringify(rows)}`);
+    const requestCount = rows[0]?.request_count || 0;
+
+    const REQUEST_LIMIT = 5; // Set your desired daily limit here
+
+    if (requestCount >= REQUEST_LIMIT) {
+      alert(`You have reached your daily open journal limit.`);
+      return res.status(403).json({ error: "Open journal request limit reached." });
+    }
+
+    // Update or insert the request count
+    if (rows.length === 0) {
+      const insertQuery = `
+        INSERT INTO user_requests (user_id, request_date, request_count)
+        VALUES ($1, $2, 1)
+      `;
+      await pool.query(insertQuery, [userId, today]);
+    } else {
+      const updateQuery = `
+        UPDATE user_requests 
+        SET request_count = request_count + 1 
+        WHERE user_id = $1 AND request_date = $2
+      `;
+      await pool.query(updateQuery, [userId, today]);
+    }
+
+    console.log("[INFO] User request count updated.");
+
     const { journalEntry, mood, title } = req.body;
     if (!journalEntry || !mood || !title) {
-      console.error("[ERROR] Missing required fields in request body.");
+      alert("Please fill in the title and journal entry before saving.");
       return res.status(400).json({ error: "All fields are required" });
     }
 
     console.log("[INFO] Journal entry received:", journalEntry);
+
+    
 
     // Generate a response from OpenAI
     const prompt = `

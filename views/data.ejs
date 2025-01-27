@@ -5,16 +5,16 @@
     const user = <%- JSON.stringify(user) %>;
 </script>
 <script src="/profile.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <div class="data-container">
     <h1 class="page-title">Your Journal Stats</h1>
-    <p>*Mock statistics*</p>
-
     <!-- Top 3 Cards Pulled Section -->
+    <!--
     <div class="stat-section">
         <h2>Top 3 Cards Pulled</h2>
         <ul class="top-cards">
-            <% data.topCards.forEach(card => { %>
+            <% suitsData.forEach(card => { %>
                 <li>
                     <span class="card-name"><%= card.card_name %> (<%= card.orientation %>)</span>
                     <span class="card-count">Pulled: <%= card.count %> times</span>
@@ -22,62 +22,173 @@
             <% }); %>
         </ul>
     </div>
+    -->
 
     <!-- Total Entries Created -->
+    <!--
     <div class="stat-section">
         <h2>Total Entries</h2>
-        <p><strong><%= data.totalEntries %></strong> entries created</p>
+        <p><strong><%= suitsData.totalEntries %></strong> entries created</p>
+    </div>
+    -->
+
+    <!-- Suit Polar Chart-->
+    <div class="stat-section">
+        <h2>Card Suit Distribution</h2>
+        <canvas id="suitChart" width="400" height="400"></canvas>
     </div>
 
     <!-- Longest Streak -->
+    <!--
     <div class="stat-section">
         <h2>Longest Streak</h2>
-        <p><strong><%= data.longestStreak %></strong> days of continuous journaling</p>
+        <p><strong><%= suitsData.longestStreak %></strong> days of continuous journaling</p>
     </div>
+    -->
 
     <!-- Total Words Typed -->
+    <!--
     <div class="stat-section">
         <h2>Total Words Typed</h2>
-        <p><strong><%= data.totalWords %></strong> words in your journal</p>
+        <p><strong><%= suitsData.totalWords %></strong> words in your journal</p>
     </div>
+    -->
 
     <!-- Top Theme Section -->
+    <!--
     <div class="stat-section">
         <h2>Top Theme</h2>
-        <p>Your most frequent journaling theme is <strong><%= data.topTheme %></strong></p>
+        <p>Your most frequent journaling theme is <strong><%= suitsData.topTheme %></strong></p>
     </div>
+    -->
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", async () => {
+        const ctx = document.getElementById('suitChart').getContext('2d');
+
+        const suitsData = <%- JSON.stringify(suitsData) %>;
+
+        const labels = suitsData.map(item => item.suit); // Suit names
+        const counts = suitsData.map(item => item.count); // Suit counts
+
+        // Create the Polar Area Chart
+        // Define colors for the suits
+        const colors = [
+            'rgba(231, 76, 60, 0.8)',  // Major Arcana
+            'rgba(52, 152, 219, 0.8)', // Pentacles
+            'rgba(241, 196, 15, 0.8)', // Wands
+            'rgba(46, 204, 113, 0.8)', // Cups
+            'rgba(155, 89, 182, 0.8)'  // Swords
+        ];
+
+        // Define border colors for more contrast
+        const borderColors = colors.map(color => color.replace('0.8', '1'));
+
+        // Create the Polar Area Chart
+        new Chart(ctx, {
+            type: 'polarArea',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Card Suit Counts',
+                    data: counts,
+                    backgroundColor: colors,
+                    borderColor: borderColors,
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                animation: {
+                    animateScale: true, // Smooth scaling animation
+                    animateRotate: true // Smooth rotation animation
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#f5c542', // Matches your theme
+                            font: {
+                                family: 'Cinzel',
+                                size: 16
+                            },
+                            boxWidth: 20
+                        },
+                    },
+                    tooltip: {
+                        enabled: true,
+                        backgroundColor: '#2e2e2e',
+                        titleColor: '#f5c542',
+                        bodyColor: '#f2c14e',
+                        bodyFont: {
+                            family: 'Cinzel',
+                            size: 14
+                        },
+                        padding: 12,
+                        borderColor: '#f5c542',
+                        borderWidth: 1,
+                        callbacks: {
+                            label: (tooltipItem) => {
+                                const suit = labels[tooltipItem.dataIndex];
+                                const count = counts[tooltipItem.dataIndex];
+                                return `${suit}: ${count} draws`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    r: {
+                        grid: {
+                            color: 'rgba(245, 197, 66, 0.2)',
+                            circular: true
+                        },
+                        ticks: {
+                            color: '#f5c542',
+                            showLabelBackdrop: false,
+                            stepSize: 5
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
 
 <style>
     .data-container {
-        max-width: 800px;
+        max-width: 90%;
+        min-width: 90%;
         margin: 0 auto;
-        padding: 20px;
-        background-color: #2e2e2e;
-        border-radius: 10px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        padding: 30px;
+        background: linear-gradient(135deg, #1c1c1c, #2a2a2a);
+        border-radius: 15px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7);
         color: #f5c542;
         text-align: center;
     }
     
     .page-title {
-        font-size: 2rem;
+        font-size: 2.5rem;
         margin-bottom: 20px;
         color: #f2c14e;
+        text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
     }
     
     .stat-section {
-        margin-bottom: 20px;
-        padding: 10px;
-        background-color: #1a1a1a;
-        border-radius: 5px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        margin-bottom: 30px;
+        padding: 20px;
+        background: linear-gradient(135deg, #1a1a1a, #282828);
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
     }
     
-    h2 {
-        font-size: 1.5rem;
-        margin-bottom: 10px;
-        color: #f5c542;
+    .stat-section h2 {
+        font-family: 'Cinzel', serif;
+        font-size: 1.8rem;
+        margin-bottom: 15px;
+        color: #f2c14e;
+        text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
     }
     
     p, .top-cards li {
@@ -106,6 +217,35 @@
     .card-count {
         font-style: italic;
         color: #bbb;
+    }
+
+
+    
+
+    /* Center and enhance the chart */
+    #suitChart {
+        display: block;
+        margin: 20px auto;
+        max-width: 70%;
+        filter: drop-shadow(0 6px 15px rgba(0, 0, 0, 0.8));
+    }
+
+    /* Legend customization (if applicable) */
+    .chart-legend {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-top: 20px;
+        padding-left: 20px;
+    }
+
+    .chart-legend span {
+        display: inline-block;
+        width: 25px;
+        height: 25px;
+        margin-right: 10px;
+        border-radius: 50%;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
     }
 </style>
 

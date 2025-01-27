@@ -8,7 +8,7 @@
     <div class="open-journal-section">
         <div class="card-container hidden sleek-card-container">
             <div class="card-header">
-            <h2 id="card-name">Card: </h2>
+            <span><h2 id="card-name">Card: </h2><h2 id="orientation"> </h2></span>
             </div>
             <div class="card-content">
             <img id="tarot-image" src="" alt="Tarot Card Image">
@@ -65,11 +65,13 @@
 
             // Update the UI with the card details
             document.getElementById("card-name").innerText = `Card: ${data.card_name}`;
+            document.getElementById("orientation").innerText = `(${data.orientation})`;
             document.getElementById("reasoning").innerText = data.reasoning;
 
             const image = document.getElementById("tarot-image");
             image.src = data.image_data;
             image.alt = `${data.card_name} Tarot Card`;
+            image.style.transform = data.orientation === 'reversed' ? 'rotate(180deg)' : 'rotate(0deg)';
 
             // Unhide card details
             document.querySelector(".card-container").classList.remove("hidden");
