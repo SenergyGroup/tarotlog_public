@@ -38,6 +38,13 @@
         <canvas id="suitChart" width="400" height="400"></canvas>
     </div>
 
+    <div class="stat-section">
+        <h2>Mood Over Time</h2>
+        <div class="chart-wrapper">
+            <canvas id="moodChart"></canvas>
+        </div>
+    </div>
+
     <!-- Longest Streak -->
     <!--
     <div class="stat-section">
@@ -152,6 +159,85 @@
                 }
             }
         });
+
+        // Add mood chart setup here
+        const moodCtx = document.getElementById('moodChart').getContext('2d');
+        const moodsData = <%- JSON.stringify(moodsData) %>;
+        
+        // Process mood data
+        const dates = moodsData.map(entry => new Date(entry.created_at).toLocaleDateString());
+        const moods = moodsData.map(entry => entry.mood);
+
+        new Chart(moodCtx, {
+            type: 'line',
+            data: {
+                labels: dates,
+                datasets: [{
+                    label: 'Mood Level',
+                    data: moods,
+                    borderColor: '#f5c542',
+                    backgroundColor: 'rgba(245, 197, 66, 0.2)',
+                    tension: 0.3,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#f5c542',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#f5c542',
+                            font: {
+                                family: 'Cinzel',
+                                size: 14
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: '#2e2e2e',
+                        titleColor: '#f5c542',
+                        bodyColor: '#f2c14e',
+                        borderColor: '#f5c542',
+                        borderWidth: 1,
+                        callbacks: {
+                            title: (items) => {
+                                const rawDate = new Date(moodsData[items[0].dataIndex].created_at);
+                                return rawDate.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            color: 'rgba(245, 197, 66, 0.1)'
+                        },
+                        ticks: {
+                            color: '#f5c542',
+                            maxRotation: 45,
+                            minRotation: 45
+                        }
+                    },
+                    y: {
+                        min: 1,
+                        max: 5,
+                        grid: {
+                            color: 'rgba(245, 197, 66, 0.1)'
+                        },
+                        ticks: {
+                            color: '#f5c542',
+                            stepSize: 1,
+                            callback: function(value) {
+                                return Number.isInteger(value) ? value : '';
+                            }
+                        }
+                    }
+                }
+            }
+        });
     });
 </script>
 
@@ -246,6 +332,18 @@
         margin-right: 10px;
         border-radius: 50%;
         box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+    }
+
+    .chart-wrapper {
+        position: relative;
+        margin: 0 auto;
+        width: 90%;
+        height: 400px;
+    }
+
+    #moodChart {
+        width: 100% !important;
+        height: 100% !important;
     }
 </style>
 
