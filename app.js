@@ -6,9 +6,10 @@ const { Pool } = require('pg');
 const cookieParser = require('cookie-parser');
 const { sequelize } = require('./config/database');
 const authRoutes = require('./routes/authRoutes');
+const settingsRoutes = require('./routes/settingsRoutes');
 const entriesController = require('./controllers/entriesController');
 const { checkUser } = require('./middleware/authMiddleware');
-const cleanupExpiredTokens = require('./tasks/cleanupExpiredTokens');
+// const cleanupExpiredTokens = require('./tasks/cleanupExpiredTokens');
 const { encrypt } = require('./utils/encryption');
 
 
@@ -154,6 +155,19 @@ app.post('/api/generate-prompt', async (req, res) => {
     return res.json({ aiPrompt: 'This is a testing prompt for debugging purposes.' });
   }
 
+  let userFocus = 'general'; // a fallback if user has no focus
+  try {
+    const user = await User.findOne({
+      where: { user_id: userId },
+      attributes: ['focus']
+    });
+    if (user && user.focus) {
+      userFocus = user.focus;
+    }
+  } catch (err) {
+    console.error('Error fetching user focus:', err.message);
+  }
+
   const prePrompt = `
     You are a tarot guide. Your task is to create a journaling prompt and a short description based on a tarot card drawn. 
 
@@ -164,6 +178,9 @@ app.post('/api/generate-prompt', async (req, res) => {
       - Directly relates to the card's themes and orientation.
       - Encourages personal reflection and growth.
       - Has a tone that is supportive, thoughtful, and inspiring.
+
+    Keep in mind the user's chosen focus for their journaling is: "${userFocus}".
+    Incorporate the essence of this focus into both the description and journaling prompt wherever possible.
 
     Output should follow this structure:
     1. A short description of the card's meaning (3-4 sentences).
@@ -438,6 +455,7 @@ app.use('/auth', authRoutes);
 app.use('/entries', entriesController);
 app.use('/data', dataController);
 app.get('/store', storeController.store_get);
+app.use('/settings', settingsRoutes);
 
 // Global Error Handler
 app.use((err, req, res, next) => {

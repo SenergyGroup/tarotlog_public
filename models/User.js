@@ -49,6 +49,10 @@ const User = sequelize.define('User', {
         allowNull: true, // Optional field for storing the token's expiration time
         field: 'tokenexpiration'
     },
+    focus: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
 }, {
     tableName: 'users', 
     timestamps: true,

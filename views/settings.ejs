@@ -33,10 +33,10 @@
                 <!-- Focus Area -->
                 <label for="focus">Focus for Journaling:</label>
                 <select id="focus" name="focus">
-                    <option value="self_growth">Self Growth</option>
-                    <option value="career">Career</option>
-                    <option value="romance">Romance</option>
-                    <option value="spirituality">Spirituality</option>
+                    <option value="self_growth" <%= focus === 'self_growth' ? 'selected' : '' %>>Self Growth</option>
+                    <option value="career" <%= focus === 'career' ? 'selected' : '' %>>Career</option>
+                    <option value="romance" <%= focus === 'romance' ? 'selected' : '' %>>Romance</option>
+                    <option value="spirituality" <%= focus === 'spirituality' ? 'selected' : '' %>>Spirituality</option>
                 </select>
         
                 <button type="submit">Save Changes</button>
