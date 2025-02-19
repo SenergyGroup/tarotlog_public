@@ -141,8 +141,9 @@ app.post('/api/save-response', async (req, res) => {
 });
 
 
-app.post('/api/generate-prompt', async (req, res) => {
+app.post('/api/generate-prompt', checkUser, async (req, res) => {
   const { cardName, orientation, meanings } = req.body;
+  const userId = req.user?.id;
 
   if (!cardName || !orientation || !meanings) {
     console.error('Missing required fields:', { cardName, orientation, meanings });
