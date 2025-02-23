@@ -443,6 +443,7 @@ app.post("/get-tarot-card", async (req, res) => {
 
 const dataController = require('./controllers/dataController'); 
 const storeController = require('./controllers/storeController');
+const dashboardController = require('./controllers/dashboardController');
 
 //EJS Routes
 app.get('/', (req, res) => res.render('home'));
@@ -453,6 +454,7 @@ app.get('/open-journal', (req, res) => res.render('openJournal'));
 
 // Route files
 app.use('/auth', authRoutes);
+app.use('/dashboard', dashboardController);
 app.use('/entries', entriesController);
 app.use('/data', dataController);
 app.get('/store', storeController.store_get);
