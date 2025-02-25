@@ -452,6 +452,68 @@ app.get('/tarot', (req, res) => {
 });
 app.get('/open-journal', (req, res) => res.render('openJournal'));
 
+// Card Glossary
+app.get('/card-glossary', async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const query = `
+      SELECT t.*,
+             COALESCE(r.entry_count, 0) AS total_entries
+      FROM tarot_cards t
+      LEFT JOIN (
+        SELECT card_id, COUNT(*) AS entry_count
+        FROM responses
+        WHERE user_id = $1
+        GROUP BY card_id
+      ) r ON t.card_id = r.card_id
+      ORDER BY t.card_id
+    `;
+    const { rows } = await pool.query(query, [userId]);
+    res.render('cardGlossary', { cards: rows, user: res.locals.user });
+  } catch (error) {
+    console.error('Error fetching all cards:', error);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
+app.get('/api/card-entry-count/:card_id', async (req, res) => {
+  const userId = req.user.id;
+  const cardId = req.params.card_id;
+  try {
+    const result = await pool.query(
+      `SELECT orientation, COUNT(*) AS entry_count 
+       FROM responses 
+       WHERE user_id = $1 AND card_id = $2 
+       GROUP BY orientation`,
+      [userId, cardId]
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching entry counts:', error);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
+app.get('/api/top-cards', async (req, res) => {
+  const userId = req.user.id;
+  try {
+    const { rows } = await pool.query(`
+      SELECT t.card_id, t.card_name, t.image_data, COUNT(*) AS total_entries
+      FROM responses r
+      JOIN tarot_cards t ON r.card_id = t.card_id
+      WHERE r.user_id = $1
+      GROUP BY t.card_id, t.card_name, t.image_data
+      ORDER BY total_entries DESC
+      LIMIT 10
+    `, [userId]);
+    res.json(rows);
+  } catch (error) {
+    console.error('Error fetching top cards:', error);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
+
 // Route files
 app.use('/auth', authRoutes);
 app.use('/dashboard', dashboardController);
