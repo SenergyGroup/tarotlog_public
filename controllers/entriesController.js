@@ -28,6 +28,7 @@ router.get('/', authenticateToken, async (req, res) => {
         let countQuery = `
             SELECT COUNT(*) AS total_entries
             FROM responses r 
+            JOIN tarot_cards t ON r.card_id = t.card_id
             WHERE r.user_id = $1
         `;
 
@@ -35,8 +36,8 @@ router.get('/', authenticateToken, async (req, res) => {
 
         // Add search condition if provided
         if (searchQuery) {
-            query += ` AND (r.prompt_text ILIKE $2 OR r.response_text ILIKE $2)`;
-            countQuery += ` AND (r.prompt_text ILIKE $2 OR r.response_text ILIKE $2)`;
+            query += ` AND (r.prompt_text ILIKE $2 OR r.response_text ILIKE $2 OR t.card_name ILIKE $2)`;
+            countQuery += ` AND (r.prompt_text ILIKE $2 OR r.response_text ILIKE $2 OR t.card_name ILIKE $2)`;
             params.push(searchQuery);
         }
 

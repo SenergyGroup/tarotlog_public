@@ -59,6 +59,11 @@ footer {
   padding: 10px;
 }
 
+.nav-left {
+  display: flex;
+  align-items: center;
+}
+
 /* Hamburger menu icon */
 .hamburger {
   display: none;            /* Hidden on large screens */
@@ -68,18 +73,12 @@ footer {
   user-select: none;        /* Prevent text selection */
 }
 
-/* Center and right sections on the same row by default */
-.nav-center,
-.nav-right {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-}
-
-/* Center links */
+/* Center section (main links) */
 .nav-center {
-  flex-direction: row;
+  display: flex;
   justify-content: center;
+  flex: 1; /* Grow to fill space for proper centering */
+  gap: 1.5rem;
 }
 
 .nav-center a {
@@ -95,7 +94,13 @@ footer {
   border-bottom: 2px solid var(--accent-purple);
 }
 
-/* Right side (login, profile circle, etc.) */
+/* Right section (login/profile) */
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
 .nav-right h1 {
   margin: 0;
   font-size: 1.2rem;
@@ -117,9 +122,9 @@ body, .app-container, .entry-list-page, form {
 
 /* Dark tarot theme */
 body {
-  font-family: 'Cinzel', serif;
+  font-family: 'Arial', sans-serif;
   background-color: var(--background-dark);
-  color: #e0e0e0;
+  color: #fff;
   margin: 0;
   padding: 0;
   min-height: 100vh;

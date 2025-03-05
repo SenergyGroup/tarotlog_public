@@ -24,30 +24,44 @@
     width: 90%;
     max-width: 1200px;
     margin: 40px;
-  }
-  /* Header */
-  .dashboard-header {
-    text-align: center;
-    margin-bottom: 30px;
-  }
-  .dashboard-header h1 {
-    font-size: 2.5rem;
-    margin: 0;
-    font-family: 'Cinzel', serif;
-  }
-  /* Dashboard Content Grid */
-  .dashboard-content {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-    transition: all 0.3s ease;
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 2rem;
+    padding: 2rem;
   }
-  /* Expanded State: Previous Entry spans full width; the other two are in a new row, side by side */
-  .dashboard-content.expanded {
-    grid-template-columns: 1fr 1fr;
+  .sidebar, .extras {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 1.5rem;
+    border-radius: 8px;
   }
-  .dashboard-content.expanded .previous-entry {
-    grid-column: 1 / -1;
+  .sidebar#sidebar-left {
+    cursor: pointer;
+  }
+  .sidebar#sidebar-left h2 {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+  /* Remove default bullets and spacing for the UL */
+  .sidebar#sidebar-left ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  /* Spacing between list items */
+  .sidebar#sidebar-left li {
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+  }
+  .main-content > div {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-radius: 8px;
+  }
+  h2, h3 {
+    margin-bottom: 1rem;
   }
   /* Card Styling */
   .card {
@@ -55,7 +69,7 @@
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    cursor: pointer;
+    
     transition: transform 0.2s ease;
   }
   .card:hover {
@@ -94,26 +108,53 @@
     background-color: var(--hover-purple);
   }
   /* Responsive */
-  @media (max-width: 768px) {
+  @media (max-width: 1024px) {
     .dashboard {
-      margin: 20px;
+      grid-template-columns: 1fr;
     }
+  
+    .sidebar, .extras {
+      order: 1;
+      margin-top: 1rem;
+    }
+  
+    .main-content {
+      order: 2;
+    }
+    @media (max-width: 768px) {
+      .dashboard {
+      padding: 1rem;
+    }
+  
+    .sidebar, .extras, .main-content > div {
+      padding: 1rem;
+    }
+  }
   }
 </style>
 </head>
 <body>
-  <div class="dashboard">
-    <div class="dashboard-content" id="dashboardContent">
+  <main class="dashboard">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar-left" onclick="location.href='/data'">
+      <h2>Your Stats</h2>
+      <ul>
+        <li>Current Streak: <strong><%= dailyStreak %></strong> days</li>
+        <li>Total Responses: <strong><%= totalResponses %></strong></li>
+        <li>Journaled This Month: <strong><%= monthResponses %></strong></li>
+        <li>Average Mood This Month: <strong><%= formattedAvgMood || 'N/A' %></strong></li>
+        <li>Most Pulled Card: <strong><%= mostPulledCard || 'N/A' %></strong></li>
+      </ul>
+    </aside>
+  
+    <!-- Main content -->
+    <section class="main-content">
       <!-- Previous Entry Card -->
       <div class="card previous-entry" id="prevEntry" onclick="toggleEntry()">
-          <h2>Previous Entry</h2>
-          <p>Click to load your previous entry.</p>
-      </div>          
-      <!-- Streak Data Card -->
-      <div class="card streak-data" onclick="location.href='/data'">
-        <h2>Data</h2>
-        <p>Current Streak: <strong><%= dailyStreak %></strong> days</p>
+        <h2>Previous Entry</h2>
+        <p>Click to load your previous entry.</p>
       </div>
+    
       <!-- Actions Card -->
       <div class="card actions">
         <h2>Actions</h2>
@@ -122,27 +163,36 @@
           <a href="/open-journal" class="btn open-journal">Open Journal</a>
         </div>
       </div>
-    </div>
-  </div>
+    </section>
+  
+    <!-- Extras (optional) -->
+    <aside class="extras">
+      <div class="quote">
+        <h3>Card of the Day</h3>
+        <p>This would be a placeholder for a card of the day implementation.</p>
+      </div>
+    </aside>
+  </main>
   <script>
     // Global variable to store the expanded HTML content
     let fullEntryHtml = null;
     
     function toggleEntry() {
       const prevEntryCard = document.getElementById('prevEntry');
-      const content = document.getElementById('dashboardContent');
-      const isExpanded = content.classList.contains('expanded');
+      const dashboard = document.querySelector('.dashboard');
+      const isExpanded = dashboard.classList.contains('expanded');
   
       if (isExpanded) {
-        // Collapse the card: remove expanded class and set default text
-        content.classList.remove('expanded');
+        // Collapse: remove 'expanded' from .dashboard
+        dashboard.classList.remove('expanded');
+        // Reset the card content
         prevEntryCard.innerHTML = `
           <h2>Previous Entry</h2>
           <p>Click to load your previous entry.</p>
         `;
       } else {
-        // Expand the card: add expanded class
-        content.classList.add('expanded');
+        // Expand: add 'expanded' to .dashboard
+        dashboard.classList.add('expanded');
         
         // If we already have the full entry stored, reuse it
         if (fullEntryHtml) {
@@ -152,24 +202,24 @@
           fetch('/dashboard/latest-entry')
             .then(response => response.json())
             .then(data => {
-                if (data.latestEntry) {
-                    fullEntryHtml = `
-                      <h2>Previous Entry</h2>
-                      <p><strong>Prompt:</strong> ${data.latestEntry.prompt_text}</p>
-                      <br>
-                      <p><strong>Response:</strong> ${data.latestEntry.response_text}</p>
-                      <br>
-                      <p><small><strong>Date:</strong> ${new Date(data.latestEntry.created_at).toLocaleString()}</small></p>
-                    `;
-                } else {
-                    fullEntryHtml = '<h2>Previous Entry</h2><p>No previous entry found. Start your journal!</p>';
-                }
-                prevEntryCard.innerHTML = fullEntryHtml;
+              if (data.latestEntry) {
+                fullEntryHtml = `
+                  <h2>Previous Entry</h2>
+                  <p><strong>Prompt:</strong> ${data.latestEntry.prompt_text}</p><br>
+                  <p><strong>Response:</strong> ${data.latestEntry.response_text}</p><br>
+                  <p><small><strong>Date:</strong> ${
+                    new Date(data.latestEntry.created_at).toLocaleString()
+                  }</small></p>
+                `;
+              } else {
+                fullEntryHtml = '<h2>Previous Entry</h2><p>No previous entry found. Start your journal!</p>';
+              }
+              prevEntryCard.innerHTML = fullEntryHtml;
             })
             .catch(err => {
-                console.error("Error fetching latest entry:", err);
-                fullEntryHtml = '<h2>Previous Entry</h2><p>Error loading entry</p>';
-                prevEntryCard.innerHTML = fullEntryHtml;
+              console.error("Error fetching latest entry:", err);
+              fullEntryHtml = '<h2>Previous Entry</h2><p>Error loading entry</p>';
+              prevEntryCard.innerHTML = fullEntryHtml;
             });
         }
       }

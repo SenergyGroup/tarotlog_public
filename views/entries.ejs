@@ -27,26 +27,29 @@
   <ul class="entries-list">
     <% if (entries.length > 0) { %>
       <% 
-        // Define the properCase function once at the beginning of the loop
-        const properCase = (str) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-      %>
-      <% entries.forEach(entry => { %>
-        <li class="entry-item">
-          <div class="entry-summary" data-entry-id="<%= entry.response_id %>">
-            <span class="entry-date"><%= new Date(entry.created_at).toLocaleDateString() %></span>
-            <span class="entry-card"><%= entry.card_name %></span>
-            <span class="entry-orientation"><%= properCase(entry.orientation) %></span>
-          </div>
-          <div class="entry-details hidden">
-            <p class="entry-prompt"><strong>Prompt:</strong> <%= entry.parsed_prompt_text %></p>
-            <br>
-            <p class="entry-response"><strong>Response:</strong> <%= entry.response_text %></p>
-          </div>
-        </li>
-      <% }) %>
-    <% } else { %>
-      <li>No entries found.</li>
-    <% } %>
+          // Safer properCase function
+          const properCase = (str) => {
+            if (!str) return 'N/A'; // Fallback if orientation is missing
+            return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+          };
+        %>
+        <% entries.forEach(entry => { %>
+          <li class="entry-item">
+            <div class="entry-summary" data-entry-id="<%= entry.response_id %>">
+              <span class="entry-date"><%= new Date(entry.created_at).toLocaleDateString() %></span>
+              <span class="entry-card"><%= entry.card_name %></span>
+              <span class="entry-orientation"><%= properCase(entry.orientation) %></span>
+            </div>
+            <div class="entry-details hidden">
+              <p class="entry-prompt"><strong>Prompt:</strong> <%= entry.parsed_prompt_text %></p>
+              <br>
+              <p class="entry-response"><strong>Response:</strong> <%= entry.response_text %></p>
+            </div>
+          </li>
+        <% }) %>
+      <% } else { %>
+        <li>No entries found.</li>
+      <% } %>
   </ul>
 </div>
 

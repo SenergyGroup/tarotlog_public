@@ -50,9 +50,59 @@ router.get('/', checkUser, async (req, res) => {
       };
   
       const dailyStreak = computeDailyStreak(entries);
+
+      const totalResponsesQuery = `
+        SELECT COUNT(*) AS total_responses
+        FROM responses
+        WHERE user_id = $1
+      `;
+      const totalResponsesResult = await pool.query(totalResponsesQuery, [userId]);
+      const totalResponses = totalResponsesResult.rows[0].total_responses;
+
+      // Query to count responses (journals) for the current month.
+      const monthResponsesQuery = `
+        SELECT COUNT(*) AS month_responses
+        FROM responses
+        WHERE user_id = $1
+          AND created_at >= date_trunc('month', CURRENT_DATE)
+      `;
+      const monthResponsesResult = await pool.query(monthResponsesQuery, [userId]);
+      const monthResponses = monthResponsesResult.rows[0].month_responses;
+
+      // Query to get the average mood for responses this month.
+      const averageMoodQuery = `
+        SELECT AVG(mood) AS avg_mood
+        FROM responses
+        WHERE user_id = $1
+          AND created_at >= date_trunc('month', CURRENT_DATE)
+      `;
+      const averageMoodResult = await pool.query(averageMoodQuery, [userId]);
+      const avgMood = averageMoodResult.rows[0].avg_mood;
+      const formattedAvgMood = avgMood ? Number(avgMood).toFixed(1) : null;
+
+      // Query to determine the most pulled card for the user.
+      // We join with the tarot_cards table to get the card_name.
+      const mostPulledCardQuery = `
+        SELECT tc.card_name, COUNT(*) AS count
+        FROM responses r
+        JOIN tarot_cards tc ON r.card_id = tc.card_id
+        WHERE r.user_id = $1
+        GROUP BY tc.card_name
+        ORDER BY count DESC
+        LIMIT 1
+      `;
+      const mostPulledCardResult = await pool.query(mostPulledCardQuery, [userId]);
+      const mostPulledCard = mostPulledCardResult.rows.length ? mostPulledCardResult.rows[0].card_name : null;
   
       // Render the dashboard and pass the computed daily streak
-      res.render('dashboard', { dailyStreak });
+      res.render('dashboard', { 
+        dailyStreak,
+        totalResponses,
+        monthResponses,
+        formattedAvgMood,
+        mostPulledCard 
+      });
+      
     } catch (err) {
       console.error('Dashboard query error:', err);
       res.status(500).send('Internal Server Error');
