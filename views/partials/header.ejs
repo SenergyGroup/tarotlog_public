@@ -26,6 +26,7 @@
             </div>
 
             <!-- Nav Center -->
+            <% if (user) { %>
             <div class="nav-center" id="nav-center">
                 <a href="/dashboard">Dashboard</a>
                 <a href="/tarot">Draw a Card</a>
@@ -35,6 +36,8 @@
                 <a href="/card-glossary">Card Glossary</a>
             <!-- <a href="/store">Store</a> -->
             </div>
+            <% } else { %>
+            <% } %>
 
             <!-- Nav Right -->
             <div class="nav-right" id="nav-right">
@@ -47,8 +50,8 @@
                 </div>
                 </div>
             <% } else { %>
-                <h1><a href="/auth/login">Log In</a></h1>
-                <h1><a href="/auth/signup">Sign Up</a></h1>
+                <!--<h1><a href="/auth/login">Log In</a></h1> -->
+                <!--<h1><a href="/auth/signup">Sign Up</a></h1> -->
             <% } %>
             </div>
         </nav>
