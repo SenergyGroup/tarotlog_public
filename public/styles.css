@@ -14,46 +14,96 @@ h1, p, button, textarea {
 
 header, footer {
   position: fixed;
-  left: 50%; /* Changed from 0 to ensure centering */
-  transform: translateX(-50%); /* Added to center the header/footer */
-  width: 95%; /* Changed to ensure 95% width with space on sides */
-  z-index: 1000; /* Ensure header/footer stay on top */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 95%;
+  z-index: 1000;
   background-color: #1c1c1c;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-  padding: 10px 20px;
 }
 
 header {
   top: 0;
+  display: flex;
+  flex-direction: column;  /* Stacks the brand title above the nav */
+  align-items: center;
+  padding: 0; /* Remove extra space so the title is snug */
 }
 
+/* Footer stays pinned at bottom */
 footer {
   bottom: 0;
 }
 
-nav {
-    display: flex;
-    justify-content: space-between; /* Push left and right groups apart */
-    width: 95%; /* Ensure full width usage */
+/* Brand Title (centered at the top) */
+.brand-title {
+  margin: 0;
+  text-align: center;
+  padding: 10px 0; /* Space around the title */
 }
 
-.nav-left h1, .nav-right h1 {
-    margin: 0; /* Remove default margin from h1 */
-    font-size: 2rem; /* Adjust font size as needed */
+.brand-title a {
+  color: var(--accent-gold);
+  text-decoration: none;
+  font-size: 2rem;
 }
 
-.nav-left a, .nav-right a {
-    color: var(--accent-gold);
-    text-decoration: none;
+/* Nav container beneath the title */
+.header-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 95%;
+  max-width: 1200px;
+  background-color: #1c1c1c; /* Match header background */
+  padding: 10px;
 }
 
+/* Hamburger menu icon */
+.hamburger {
+  display: none;            /* Hidden on large screens */
+  font-size: 1.8rem;
+  color: var(--accent-gold);
+  cursor: pointer;
+  user-select: none;        /* Prevent text selection */
+}
+
+/* Center and right sections on the same row by default */
+.nav-center,
 .nav-right {
-    display: flex;
-    gap: 20px; /* Space between Sign Up and Log In */
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
 }
 
+/* Center links */
+.nav-center {
+  flex-direction: row;
+  justify-content: center;
+}
+
+.nav-center a {
+  color: var(--accent-gold);
+  text-decoration: none;
+  font-size: 1rem;
+  padding: 0.5rem;
+  transition: color 0.3s ease, border-bottom 0.3s ease;
+}
+
+.nav-center a:hover {
+  color: var(--hover-purple);
+  border-bottom: 2px solid var(--accent-purple);
+}
+
+/* Right side (login, profile circle, etc.) */
 .nav-right h1 {
-    font-size: 1.2rem; /* Adjust to differentiate from the title */
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.nav-right a {
+  color: var(--accent-gold);
+  text-decoration: none;
 }
 
 
@@ -740,8 +790,9 @@ form div {
 
 /* Profile Menu */
 .profile-menu {
-  position: relative;
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  position: relative; /* For the dropdown menu */
 }
 
 .profile-circle {
@@ -972,16 +1023,21 @@ form div {
 
 /* Mobile responsiveness */
 @media (max-width: 768px) {
-  nav {
-      flex-direction: column; /* Stack items */
-      align-items: center; /* Center-align stacked items */
-      text-align: center;
+  .hamburger {
+    display: block;
   }
 
+  .nav-center,
   .nav-right {
-      flex-direction: column; /* Stack Sign Up and Log In */
-      gap: 10px; /* Adjust gap */
-      padding-right: 20px;
+    display: none;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 10px;
+  }
+
+  .header-nav.active .nav-center,
+  .header-nav.active .nav-right {
+    display: flex;
   }
 
   .app-container {

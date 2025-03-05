@@ -1,4 +1,14 @@
 <footer>A blend of the mystic and reflection</footer>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const hamburger = document.getElementById('hamburger');
+        const headerNav = document.querySelector('.header-nav');
+
+        hamburger.addEventListener('click', () => {
+        headerNav.classList.toggle('active');
+        });
+    });
+</script>
 
 </body>
 </html>

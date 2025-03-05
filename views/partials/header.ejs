@@ -2,40 +2,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tarot Card Drawer</title>
+    <title>TarotTales</title>
     <link rel="stylesheet" href="/styles.css">
 </head>
 
 <body>
     <header>
-        <nav>
-            <div class="nav-left">
-                <% if (user) { %>
-                    <h1><a href="/dashboard">TarotLog</a></h1>
-                <% } else { %>
-                    <h1><a href="/">TarotLog</a></h1>
-                <% } %>
+          <!-- Brand Title (centered) -->
+        <h1 class="brand-title">
+            <% if (user) { %>
+            <a href="/dashboard">TarotTales</a>
+            <% } else { %>
+            <a href="/">TarotTales</a>
+            <% } %>
+        </h1>
+
+        <!-- Navigation Container -->
+        <nav class="header-nav">
+            <!-- Hamburger Icon (hidden on large screens) -->
+            <div class="hamburger" id="hamburger">&#9776;</div>
+
+            <!-- Nav Center -->
+            <div class="nav-center" id="nav-center">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/tarot">Draw a Card</a>
+            <a href="/open-journal">Open Journal</a>
+            <a href="/entries">Entries</a>
+            <a href="/data">Data</a>
+            <a href="/card-glossary">Card Glossary</a>
+            <a href="/store">Store</a>
             </div>
-            <div class="nav-center">
-                <!-- Add content here if I want to have something-->
-              </div>
-              <div class="nav-right">
-                <% if (user) { %>
-                    <div class="profile-menu">
-                        <div class="profile-circle" id="profile-circle">👤</div> <!-- Placeholder for profile picture -->
-                        <div class="dropdown-menu" id="dropdown-menu">
-                            <a href="/entries">Entries</a>
-                            <a href="/data">Data</a>
-                            <a href="/card-glossary">Card Glossary</a>
-                            <a href="/store">Store</a>
-                            <a href="/settings">Settings</a>
-                            <a href="/auth/logout">Log Out</a>
-                        </div>
-                    </div>
-                <% } else { %>
-                    <h1><a href="/auth/signup">Sign Up</a></h1>
-                    <h1><a href="/auth/login">Log In</a></h1>
-                <% } %>
+
+            <!-- Nav Right -->
+            <div class="nav-right" id="nav-right">
+            <% if (user) { %>
+                <div class="profile-menu">
+                <div class="profile-circle" id="profile-circle">👤</div>
+                <div class="dropdown-menu" id="dropdown-menu">
+                    <a href="/settings">Settings</a>
+                    <a href="/auth/logout">Log Out</a>
+                </div>
+                </div>
+            <% } else { %>
+                <h1><a href="/auth/login">Log In</a></h1>
+                <h1><a href="/auth/signup">Sign Up</a></h1>
+            <% } %>
             </div>
         </nav>
     </header>

@@ -446,7 +446,16 @@ const storeController = require('./controllers/storeController');
 const dashboardController = require('./controllers/dashboardController');
 
 //EJS Routes
-app.get('/', (req, res) => res.render('home'));
+app.get('/', checkUser, (req, res) => {
+  // If the user is authenticated, req.user will be set by checkUser
+  if (req.user) {
+    return res.redirect('/dashboard');
+  }
+  // Otherwise, render the home page
+  res.render('home');
+});
+
+
 app.get('/tarot', (req, res) => {
   res.render('tarot', { user: res.locals.user });
 });
