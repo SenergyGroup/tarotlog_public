@@ -9,10 +9,8 @@ router.get('/', checkUser, async (req, res) => {
       // Fetch user data
         const userId = req.user?.id; // Use optional chaining to handle cases where req.user might be undefined
         if (!userId) {
-            console.error("[ERROR] User is not authenticated.");
-            return res.status(401).json({ error: "User not authenticated" });
+          return res.redirect('/');
         }
-
         const foundUser = await User.findOne({
             where: { user_id: userId },
             attributes: ['focus']

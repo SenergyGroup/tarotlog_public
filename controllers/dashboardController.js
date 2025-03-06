@@ -9,7 +9,8 @@ const router = express.Router();
 router.get('/', checkUser, async (req, res) => {
     const userId = req.user?.id;
     if (!userId) {
-      return res.status(401).send('User not authenticated');
+      console.error("[ERROR] User is not authenticated.");
+      return res.redirect('/');
     }
     
     try {

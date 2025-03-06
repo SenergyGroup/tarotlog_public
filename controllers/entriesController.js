@@ -7,6 +7,11 @@ const { decrypt } = require('../utils/encryption');
 
 // Fetch entries for logged-in user with optional filters
 router.get('/', authenticateToken, async (req, res) => {
+    const userId = req.user?.id;
+    if (!userId) {
+        console.error("[ERROR] User is not authenticated.");
+        return res.redirect('/');
+    }
     try {
         const userId = req.user.id; // Extract user ID from JWT
         const filter = req.query.filter || 'most-recent'; // Get the filter parameter from query string

@@ -457,12 +457,29 @@ app.get('/', checkUser, (req, res) => {
 
 
 app.get('/tarot', (req, res) => {
+  const userId = req.user?.id;
+  if (!userId) {
+    return res.redirect('/');
+  }
   res.render('tarot', { user: res.locals.user });
 });
-app.get('/open-journal', (req, res) => res.render('openJournal'));
+
+app.get('/open-journal', (req, res) => {
+  const userId = req.user?.id;
+  if (!userId) {
+    return res.redirect('/');
+  }
+
+  res.render('openJournal', { user: res.locals.user });
+});
 
 // Card Glossary
 app.get('/card-glossary', async (req, res) => {
+  const userId = req.user?.id;
+  if (!userId) {
+    return res.redirect('/');
+  }
+
   try {
     const userId = req.user.id;
     const query = `

@@ -9,7 +9,7 @@ router.get('/', checkUser, async (req, res) => {
         const userId = req.user?.id; // Use optional chaining to handle cases where req.user might be undefined
         if (!userId) {
           console.error("[ERROR] User is not authenticated.");
-          return res.status(401).json({ error: "User not authenticated" });
+          return res.redirect('/');
         }
 
         const suitQuery = `
