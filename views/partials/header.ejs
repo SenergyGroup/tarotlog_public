@@ -4,6 +4,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MyTarotTales</title>
     <link rel="stylesheet" href="/styles.css">
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.innerWidth <= 768) {
+                let lastScrollY = window.scrollY;
+                const header = document.querySelector('header');
+                const handleScroll = () => {
+                const currentScrollY = window.scrollY;
+                if (currentScrollY > lastScrollY && currentScrollY > header.offsetHeight) {
+                    header.classList.add('header-hidden');
+                } else {
+                    header.classList.remove('header-hidden');
+                }
+                lastScrollY = currentScrollY;
+                };
+                window.addEventListener('scroll', debounce(() => {
+                requestAnimationFrame(handleScroll);
+                }, 50), { passive: true });
+            }
+            });
+        
+            // Debounce utility function:
+            function debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+            }
+        </script>      
 </head>
 
 <body>

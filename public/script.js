@@ -46,13 +46,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 try {
                     const response = await fetch(`${API_BASE_URL}/api/draw-card`);
                     if (!response.ok) {
-                        throw new Error('Failed to fetch card');
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || 'Failed to fetch card');
                     }
 
                     const card = await response.json();
-
                     await updateCardUI(card);
-
                 } catch (error) {
                     console.error('Can not draw a card:', error);
                     alert(`Can not draw a card: ${error.message}`);

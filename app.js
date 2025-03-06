@@ -274,7 +274,6 @@ app.post("/get-tarot-card", async (req, res) => {
     const REQUEST_LIMIT = 5; // Set your desired daily limit here
 
     if (requestCount >= REQUEST_LIMIT) {
-      alert(`You have reached your daily open journal limit.`);
       return res.status(403).json({ error: "Open journal request limit reached." });
     }
 
