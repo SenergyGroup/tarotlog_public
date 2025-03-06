@@ -30,7 +30,12 @@ const signup_post = async (req, res) => {
     const userData = { username, email, password };
     const newUser = await User.create(userData);
     const token = createToken(newUser.user_id);
-    res.cookie('jwt', token, { httpOnly: true, maxAge: maxAgeCookie });
+    res.cookie('jwt', token, { 
+      httpOnly: true, 
+      maxAge: maxAgeCookie,
+      domain: 'mytarottales.com',
+      secure: true,
+    });
     res.status(201).json({ message: 'User created successfully', user: newUser });
   } catch (error) {
     let errors = {};
@@ -55,7 +60,12 @@ const login_post = async (req, res) => {
   try {
     const user = await User.login(email, password);
     const token = jwt.sign({ id: user.user_id, username: user.username }, process.env.JWT_SECRET, { expiresIn: maxAge });
-    res.cookie('jwt', token, { httpOnly: true, maxAge: 3 * 24 * 60 * 60 * 1000 });
+    res.cookie('jwt', token, { 
+      httpOnly: true, 
+      maxAge: 3 * 24 * 60 * 60 * 1000,
+      domain: 'mytarottales.com',
+      secure: true,
+     });
     res.status(200).json({ userID: user.user_id, username: user.username });
   } catch (err) {
     if (err.message.includes('No email associated')) {
