@@ -54,8 +54,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     await updateCardUI(card);
 
                 } catch (error) {
-                    console.error('Error drawing card:', error);
-                    alert(`Failed to draw card: ${error.message}`);
+                    console.error('Can not draw a card:', error);
+                    alert(`Can not draw a card: ${error.message}`);
                 } finally {
                     isDrawing = false;
                     spinner.style.display = 'none';

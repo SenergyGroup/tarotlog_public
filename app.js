@@ -89,8 +89,7 @@ app.get('/api/draw-card', async (req, res) => {
     let drawCount = rows[0]?.draw_count || 0;
 
     if (drawCount >= 5) {
-      alert(`You have reached your daily card draw limit.`);
-      return res.status(403).json({ error: 'Daily card draw limit reached.' });
+      return res.status(403).json({ error: `You have reached your daily card draw limit.` });
     }
 
     // Increment draw count
