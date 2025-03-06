@@ -30,14 +30,27 @@ const pool = new Pool({
   },
 });
 
+const allowedOrigins = ['https://www.mytarottales.com', 'https://mytarottales.com'];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
+  credentials: true // to allow cookies to be sent/received
+}));
+
 // Middleware
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(cors());
 app.use(cookieParser());
 app.use(checkUser);
-
 
 // View engine
 app.set('view engine', 'ejs');
