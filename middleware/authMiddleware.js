@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
 
 const checkUser = (req, res, next) => {
-  console.log('Cookies:', req.cookies);
   const token = req.cookies.jwt;
 
   if (token) {
@@ -11,7 +10,6 @@ const checkUser = (req, res, next) => {
         res.locals.user = null;
         req.user = null
       } else {
-        console.log('Decoded token:', decodedToken);
         res.locals.user = { id: decodedToken.id, username: decodedToken.username };
         req.user = { id: decodedToken.id, username: decodedToken.username };
       }
