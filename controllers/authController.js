@@ -16,8 +16,8 @@ const setJwtCookie = (req, res, token, maxAgeCookieValue) => {
   };
 
   // If running on your custom domain, set the domain option.
-  if (req.hostname && req.hostname.includes('mytarottales.com')) {
-    cookieOptions.domain = 'mytarottales.com';
+  if (req.hostname && req.hostname.includes('www.mytarottales.com')) {
+    cookieOptions.domain = 'www.mytarottales.com';
   }
   
   res.cookie('jwt', token, cookieOptions);
