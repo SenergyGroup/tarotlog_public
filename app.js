@@ -18,6 +18,33 @@ const { encrypt } = require('./utils/encryption');
 const app = express();
 const port = process.env.PORT || 3000;
 
+const allowedOrigins = ['https://www.mytarottales.com', 'https://mytarottales.com', 
+  'http://localhost:3000',
+];
+
+app.use(cors({
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      return callback(null, true);
+    } else {
+      return callback(new Error('Not allowed by CORS'), false);
+    }
+  },
+  credentials: true
+}));
+
+app.options('*', cors());
+
+app.set('trust proxy', true);
+
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  next();
+});
+
 //GPT API
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -29,21 +56,6 @@ const pool = new Pool({
     rejectUnauthorized: false, 
   },
 });
-
-const allowedOrigins = ['https://www.mytarottales.com', 'https://mytarottales.com'];
-
-app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-      return callback(new Error(msg), false);
-    }
-    return callback(null, true);
-  },
-  credentials: true // to allow cookies to be sent/received
-}));
 
 // Middleware
 app.use(express.static('public'));

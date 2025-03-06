@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
     //    : 'https://tarotlog-public.onrender.com';
     //const API_BASE_URL = 'http://localhost:3000';
     //const API_BASE_URL = 'https://tarotlog-public.onrender.com';
-    const API_BASE_URL = 'https://mytarottales.com';
+    const API_BASE_URL = 'https://www.mytarottales.com';
 
     const moodSlider = document.getElementById("mood-slider");
     const drawCardBtn = document.getElementById('draw-card-btn');
