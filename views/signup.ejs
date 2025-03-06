@@ -51,8 +51,8 @@
             const data = await res.json();
             if (data.errors) {
                 usernameError.textContent = data.errors.username || '';
-                emailError.textContent = data.errors.email;
-                passwordError.textContent = data.errors.password;
+                emailError.textContent = data.errors.email || '';
+                passwordError.textContent = data.errors.password || '';
             }
             if (data.user) {
                 const successAlert = document.getElementById("success-alert");

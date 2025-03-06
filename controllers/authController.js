@@ -63,11 +63,13 @@ const signup_post = async (req, res) => {
       });
     }
     if (error.name === 'SequelizeUniqueConstraintError') {
-      if (err.path === 'email') {
-        errors.email = 'This email is already registered';
-      } else if (err.path === 'username') {
-        errors.username = 'This username is already taken';
-      }
+      error.errors.forEach((errorItem) => {
+        if (errorItem.path === 'email') {
+          errors.email = 'This email is already registered';
+        } else if (errorItem.path === 'username') {
+          errors.username = 'This username is already taken';
+        }
+      });
     }
 
     res.status(400).json({ errors });
