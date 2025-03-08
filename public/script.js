@@ -223,8 +223,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const promptSection = document.querySelector('.prompt-section');
 
         if (cardImage) {
-            // cardImage.src = `https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/tarot_backs/${deck_back}.png`;
-            cardImage.src = 'https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/image_back.png';
+            const deckBack = user && user.deck_back ? user.deck_back : 'image_back_4';
+            cardImage.src = `https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/deck_backs/${deckBack}.png`;
             cardImage.alt = 'Facedown Card';
         }
 

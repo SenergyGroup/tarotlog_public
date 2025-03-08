@@ -11,7 +11,10 @@
 <div class="app-container">
     <div class="card-section">
         <div class="card-container">
-            <img id="drawn-card" src="https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/image_back.png" alt="Facedown Card" class="card-image">
+            <img id="drawn-card" 
+            src="https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/deck_backs/<%= user && user.deck_back ? user.deck_back : 'image_back_4' %>.png" 
+            alt="Facedown Card" 
+            class="card-image">
         </div>
         <button id="draw-card-btn" class="draw-button">Draw a Card</button>
         

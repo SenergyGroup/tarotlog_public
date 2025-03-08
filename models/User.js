@@ -58,6 +58,11 @@ const User = sequelize.define('User', {
       allowNull: false,
       defaultValue: 'rider_white',
     },
+    deck_back: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'image_back_4'
+    },
 }, {
     tableName: 'users', 
     timestamps: true,

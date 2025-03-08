@@ -1,13 +1,66 @@
 <%- include('partials/header'); -%>
 <script src="/profile.js"></script>
+<style>
+    .custom-dropdown {
+        position: relative;
+        width: 220px; /* Adjust as needed */
+        font-family: sans-serif;
+      }
+      
+      .selected-option {
+        padding: 10px;
+        border: 1px solid #ccc;
+        background: #2e2e2e;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: #fff;
+      }
+      
+      .arrow-icon {
+        margin-left: 10px;
+      }
+      
+      .dropdown-options {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        max-height: 200px;
+        overflow-y: auto;
+        background: #2e2e2e;
+        border: 1px solid #ccc;
+        z-index: 100;
+      }
+      
+      .dropdown-option {
+        display: flex;
+        align-items: center;
+        padding: 5px;
+        cursor: pointer;
+        transition: background 0.2s ease;
+      }
+      
+      .dropdown-option:hover {
+        background: #7a4b9f;
+      }
+      
+      .dropdown-option img {
+        width: 40px;
+        height: auto;
+        margin-right: 10px;
+      }
+</style>
 
 <div class="settings-container">
     <nav class="settings-nav">
         <ul>
             <li data-section="general" class="active">General</li>
-            <li data-section="notifications">Notifications</li>
+            <!-- <li data-section="notifications">Notifications</li> -->
             <li data-section="billing">Billing</li>
-            <li data-section="login-security">Login & Security</li>
+            <!-- <li data-section="login-security">Login & Security</li> -->
         </ul>
     </nav>
     <div class="settings-content">
@@ -20,18 +73,92 @@
                 
                 <!-- Card Back Selection -->
                 <label for="card-back">Card Back:</label>
-                <select id="card-back" name="card_back">
-                    <option value="default">Default</option>
-                </select>
+                    <div class="custom-dropdown" id="deck-back-dropdown">
+                        <!-- This is the visible part that shows the selected option -->
+                        <div class="selected-option" id="selected-deck-back">
+                        <span id="selected-deck-back-text">
+                            <%= deck_back === 'image_back_1' ? 'Artistic Sky' : 
+                                deck_back === 'image_back_2' ? 'Landscape' : 
+                                deck_back === 'image_back_3' ? 'Space' : 
+                                deck_back === 'image_back_4' ? 'Sun and Moon' : 
+                                deck_back === 'image_back_5' ? 'Mystic Tarot' : 
+                                deck_back === 'image_back_6' ? 'Sunset Waves' : 
+                                deck_back === 'image_back_7' ? 'Archangel' : 'Select Deck Back' %>
+                        </span>
+                        <span class="arrow-icon">▼</span>
+                        </div>
+                        <!-- This is the hidden dropdown list with the image options -->
+                        <div class="dropdown-options" id="deck-back-options">
+                            <div class="dropdown-option" data-value="image_back_1" data-name="Artistic Sky">
+                            <img src="https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/deck_backs/image_back_1.png" alt="Artistic Sky">
+                            <span>Artistic Sky</span>
+                            </div>
+                            <div class="dropdown-option" data-value="image_back_2" data-name="Landscape">
+                            <img src="https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/deck_backs/image_back_2.png" alt="Landscape">
+                            <span>Landscape</span>
+                            </div>
+                            <div class="dropdown-option" data-value="image_back_3" data-name="Space">
+                            <img src="https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/deck_backs/image_back_3.png" alt="Space">
+                            <span>Space</span>
+                            </div>
+                            <div class="dropdown-option" data-value="image_back_4" data-name="Sun and Moon">
+                            <img src="https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/deck_backs/image_back_4.png" alt="Sun and Moon">
+                            <span>Sun and Moon</span>
+                            </div>
+                            <div class="dropdown-option" data-value="image_back_5" data-name="Mystic Tarot">
+                            <img src="https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/deck_backs/image_back_5.png" alt="Mystic Tarot">
+                            <span>Mystic Tarot</span>
+                            </div>
+                            <div class="dropdown-option" data-value="image_back_6" data-name="Sunset Waves">
+                            <img src="https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/deck_backs/image_back_6.png" alt="Sunset Waves">
+                            <span>Sunset Waves</span>
+                            </div>
+                            <div class="dropdown-option" data-value="image_back_7" data-name="Archangel">
+                            <img src="https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/deck_backs/image_back_7.png" alt="Archangel">
+                            <span>Archangel</span>
+                            </div>
+                        </div>
+                        <!-- Hidden input to hold the value for form submission -->
+                        <input type="hidden" name="deck_back" id="deck_back_hidden" value="<%= deck_back %>">
+                    </div>
         
                 <!-- Active Card Theme -->
                 <label for="deck_preference">Active Card Theme:</label>
-                <select id="deck_preference" name="deck_preference">
-                    <option value="rider_white" <%= deck_preference === 'rider_white' ? 'selected' : '' %>>Rider-Waite</option>
-                    <option value="clown_tarot" <%= deck_preference === 'clown_tarot' ? 'selected' : '' %>>Clown Town Tarot</option>
-                    <option value="anecdotes" <%= deck_preference === 'anecdotes' ? 'selected' : '' %>>Anecdotes</option>
-                    <option value="arlecchinos" <%= deck_preference === 'arlecchinos' ? 'selected' : '' %>>Arlecchinos</option>
-                </select>
+                <div class="custom-dropdown" id="card-theme-dropdown">
+                <!-- Visible part that shows the selected option -->
+                <div class="selected-option" id="selected-card-theme">
+                    <span id="selected-card-theme-text">
+                    <%= deck_preference === 'rider_white' ? 'Rider-Waite' : 
+                        deck_preference === 'clown_tarot' ? 'Clown Town Tarot' : 
+                        deck_preference === 'anecdotes' ? 'Anecdotes' : 
+                        deck_preference === 'arlecchinos' ? 'Arlecchinos' : 'Select Deck' %>
+                    </span>
+                    <span class="arrow-icon">▼</span>
+                </div>
+                
+                <!-- Hidden dropdown list with image options -->
+                <div class="dropdown-options" id="card-theme-options">
+                    <div class="dropdown-option" data-value="rider_white" data-name="Rider-Waite">
+                    <img src="https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/tarot_decks/rider_white/image_1.jpg" alt="Rider-Waite">
+                    <span>Rider-Waite</span>
+                    </div>
+                    <div class="dropdown-option" data-value="clown_tarot" data-name="Clown Town Tarot">
+                    <img src="https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/tarot_decks/clown_tarot/image_1.jpg" alt="Clown Town Tarot">
+                    <span>Clown Town Tarot</span>
+                    </div>
+                    <div class="dropdown-option" data-value="anecdotes" data-name="Anecdotes">
+                    <img src="https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/tarot_decks/anecdotes/image_1.jpg" alt="Anecdotes">
+                    <span>Anecdotes</span>
+                    </div>
+                    <div class="dropdown-option" data-value="arlecchinos" data-name="Arlecchinos">
+                    <img src="https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/tarot_decks/arlecchinos/image_1.jpg" alt="Arlecchinos">
+                    <span>Arlecchinos</span>
+                    </div>
+                </div>
+                
+                <!-- Hidden input for form submission -->
+                <input type="hidden" name="deck_preference" id="deck_preference_hidden" value="<%= deck_preference %>">
+                </div>
         
                 <!-- Focus Area -->
                 <label for="focus">Focus for Journaling:</label>
@@ -45,17 +172,16 @@
                 <button type="submit">Save Changes</button>
             </form>
         </div>
+        <!-- Notifications Section -->
         <div id="notifications" class="settings-section">
             <h2>Notifications Settings</h2>
             <form action="/settings/notifications" method="POST">
-                <!-- Daily Reminders -->
                 <label for="daily-reminders">Daily Reminders:</label>
                 <select id="daily-reminders" name="daily_reminders">
                     <option value="yes">Yes</option>
                     <option value="no">No</option>
                 </select>
         
-                <!-- Reminder Time -->
                 <label for="reminder-time">Reminder Time:</label>
                 <input type="time" id="reminder-time" name="reminder_time">
         
@@ -67,25 +193,20 @@
             <h2>Billing</h2>
             <p>You are currently a <strong>premium user</strong>. Enjoy all features while we are in the testing phase!</p>
         </div>
+        <!-- Login & Security Section -->
         <div id="login-security" class="settings-section">
             <h2>Login & Security</h2>
             <form action="/settings/security" method="POST">
-                <!-- Username -->
                 <label for="username">Change Username:</label>
                 <input type="text" id="username" name="username" placeholder="New Username">
         
-                <!-- Email -->
                 <label for="email">Change Email:</label>
                 <input type="email" id="email" name="email" placeholder="New Email">
         
-                <!-- Password -->
                 <label for="password">Change Password:</label>
                 <input type="password" id="password" name="password" placeholder="New Password">
 
-                <!-- Download Data Button -->
                 <button type="button" onclick="location.href='/settings/download-data'">Download My Data</button>
-
-                <!-- Delete Account Button -->
                 <button type="button" onclick="location.href='/settings/deactivate'">Deactivate My Account</button>
                 <p><strong>Warning!</strong> Deleting your account deletes all of your data.</p>
         
@@ -113,5 +234,79 @@
         });
     });
 </script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const dropdown = document.getElementById("deck-back-dropdown");
+    const selectedOption = document.getElementById("selected-deck-back");
+    const dropdownOptions = document.getElementById("deck-back-options");
+    const selectedText = document.getElementById("selected-deck-back-text");
+    const hiddenInput = document.getElementById("deck_back_hidden");
+
+    // Toggle dropdown when clicking on the selected option box
+    selectedOption.addEventListener("click", function() {
+      const isVisible = dropdownOptions.style.display === "block";
+      dropdownOptions.style.display = isVisible ? "none" : "block";
+    });
+
+    // Close dropdown if click outside
+    document.addEventListener("click", function(event) {
+      if (!dropdown.contains(event.target)) {
+        dropdownOptions.style.display = "none";
+      }
+    });
+
+    // Set up click handler for each option
+    const options = dropdownOptions.querySelectorAll(".dropdown-option");
+    options.forEach(function(option) {
+      option.addEventListener("click", function() {
+        const value = option.getAttribute("data-value");
+        const name = option.getAttribute("data-name");
+        // Update the visible text and hidden input
+        selectedText.textContent = name;
+        hiddenInput.value = value;
+        // Hide the options dropdown
+        dropdownOptions.style.display = "none";
+      });
+    });
+  });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const cardThemeDropdown = document.getElementById("card-theme-dropdown");
+      const selectedCardTheme = document.getElementById("selected-card-theme");
+      const cardThemeOptions = document.getElementById("card-theme-options");
+      const selectedCardThemeText = document.getElementById("selected-card-theme-text");
+      const deckPreferenceHidden = document.getElementById("deck_preference_hidden");
+  
+      // Toggle dropdown visibility when clicking the selected area
+      selectedCardTheme.addEventListener("click", function() {
+        const isVisible = cardThemeOptions.style.display === "block";
+        cardThemeOptions.style.display = isVisible ? "none" : "block";
+      });
+  
+      // Close dropdown if clicking outside
+      document.addEventListener("click", function(event) {
+        if (!cardThemeDropdown.contains(event.target)) {
+          cardThemeOptions.style.display = "none";
+        }
+      });
+  
+      // Set up click handler for each dropdown option
+      const options = cardThemeOptions.querySelectorAll(".dropdown-option");
+      options.forEach(function(option) {
+        option.addEventListener("click", function() {
+          const value = option.getAttribute("data-value");
+          const name = option.getAttribute("data-name");
+          // Update the displayed text and hidden input value
+          selectedCardThemeText.textContent = name;
+          deckPreferenceHidden.value = value;
+          // Hide the dropdown options
+          cardThemeOptions.style.display = "none";
+        });
+      });
+    });
+  </script>
 
 <%- include('partials/footer'); -%>

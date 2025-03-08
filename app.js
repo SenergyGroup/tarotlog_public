@@ -11,6 +11,7 @@ const entriesController = require('./controllers/entriesController');
 const { checkUser } = require('./middleware/authMiddleware');
 // const cleanupExpiredTokens = require('./tasks/cleanupExpiredTokens');
 const { encrypt } = require('./utils/encryption');
+require('./tasks/dailyCardScheduler');
 
 
 
@@ -19,7 +20,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 const allowedOrigins = ['https://www.mytarottales.com', 'https://mytarottales.com', 
-  'http://localhost:3000',
+  'http://localhost:3000'
 ];
 
 app.use(cors({
@@ -508,12 +509,21 @@ app.get('/', checkUser, (req, res) => {
 });
 
 
-app.get('/tarot', (req, res) => {
-  const userId = req.user?.id;
-  if (!userId) {
-    return res.redirect('/');
+app.get('/tarot', async (req, res) => {
+  if (req.user) {
+    try {
+      const fullUser = await User.findOne({
+        where: { user_id: req.user.id },
+        attributes: ['user_id', 'username', 'deck_back']  // include deck_back here
+      });
+      res.render('tarot', { user: fullUser });
+    } catch (error) {
+      console.error('Error fetching user data for tarot:', error);
+      res.render('tarot', { user: req.user }); // fallback
+    }
+  } else {
+    res.render('tarot', { user: null });
   }
-  res.render('tarot', { user: res.locals.user });
 });
 
 app.get('/open-journal', (req, res) => {

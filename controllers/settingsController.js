@@ -9,14 +9,15 @@ const updateGeneralSettings = async (req, res) => {
           return res.status(401).json({ error: "User not authenticated" });
         }
   
-    const { focus, deck_preference } = req.body;
+    const { focus, deck_preference, deck_back } = req.body;
 
     try {
       // Update both 'focus' and 'deck_preference' columns
       await User.update(
         { 
           focus, 
-          deck_preference 
+          deck_preference,
+          deck_back,
         },
         { where: { user_id: userId } }
       );
@@ -35,7 +36,7 @@ const getUserSettings = async (req, res) => {
     try {
         const user = await User.findOne({
         where: { user_id: userId },
-        attributes: ['focus', 'deck_preference']
+        attributes: ['focus', 'deck_preference', 'deck_back']
         });
 
         if (!user) {
@@ -45,7 +46,8 @@ const getUserSettings = async (req, res) => {
         // Render settings.ejs and pass the user's focus + deck_preference
         res.render('settings', {
           focus: user.focus,
-          deck_preference: user.deck_preference
+          deck_preference: user.deck_preference,
+          deck_back: user.deck_back
         });
     } catch (error) {
         console.error('Error fetching user settings:', error);

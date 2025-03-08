@@ -21,7 +21,7 @@
     min-height: 100vh;
   }
   .dashboard {
-    width: 90%;
+    width: 95%;
     max-width: 1200px;
     margin: 40px;
     display: grid;
@@ -33,6 +33,7 @@
     background: rgba(0, 0, 0, 0.3);
     padding: 1.5rem;
     border-radius: 8px;
+    cursor: pointer;
   }
   .sidebar#sidebar-left {
     cursor: pointer;
@@ -41,12 +42,18 @@
   margin-bottom: 1rem;
   text-align: center;
 }
+  .sidebar#sidebar-left h4 {
+    margin-bottom: 0.9rem;
+    text-align: center;
+    color: #f5c542;
+  }
 
   /* Remove default bullets and spacing for the UL */
   .sidebar#sidebar-left ul {
     list-style: none;
     padding: 0;
     margin: 0;
+    text-align: center;
   }
 
   /* Spacing between list items */
@@ -79,6 +86,9 @@
     margin-bottom: 15px;
     font-family: 'Cinzel', serif;
   }
+  .card.previous-entry {
+      cursor: pointer;
+  }
   .card.previous-entry p {
       text-align: left;
   }
@@ -106,6 +116,33 @@
   }
   .btn:hover {
     background-color: var(--hover-purple);
+  }
+  .card-of-day {
+    background-color: #2e2e2e;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    margin-top: 20px;
+  }
+
+  .daily-card-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    margin-bottom: 10px;
+  }
+
+  .card-name {
+    font-size: 1.5rem;
+    margin: 10px 0 5px;
+    color: #f5c542;
+  }
+
+  .card-motto {
+    font-size: 1.1rem;
+    color: #e0e0e0;
+    margin: 0;
   }
   /* Responsive */
   @media (max-width: 1024px) {
@@ -137,27 +174,34 @@
   <main class="dashboard">
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar-left" onclick="location.href='/data'">
-      <h2>Your Stats</h2>
-      <ul>
-        <li>Current Streak: <strong><%= dailyStreak %></strong> days</li>
-        <li>Total Responses: <strong><%= totalResponses %></strong></li>
-        <li>Journaled This Month: <strong><%= monthResponses %></strong></li>
-        <li>Average Mood This Month: <strong><%= formattedAvgMood || 'N/A' %></strong></li>
-        <li>Most Pulled Card: <strong><%= mostPulledCard || 'N/A' %></strong></li>
-      </ul>
+      <h1>My Stats</h1>
+      <div class="card-of-day">
+        <ul>
+          <h4>Current Streak</h3>
+          <li><strong><%= dailyStreak %></strong> days</li>
+          <h4>Total Responses</h3>
+          <li><strong><%= totalResponses %></strong></li>
+          <h4>Times Journaled (Month)</h3>
+          <li><strong><%= monthResponses %></strong></li>
+          <h4>Average Mood (Month)</h3>
+          <li><strong><%= formattedAvgMood || 'N/A' %></strong></li>
+          <h4>Most Pulled Card</h3>
+          <li><strong><%= mostPulledCard || 'N/A' %></strong></li>
+        </ul>
+      </div>
     </aside>
   
     <!-- Main content -->
     <section class="main-content">
       <!-- Previous Entry Card -->
       <div class="card previous-entry" id="prevEntry" onclick="toggleEntry()">
-        <h2>Previous Entry</h2>
+        <h1>Previous Entry</h2>
         <p>Click to load your previous entry.</p>
       </div>
     
       <!-- Actions Card -->
       <div class="card actions">
-        <h2>Actions</h2>
+        <h1>Actions</h2>
         <div class="action-buttons">
           <a href="/tarot" class="btn draw-card">Draw a Card</a>
           <a href="/open-journal" class="btn open-journal">Open Journal</a>
@@ -167,10 +211,17 @@
   
     <!-- Extras (optional) -->
     <aside class="extras">
-      <div class="quote">
-        <h3>Card of the Day</h3>
-        <p>This would be a placeholder for a card of the day implementation.</p>
+      <h1>Card of the Day</h1>
+      <div class="card-of-day" onclick="location.href='/card-glossary'">
+        <% if (dailyCard) { %>
+          <img src="<%= dailyCard.image_data %>" alt="<%= dailyCard.card_name %>" class="daily-card-image">
+          <h4 class="card-name"><%= dailyCard.card_name %></h4>
+          <p class="card-motto"><%= dailyCard.mottos %></p>
+        <% } else { %>
+          <p>No card available for today.</p>
+        <% } %>
       </div>
+    </div>
     </aside>
   </main>
   <script>

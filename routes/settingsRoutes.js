@@ -13,12 +13,13 @@ router.get('/', checkUser, async (req, res) => {
         }
         const foundUser = await User.findOne({
             where: { user_id: userId },
-            attributes: ['focus', 'deck_preference']
+            attributes: ['focus', 'deck_preference', 'deck_back']
         });
 
         res.render('settings', {
           focus: foundUser?.focus,
-          deck_preference: foundUser?.deck_preference
+          deck_preference: foundUser?.deck_preference,
+          deck_back: foundUser?.deck_back
         });
     } catch (error) {
         console.error(error);

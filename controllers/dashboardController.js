@@ -82,7 +82,6 @@ router.get('/', checkUser, async (req, res) => {
       const formattedAvgMood = avgMood ? Number(avgMood).toFixed(1) : null;
 
       // Query to determine the most pulled card for the user.
-      // We join with the tarot_cards table to get the card_name.
       const mostPulledCardQuery = `
         SELECT tc.card_name, COUNT(*) AS count
         FROM responses r
@@ -94,6 +93,52 @@ router.get('/', checkUser, async (req, res) => {
       `;
       const mostPulledCardResult = await pool.query(mostPulledCardQuery, [userId]);
       const mostPulledCard = mostPulledCardResult.rows.length ? mostPulledCardResult.rows[0].card_name : null;
+
+      // Query for today's daily card
+      const today = new Date().toISOString().slice(0, 10);
+      const dailyCardQuery = `
+        SELECT dc.date, dc.mottos, tc.*
+        FROM daily_card dc
+        JOIN tarot_cards tc ON dc.card_id = tc.card_id
+        WHERE dc.date = $1
+      `;
+      let dailyCardResult = await pool.query(dailyCardQuery, [today]);
+      let dailyCard = dailyCardResult.rows.length ? dailyCardResult.rows[0] : null;
+
+      // If no daily card exists for today, populate it with an initial card
+      if (!dailyCard) {
+        console.log("No daily card found for today. Inserting initial card...");
+        const cardResult = await pool.query('SELECT * FROM tarot_cards ORDER BY RANDOM() LIMIT 1');
+        if (cardResult.rows.length) {
+          const card = cardResult.rows[0];
+          const cardMotto = card.mottos || "Your journey awaits"; // Default if missing
+          await pool.query(
+            'INSERT INTO daily_card (date, card_id, mottos ) VALUES ($1, $2, $3)',
+            [today, card.card_id, cardMotto]
+          );
+          // Retrieve the inserted daily card
+          dailyCardResult = await pool.query(
+            `SELECT dc.date, dc.mottos, tc.*
+            FROM daily_card dc
+            JOIN tarot_cards tc ON dc.card_id = tc.card_id
+            WHERE dc.date = $1`, [today]
+          );
+          dailyCard = dailyCardResult.rows.length ? dailyCardResult.rows[0] : null;
+        } else {
+          console.error("Error: No card found in the tarot_cards table to set as daily card.");
+        }
+      }
+
+      // Update dailyCard image_data based on the user's current deck preference
+      if (dailyCard) {
+        const deckQuery = `SELECT deck_preference FROM users WHERE user_id = $1`;
+        const deckResult = await pool.query(deckQuery, [userId]);
+        const userDeck = deckResult.rows[0]?.deck_preference || 'rider_white';
+        // Use the card_id as the card number
+        const cardNumber = dailyCard.card_id;
+        const imageURL = `https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/tarot_decks/${userDeck}/image_${cardNumber}.jpg`;
+        dailyCard.image_data = imageURL;
+      }
   
       // Render the dashboard and pass the computed daily streak
       res.render('dashboard', { 
@@ -101,7 +146,8 @@ router.get('/', checkUser, async (req, res) => {
         totalResponses,
         monthResponses,
         formattedAvgMood,
-        mostPulledCard 
+        mostPulledCard,
+        dailyCard  
       });
       
     } catch (err) {
