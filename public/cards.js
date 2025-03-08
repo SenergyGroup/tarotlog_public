@@ -5,6 +5,8 @@ function loadTopCards() {
     fetch('/api/top-cards')
       .then(response => response.json())
       .then(data => {
+        const container = document.getElementById('topCardsContainer');
+
         if (!data.length) {
           container.innerHTML = '<p>No entries found yet.</p>';
         } else {
@@ -13,7 +15,7 @@ function loadTopCards() {
             html += `
               <div class="card" onclick="openModal('${card.card_id}')">
               <div class="card-content">
-                <img src="${card.image_data}" alt="${card.card_name}">
+                <img src="${card.image_url}" alt="${card.card_name}">
                 <h3>${card.card_name}</h3>
               </div>
               <div class="card-footer">

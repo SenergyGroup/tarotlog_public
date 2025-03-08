@@ -118,12 +118,27 @@ app.get('/api/draw-card', async (req, res) => {
     // Randomly determine orientation
     const isReversed = Math.random() < 0.5; // 50% chance for reversed
 
+    // Code to build image URL from deck choice
+    const deckQuery = `
+        SELECT deck_preference 
+        FROM users 
+        WHERE user_id = $1
+      `;
+    const deckResult = await pool.query(deckQuery, [userId]);
+    const userDeck = deckResult.rows[0]?.deck_preference || 'rider_white'; // Default deck if none is set
+
+    // Build image URL from deck preference + card_number
+    // NOTE: Ensure your tarot_cards table has a 'card_number' column
+    const cardNumber = card.card_id; 
+    const imageURL = `https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/tarot_decks/${userDeck}/image_${cardNumber}.jpg`;
+
     // Add orientation and appropriate description to the response
     const cardWithOrientation = {
       ...card,
       orientation: isReversed ? 'Reversed' : 'Upright',
       description: isReversed ? card.description_reversed : card.description_upright,
       meanings: isReversed ? card.meaning_reversed.split(',') : card.meaning_upright.split(','),
+      image_data: imageURL
     };
 
     res.json(cardWithOrientation);
@@ -297,7 +312,6 @@ app.post("/get-tarot-card", async (req, res) => {
 
     const { journalEntry, mood, title } = req.body;
     if (!journalEntry || !mood || !title) {
-      alert("Please fill in the title and journal entry before saving.");
       return res.status(400).json({ error: "All fields are required" });
     }
 
@@ -410,6 +424,20 @@ app.post("/get-tarot-card", async (req, res) => {
     const card = result.rows[0];
     console.log("[INFO] Card fetched from database:", card);
 
+    // Code to build image URL from deck choice
+    const deckQuery = `
+        SELECT deck_preference 
+        FROM users 
+        WHERE user_id = $1
+      `;
+    const deckResult = await pool.query(deckQuery, [userId]);
+    const userDeck = deckResult.rows[0]?.deck_preference || 'rider_white'; // Default deck if none is set
+
+    // Build image URL from deck preference + card_number
+    // NOTE: Ensure your tarot_cards table has a 'card_number' column
+    const cardNumber = card.card_id; 
+    const imageURL = `https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/tarot_decks/${userDeck}/image_${cardNumber}.jpg`;
+
     // Insert the journal entry into the responses table
     try {
       const encryptedResponse = encrypt(journalEntry);
@@ -420,6 +448,7 @@ app.post("/get-tarot-card", async (req, res) => {
         ) VALUES ($1, $2, $3, $4, NOW(), NOW(), $5, $6, $7)
         RETURNING *;
       `;
+
       const insertValues = [
         userId,
         card.card_id,
@@ -442,14 +471,14 @@ app.post("/get-tarot-card", async (req, res) => {
       card_name: card.card_name,
       orientation: normalizedOrientation,
       reasoning: normalizedReasoning,
-      image_data: card.image_data,
+      image_data: imageURL,
     });
 
     console.log("[INFO] Response sent to frontend:", {
       card_name: card.card_name,
       orientation: normalizedOrientation,
       reasoning: normalizedReasoning,
-      image_data: card.image_data,
+      image_data: imageURL,
     });
 
     } catch (error) {
@@ -504,7 +533,14 @@ app.get('/card-glossary', async (req, res) => {
   }
 
   try {
-    const userId = req.user.id;
+    // 1) Fetch the user's deck_preference
+    const deckResult = await pool.query(`
+      SELECT deck_preference 
+      FROM users
+      WHERE user_id = $1
+    `, [userId]);
+    const userDeck = deckResult.rows[0]?.deck_preference || 'rider_white';
+    
     const query = `
       SELECT t.*,
              COALESCE(r.entry_count, 0) AS total_entries
@@ -518,6 +554,12 @@ app.get('/card-glossary', async (req, res) => {
       ORDER BY t.card_id
     `;
     const { rows } = await pool.query(query, [userId]);
+
+    for (const card of rows) {
+      const cardNumber = card.card_id;  // Must be in the 'tarot_cards' table
+      card.image_url = `https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/tarot_decks/${userDeck}/image_${cardNumber}.jpg`;
+    }
+
     res.render('cardGlossary', { cards: rows, user: res.locals.user });
   } catch (error) {
     console.error('Error fetching all cards:', error);
@@ -546,6 +588,14 @@ app.get('/api/card-entry-count/:card_id', async (req, res) => {
 app.get('/api/top-cards', async (req, res) => {
   const userId = req.user.id;
   try {
+    // 1) Fetch the user's deck_preference
+    const deckResult = await pool.query(`
+      SELECT deck_preference 
+      FROM users
+      WHERE user_id = $1
+    `, [userId]);
+    const userDeck = deckResult.rows[0]?.deck_preference || 'rider_white';
+
     const { rows } = await pool.query(`
       SELECT t.card_id, t.card_name, t.image_data, COUNT(*) AS total_entries
       FROM responses r
@@ -555,6 +605,13 @@ app.get('/api/top-cards', async (req, res) => {
       ORDER BY total_entries DESC
       LIMIT 10
     `, [userId]);
+
+    // 3) Build an image_url for each card
+    rows.forEach(card => {
+      card.image_url = `https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/tarot_decks/${userDeck}/image_${card.card_id}.jpg`;
+    });
+
+    // Return them in JSON
     res.json(rows);
   } catch (error) {
     console.error('Error fetching top cards:', error);

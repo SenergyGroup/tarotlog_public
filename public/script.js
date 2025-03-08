@@ -1,8 +1,6 @@
 let drawnCard = null;
 
 document.addEventListener("DOMContentLoaded", () => {
-    //const API_BASE_URL = 'http://localhost:3000';
-    //const API_BASE_URL = 'https://tarotlog-public.onrender.com';
     const API_BASE_URL = '';
 
     const moodSlider = document.getElementById("mood-slider");
@@ -130,9 +128,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const promptSection = document.querySelector('.prompt-section');
 
         // Get meanings based on orientation
-        const meanings = card.orientation === 'Reversed'
-            ? card.meaning_reversed.split(',').map(meaning => meaning.trim())
-            : card.meaning_upright.split(',').map(meaning => meaning.trim());
+        const isReversed = card.orientation.toLowerCase() === 'reversed';
+        const meanings = isReversed
+            ? card.meaning_reversed.split(',').map(m => m.trim())
+            : card.meaning_upright.split(',').map(m => m.trim());
 
         // Call the backend to generate the AI prompt
         try {
@@ -195,6 +194,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // Append meaningsContainer after cardPrompt
         cardPrompt.insertAdjacentElement('afterend', meaningsContainer);
 
+        // Safety checks
         if (!cardImage || !cardTitleElement || !cardPrompt || !cardHeaderElement) {
             console.error('UI elements for card display not found.');
             return;
@@ -203,7 +203,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (cardImage && cardTitleElement && cardHeaderElement && cardPrompt && responseBox && saveButton) {
             cardImage.src = card.image_data;
             cardImage.dataset.cardId = card.card_id;
-            cardImage.style.transform = card.orientation === 'Reversed' ? 'rotate(180deg)' : 'rotate(0deg)';
+            cardImage.style.transform = isReversed ? 'rotate(180deg)' : 'rotate(0deg)';
 
             cardTitleElement.innerText = `${card.suit}: ${card.card_name} (${card.orientation})`;
 
@@ -223,6 +223,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const promptSection = document.querySelector('.prompt-section');
 
         if (cardImage) {
+            // cardImage.src = `https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/tarot_backs/${deck_back}.png`;
             cardImage.src = 'https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/image_back.png';
             cardImage.alt = 'Facedown Card';
         }

@@ -183,7 +183,7 @@
                  data-reversed="<%= card.description_reversed %>"
                  onclick="openModal('<%= card.card_id %>')">
               <div class="card-content">
-                <img src="<%= card.image_data %>" alt="<%= card.card_name %>">
+                <img src="<%= card.image_url %>" alt="<%= card.card_name %>">
                 <h3><%= card.card_name %></h3>
               </div>
               <div class="card-footer">
@@ -205,7 +205,7 @@
           <% if (card.suit === 'Major Arcana') { %>
             <div class="card" onclick="openModal('<%= card.card_id %>')">
               <div class="card-content">
-                <img src="<%= card.image_data %>" alt="<%= card.card_name %>">
+                <img src="<%= card.image_url %>" alt="<%= card.card_name %>">
                 <h3><%= card.card_name %></h3>
               </div>
               <div class="card-footer">
@@ -225,7 +225,7 @@
           <% if (card.suit === 'Wands') { %>
             <div class="card" onclick="openModal('<%= card.card_id %>')">
               <div class="card-content">
-                <img src="<%= card.image_data %>" alt="<%= card.card_name %>">
+                <img src="<%= card.image_url %>" alt="<%= card.card_name %>">
                 <h3><%= card.card_name %></h3>
               </div>
               <div class="card-footer">
@@ -245,7 +245,7 @@
           <% if (card.suit === 'Cups') { %>
             <div class="card" onclick="openModal('<%= card.card_id %>')">
               <div class="card-content">
-                <img src="<%= card.image_data %>" alt="<%= card.card_name %>">
+                <img src="<%= card.image_url %>" alt="<%= card.card_name %>">
                 <h3><%= card.card_name %></h3>
               </div>
               <div class="card-footer">
@@ -265,7 +265,7 @@
           <% if (card.suit === 'Swords') { %>
             <div class="card" onclick="openModal('<%= card.card_id %>')">
               <div class="card-content">
-                <img src="<%= card.image_data %>" alt="<%= card.card_name %>">
+                <img src="<%= card.image_url %>" alt="<%= card.card_name %>">
                 <h3><%= card.card_name %></h3>
               </div>
               <div class="card-footer">
@@ -285,7 +285,7 @@
           <% if (card.suit === 'Pentacles') { %>
             <div class="card" onclick="openModal('<%= card.card_id %>')">
               <div class="card-content">
-                <img src="<%= card.image_data %>" alt="<%= card.card_name %>">
+                <img src="<%= card.image_url %>" alt="<%= card.card_name %>">
                 <h3><%= card.card_name %></h3>
               </div>
               <div class="card-footer">

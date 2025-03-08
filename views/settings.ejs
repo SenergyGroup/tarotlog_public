@@ -25,9 +25,10 @@
                 </select>
         
                 <!-- Active Card Theme -->
-                <label for="card-theme">Active Card Theme:</label>
-                <select id="card-theme" name="card_theme">
-                    <option value="default">Default</option>
+                <label for="deck_preference">Active Card Theme:</label>
+                <select id="deck_preference" name="deck_preference">
+                    <option value="rider_white" <%= deck_preference === 'rider_white' ? 'selected' : '' %>>Rider White</option>
+                    <option value="clown_tarot" <%= deck_preference === 'clown_tarot' ? 'selected' : '' %>>Clown Town Tarot</option>
                 </select>
         
                 <!-- Focus Area -->
