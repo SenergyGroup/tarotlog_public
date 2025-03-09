@@ -26,12 +26,12 @@ cron.schedule('0 0 * * *', async () => { // Runs at midnight every day
         card = cardResult.rows[0];
       }
       
-      // Define your premade motto for the card (this can be static or generated dynamically)
-      const cardMotto = "Your journey awaits"; 
+      // card.mottos; if not present, fallback to a default.
+      const cardMotto = card.mottos || "Your journey awaits"; 
       
       // Insert the new daily card record
       await pool.query(
-        'INSERT INTO daily_card (date, card_id, card_motto) VALUES ($1, $2, $3)',
+        'INSERT INTO daily_card (date, card_id, mottos) VALUES ($1, $2, $3)',
         [today, card.card_id, cardMotto]
       );
       console.log(`Daily card set for ${today}: Card ID ${card.card_id}`);
