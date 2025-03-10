@@ -6,31 +6,15 @@
 </script>
 <script src="/profile.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- <script src="https://unpkg.com/cal-heatmap/dist/cal-heatmap.min.js"></script> -->
+<!-- <link rel="stylesheet" href="https://unpkg.com/cal-heatmap/dist/cal-heatmap.css"> -->
 
 <div class="data-container">
     <h1 class="page-title">Your Journal Stats</h1>
-    <!-- Top 3 Cards Pulled Section -->
-    <!--
-    <div class="stat-section">
-        <h2>Top 3 Cards Pulled</h2>
-        <ul class="top-cards">
-            <% suitsData.forEach(card => { %>
-                <li>
-                    <span class="card-name"><%= card.card_name %> (<%= card.orientation %>)</span>
-                    <span class="card-count">Pulled: <%= card.count %> times</span>
-                </li>
-            <% }); %>
-        </ul>
-    </div>
-    -->
 
-    <!-- Total Entries Created -->
-    <!--
-    <div class="stat-section">
-        <h2>Total Entries</h2>
-        <p><strong><%= suitsData.totalEntries %></strong> entries created</p>
-    </div>
-    -->
+    <!-- Calendar Heatmap Container -->
+    <div id="journal-calendar"></div>
+    <div id="calendar-legend" style="float: right"></div>
 
     <!-- Suit Polar Chart-->
     <div class="stat-section">
@@ -40,34 +24,21 @@
 
     <div class="stat-section">
         <h2>Mood Over Time</h2>
+        <!-- Filter Form -->
+        <form method="get" action="/data" class="filter-form">
+            <label for="start">Start Date:</label>
+            <input type="date" id="start" name="start" value="<%= start || '' %>">
+            
+            <label for="end">End Date:</label>
+            <input type="date" id="end" name="end" value="<%= end || '' %>">
+
+            <button type="submit">Filter</button>
+        </form>
+        
         <div class="chart-wrapper">
             <canvas id="moodChart"></canvas>
         </div>
     </div>
-
-    <!-- Longest Streak -->
-    <!--
-    <div class="stat-section">
-        <h2>Longest Streak</h2>
-        <p><strong><%= suitsData.longestStreak %></strong> days of continuous journaling</p>
-    </div>
-    -->
-
-    <!-- Total Words Typed -->
-    <!--
-    <div class="stat-section">
-        <h2>Total Words Typed</h2>
-        <p><strong><%= suitsData.totalWords %></strong> words in your journal</p>
-    </div>
-    -->
-
-    <!-- Top Theme Section -->
-    <!--
-    <div class="stat-section">
-        <h2>Top Theme</h2>
-        <p>Your most frequent journaling theme is <strong><%= suitsData.topTheme %></strong></p>
-    </div>
-    -->
 </div>
 
 <script>
@@ -163,10 +134,8 @@
         // Add mood chart setup here
         const moodCtx = document.getElementById('moodChart').getContext('2d');
         const moodsData = <%- JSON.stringify(moodsData) %>;
-        
-        // Process mood data
-        const dates = moodsData.map(entry => new Date(entry.created_at).toLocaleDateString());
-        const moods = moodsData.map(entry => entry.mood);
+        const dates = moodsData.map(entry => new Date(entry.date).toLocaleDateString());
+        const moods = moodsData.map(entry => parseFloat(entry.mood));
 
         new Chart(moodCtx, {
             type: 'line',
@@ -204,7 +173,8 @@
                         borderWidth: 1,
                         callbacks: {
                             title: (items) => {
-                                const rawDate = new Date(moodsData[items[0].dataIndex].created_at);
+                                const index = items[0].dataIndex;
+                                const rawDate = new Date(moodsData[index].date);
                                 return rawDate.toLocaleString();
                             }
                         }
@@ -238,6 +208,81 @@
                 }
             }
         });
+    });
+</script>
+<!-- Calendar Script -->
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // 1) Instantiate CalHeatmap
+        const cal = new CalHeatmap();
+        
+        /*
+            2) “Paint” the calendar, telling CalHeatmap
+            - Where to get data (source)
+            - That we want a domain of "year" type, subDomain as "day"
+            - We can set range to 2 or 3 if we want multiple years visible
+            - We can choose a purple color scale
+        */
+        cal.paint(
+            {
+            itemSelector: "#journal-calendar", // ID of the div
+            range: 1, // 1 year displayed by default
+            date: {
+                // e.g. Start at beginning of last year
+                start: new Date(2025, 0, 1),
+                // Or set dynamically if you want multiple years:
+                // start: new Date("2023-01-01"),
+            },
+            domain: {
+                type: "year",
+                // Additional label config if you'd like
+                label: {
+                position: "top",
+                text: (year) => `Year ${dayjs(year).format("YYYY")}`
+                }
+            },
+            subDomain: {
+                type: "day",
+                radius: 2, // slight rounding on squares
+                label: (date) => dayjs(date).format("D"), // If you want day-of-month text
+            },
+            // The data is an object keyed by date. 
+            data: {
+                source: "/data/api/calendar-entries",
+                type: "json",
+                x: "timestamp",  // the property holding the timestamp (in seconds)
+                y: d => +d.value,    // the property holding the count
+            },
+            // Scale from 0 => 1 or 2. If your data is strictly “yes/no,” domain can be [0,1].
+            scale: {
+                color: {
+                type: "quantize",
+                scheme: "Purples",  // Built-in D3 scheme, or 'PRGn' etc.
+                // domain covers data range, e.g. 0–3 or 0–10
+                domain: [0, 2],
+                },
+            },
+            },
+            // 3) Add optional plugins, e.g. tooltip & legend
+            [
+            [   Tooltip,
+                {
+                    text: (date, value, dayjsDate) => {
+                    console.log("Tooltip value:", value, "at", dayjsDate.format("YYYY-MM-DD"));
+                    if (!value) {
+                        return `No entries on ${dayjsDate.format('MMM D, YYYY')}`;
+                    }
+                    return `${value} entries on ${dayjsDate.format('MMM D, YYYY')}`;
+                    }
+                }
+            ]
+            ]
+        );
+        
+        /*
+            4) Optional: Provide next/previous year(s) controls. 
+            (On your page, you could have buttons that call cal.next() or cal.previous())
+        */
     });
 </script>
 
@@ -344,6 +389,35 @@
     #moodChart {
         width: 100% !important;
         height: 100% !important;
+    }
+
+    #journal-calendar {
+    margin: 1rem auto;
+    /* If you want a fixed width or more responsiveness, adjust below */
+    max-width: 800px;
+    }
+
+    /* Additional custom styling for the cells, domain labels, etc. */
+    .cal-heatmap-container rect {
+    stroke: #222;  /* Outline each cell, optional */
+    }
+
+    @media (max-width: 768px) {
+    .chart-wrapper {
+        width: 100%;
+        height: 35%; /* Or 'auto' if you want it to scale automatically */
+        max-height: 400px;
+        margin: 0;
+    }
+
+    .stat-section h2 {
+        font-size: 1.4rem;
+    }
+
+    /* Reduce page title size if needed */
+    .page-title {
+        font-size: 2rem;
+    }
     }
 </style>
 
