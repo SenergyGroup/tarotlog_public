@@ -184,9 +184,9 @@
           <h4>Times Journaled (Month)</h3>
           <li><strong><%= monthResponses %></strong></li>
           <h4>Average Mood (Month)</h3>
-          <li><strong><%= formattedAvgMood || 'N/A' %></strong></li>
+          <li><strong><%= formattedAvgMood || 'No Data Yet' %></strong></li>
           <h4>Most Pulled Card</h3>
-          <li><strong><%= mostPulledCard || 'N/A' %></strong></li>
+          <li><strong><%= mostPulledCard || 'No Data Yet' %></strong></li>
         </ul>
       </div>
     </aside>
@@ -212,7 +212,8 @@
     <!-- Extras (optional) -->
     <aside class="extras">
       <h1>Card of the Day</h1>
-      <div class="card-of-day" onclick="location.href='/card-glossary'">
+      <div class="card-of-day" 
+      onclick="location.href='/card-glossary?card_id=<%= dailyCard.card_id %>'">
         <% if (dailyCard) { %>
           <img src="<%= dailyCard.image_data %>" alt="<%= dailyCard.card_name %>" class="daily-card-image">
           <h4 class="card-name"><%= dailyCard.card_name %></h4>

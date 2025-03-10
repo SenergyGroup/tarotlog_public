@@ -53,6 +53,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
     });
+    // Then, parse the query param
+    const urlParams = new URLSearchParams(window.location.search);
+    const paramCardId = urlParams.get('card_id');
+    
+    if (paramCardId) {
+      // If the card_id is in the URL, open the modal automatically
+      openModal(paramCardId);
+    }
   });
   
   // Modal logic
@@ -69,9 +77,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const cardName = cardElement.getAttribute('data-name') || 'Unknown Card';
     const descriptionUpright = cardElement.getAttribute('data-upright') || '';
     const descriptionReversed = cardElement.getAttribute('data-reversed') || '';
+    const imageUrl = cardElement.getAttribute('data-image') || '';
   
     // Build initial modal content
-    let modalContent = `<h2 class="modal-title">${cardName}</h2>`;
+    let modalContent = `
+      <div class="modal-card-image-wrapper">
+        <img src="${imageUrl}" alt="${cardName}" class="modal-card-image" />
+        <h2 class="modal-title">${cardName}</h2>
+      </div>
+    `;
+
     if (descriptionUpright) {
       modalContent += `<p><strong>Upright:</strong> ${descriptionUpright}</p>`;
     }
