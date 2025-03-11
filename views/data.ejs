@@ -13,8 +13,14 @@
     <h1 class="page-title">Your Journal Stats</h1>
 
     <!-- Calendar Heatmap Container -->
-    <div id="journal-calendar"></div>
-    <div id="calendar-legend" style="float: right"></div>
+    <div class="stat-section">
+        <h2>Journaling Habits</h2>
+        <div id="journal-calendar"></div>
+        <div class="button-container">
+            <a href="#" class="button" id="prev">← Previous</a>
+            <a href="#" class="button" id="next">Next →</a>
+        </div>
+    </div>
 
     <!-- Suit Polar Chart-->
     <div class="stat-section">
@@ -213,7 +219,9 @@
 <!-- Calendar Script -->
 <script>
     document.addEventListener("DOMContentLoaded", () => {
-      // 1) Instantiate CalHeatmap
+        const startDate = dayjs().subtract(1, 'month').startOf('month').toDate();
+
+        // 1) Instantiate CalHeatmap
         const cal = new CalHeatmap();
         
         /*
@@ -225,64 +233,64 @@
         */
         cal.paint(
             {
-            itemSelector: "#journal-calendar", // ID of the div
-            range: 1, // 1 year displayed by default
-            date: {
-                // e.g. Start at beginning of last year
-                start: new Date(2025, 0, 1),
-                // Or set dynamically if you want multiple years:
-                // start: new Date("2023-01-01"),
-            },
-            domain: {
-                type: "year",
-                // Additional label config if you'd like
-                label: {
-                position: "top",
-                text: (year) => `Year ${dayjs(year).format("YYYY")}`
-                }
-            },
-            subDomain: {
-                type: "day",
-                radius: 2, // slight rounding on squares
-                label: (date) => dayjs(date).format("D"), // If you want day-of-month text
-            },
-            // The data is an object keyed by date. 
-            data: {
-                source: "/data/api/calendar-entries",
-                type: "json",
-                x: "timestamp",  // the property holding the timestamp (in seconds)
-                y: d => +d.value,    // the property holding the count
-            },
-            // Scale from 0 => 1 or 2. If your data is strictly “yes/no,” domain can be [0,1].
-            scale: {
-                color: {
-                type: "quantize",
-                scheme: "Purples",  // Built-in D3 scheme, or 'PRGn' etc.
-                // domain covers data range, e.g. 0–3 or 0–10
-                domain: [0, 2],
+                itemSelector: "#journal-calendar", // ID of the div
+                range: 2, // 2 month displayed by default
+                date: {
+                    start: startDate
+                },
+                domain: {
+                    type: "month",
+                    padding: [10, 10, 10, 10],
+                    label: { position: "top" }
+                },
+                subDomain: {
+                    type: "xDay", 
+                    radius: 2, 
+                    width: 15, 
+                    height: 15, 
+                    label: "D" 
+                },
+                // The data is an object keyed by date. 
+                data: {
+                    source: "/data/api/calendar-entries",
+                    type: "json",
+                    x: d => d.timestamp * 1000,  // the property holding the timestamp (in seconds)
+                    y: d => +d.value,    // the property holding the count
+                },
+                // Scale from 0 => 1 or 2. If your data is strictly “yes/no,” domain can be [0,1].
+                scale: {
+                    color: {
+                        type: "sequential",
+                        scheme: "Purples",  // Built-in D3 scheme, or 'PRGn' etc.
+                        // domain covers data range, e.g. 0–3 or 0–10
+                        domain: [0, 1],
+                    },
                 },
             },
-            },
-            // 3) Add optional plugins, e.g. tooltip & legend
+        
+        // 3) Add optional plugins, e.g. tooltip & legend
+        [
             [
-            [   Tooltip,
+                Tooltip,
                 {
-                    text: (date, value, dayjsDate) => {
-                    console.log("Tooltip value:", value, "at", dayjsDate.format("YYYY-MM-DD"));
-                    if (!value) {
-                        return `No entries on ${dayjsDate.format('MMM D, YYYY')}`;
-                    }
-                    return `${value} entries on ${dayjsDate.format('MMM D, YYYY')}`;
-                    }
+                    text: (timestamp, value, dayjsDate) => 
+                        (value ? `${value} entries` : "No entries") + 
+                        " on " + 
+                        dayjsDate.format("LL")
                 }
             ]
-            ]
-        );
+        ]
+    );
         
-        /*
-            4) Optional: Provide next/previous year(s) controls. 
-            (On your page, you could have buttons that call cal.next() or cal.previous())
-        */
+        // Navigation buttons for previous/next.
+        document.getElementById("prev").addEventListener("click", function(e) {
+            e.preventDefault();
+            cal.previous();
+        });
+        document.getElementById("next").addEventListener("click", function(e) {
+            e.preventDefault();
+            cal.next();
+        });
     });
 </script>
 
@@ -307,6 +315,10 @@
     }
     
     .stat-section {
+        display: flex;
+        flex-direction: column; 
+        justify-content: center; 
+        align-items: center;
         margin-bottom: 30px;
         padding: 20px;
         background: linear-gradient(135deg, #1a1a1a, #282828);
@@ -350,8 +362,42 @@
         color: #bbb;
     }
 
+    #ex-1 {
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* Center elements horizontally */
+        text-align: center; /* Ensures text elements align centrally */
+        margin-bottom: 20px;
+    }
 
-    
+    .button-container{
+        display: flex;
+        gap: 10px;
+    }
+
+    /* Center the button */
+    .button {
+        display: inline-block;
+        padding: 6px 12px;
+        margin: 5px;
+        background: #7a4b9f;
+        text-decoration: none;
+        color: #eee;
+        border-radius: 4px;
+        cursor: pointer;
+        text-align: center;
+    }
+
+    .ch-tooltip {
+        display: block !important;  /* Ensures the tooltip appears */
+        opacity: 1 !important;      /* Ensures it's not transparent */
+        background: rgba(0, 0, 0, 0.8);
+        color: #fff;
+        padding: 5px;
+        border-radius: 4px;
+        position: absolute;
+        z-index: 1000;
+    }
 
     /* Center and enhance the chart */
     #suitChart {
