@@ -1,5 +1,8 @@
 const User = require('../models/User'); // Your User model
 const { checkUser } = require('../middleware/authMiddleware'); // Ensures authentication
+const { pool } = require('../config/database');
+const { Parser } = require('json2csv');
+const { decrypt } = require('../utils/encryption');
 
 
 const updateGeneralSettings = async (req, res) => {
@@ -54,7 +57,49 @@ const getUserSettings = async (req, res) => {
         res.status(500).json({ error: 'Failed to retrieve settings' });
     }
 };
+
+
+const downloadUserData = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const responsesResult = await pool.query(
+      `SELECT r.response_id, r.prompt_text, r.response_text, r.created_at, r.orientation, t.card_name 
+       FROM responses r 
+       JOIN tarot_cards t ON r.card_id = t.card_id 
+       WHERE r.user_id = $1
+       ORDER BY r.created_at DESC`,
+      [userId]
+    );
+
+    const responses = responsesResult.rows.map(row => {
+      try {
+          return {
+              ...row,
+              response_text: decrypt(row.response_text) // Decrypt all response_text
+          };
+      } catch (err) {
+          console.error(`Failed to decrypt response_text for response_id ${row.response_id}:`, err);
+          return {
+              ...row,
+              response_text: '[Error decrypting response]'
+          };
+      }
+  });
+
+    // Convert responses to CSV using json2csv
+    const fields = ['response_id', 'prompt_text', 'response_text', 'created_at', 'orientation', 'card_name'];
+    const json2csvParser = new Parser({ fields });
+    const csv = json2csvParser.parse(responses);
+    
+    res.header('Content-Type', 'text/csv');
+    res.attachment('my_data.csv');
+    return res.send(csv);
+  } catch (error) {
+    console.error('Error downloading data:', error);
+    res.status(500).send('Error downloading data');
+  }
+};
   
 
-module.exports = { updateGeneralSettings, getUserSettings };
+module.exports = { updateGeneralSettings, getUserSettings, downloadUserData };
   

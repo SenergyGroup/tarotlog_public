@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { updateGeneralSettings, getUserSettings } = require('../controllers/settingsController');
+const { updateGeneralSettings, getUserSettings, downloadUserData  } = require('../controllers/settingsController');
 const { checkUser } = require('../middleware/authMiddleware'); // Ensure user is authenticated
 const User = require('../models/User');
 
@@ -32,5 +32,7 @@ router.get('/general', checkUser, getUserSettings);
 
 // Route to update general settings
 router.post('/general', checkUser, updateGeneralSettings);
+
+router.get('/download-data', checkUser, downloadUserData);
 
 module.exports = router;
