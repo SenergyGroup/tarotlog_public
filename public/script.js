@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const selectedMeanings = Array.from(document.querySelectorAll('.meaning-bubble.selected')).map(bubble => bubble.textContent.trim());
 
             const payload = {
-                user_id: user ? user_id,
+                user_id: user_id,
                 card_id: drawnCard.card_id,
                 prompt_text: promptText,
                 response_text: response1,
