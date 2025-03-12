@@ -137,19 +137,21 @@ const forgotPassword_post = async (req, res) => {
       });
 
       await transporter.sendMail({
-          from: `"TarotLog" <${process.env.EMAIL_USER}>`,
+          from: `"MyTarotTales" <${process.env.EMAIL_USER}>`,
           to: email,
           subject: 'Password Reset Request',
           html:  `
-          <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
-              <h2 style="color: #4CAF50;">TarotLog Password Reset</h2>
-              <p>Hello,</p>
-              <p>You requested a password reset. Click the button below to reset your password:</p>
-              <a href="http://${req.headers.host}/auth/reset-password/${token}" style="display: inline-block; padding: 10px 20px; margin: 10px 0; color: white; background-color: #4CAF50; text-decoration: none; border-radius: 5px;">Reset Password</a>
-              <p>If you didn’t request this, please ignore this email. This link will expire in 1 hour.</p>
-              <p>Thanks,<br>The TarotLog Team</p>
-          </div>
-      `,
+            <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+                <h2 style="color: #4CAF50; text-align:center;">MyTarotTales Password Reset</h2>
+                <p>Hello,</p>
+                <p>You requested a password reset. Click the button below to reset your password:</p>
+                <div style="text-align: center;">
+                    <a href="http://${req.headers.host}/auth/reset-password/${token}" style="display: inline-block; padding: 10px 20px; margin: 10px 0; color: white; background-color: #4CAF50; text-decoration: none; border-radius: 5px;">Reset Password</a>
+                </div>
+                <p>If you didn’t request this, please ignore this email. This link will expire in 1 hour.</p>
+                <p>Thanks,<br>MyTarotTales Team</p>
+            </div>
+          `,
       });
 
       res.redirect('/auth/forgot-password?success=true');
@@ -205,6 +207,33 @@ const resetPassword_post = async (req, res) => {
   }
 };
 
+const changePassword_get = async (req, res) => {
+  // Ensure the user is logged in
+  if (!req.user || !req.user.id) {
+    return res.redirect('/');
+  }
+
+  try {
+    // Find the user using the logged-in user id
+    const user = await User.findByPk(req.user.id);
+    if (!user) {
+      return res.status(400).send('User not found.');
+    }
+
+    // Generate the token and set the expiration (e.g., 1 hour from now)
+    const token = generateToken(); // Use your existing token generation function
+    user.resetToken = token;
+    user.tokenExpiration = Date.now() + 3600000; // 1 hour expiration
+    await user.save();
+
+    // Redirect to the reset password page with the token appended to the URL
+    res.redirect(`/auth/reset-password/${token}`);
+  } catch (err) {
+    console.error('Error generating change password token for change password:', err);
+    res.status(500).send('Error processing password change.');
+  }
+};
+
 const forgotPassword_get = (req, res) => {
   res.render('forgotPassword', { success: req.query.success });
 };
@@ -219,4 +248,5 @@ module.exports = {
   forgotPassword_post,
   resetPassword_get,
   resetPassword_post,
+  changePassword_get
 };

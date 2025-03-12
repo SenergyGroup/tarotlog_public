@@ -629,6 +629,15 @@ app.get('/api/top-cards', async (req, res) => {
   }
 });
 
+//Artists Routes
+app.get('/artists', checkUser, (req, res) => {
+  // If the user is authenticated, req.user will be set by checkUser
+  if (!req.user) {
+    return res.redirect('/');
+  }
+  // Otherwise, render the home page
+  res.render('artists');
+});
 
 // Route files
 app.use('/auth', authRoutes);

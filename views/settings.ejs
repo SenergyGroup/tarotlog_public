@@ -52,6 +52,9 @@
         height: auto;
         margin-right: 10px;
       }
+      input {
+        width: 100%;
+      }
 </style>
 
 <div class="settings-container">
@@ -201,16 +204,21 @@
                 <!--<input type="text" id="username" name="username" placeholder="New Username">-->
         
                 <!--<label for="email">Change Email:</label>-->
-                <!--<input type="email" id="email" name="email" placeholder="New Email">-->
-        
-                <!--<button type="button" onclick="location.href='/settings'">Change Password</button>-->
+                <!--<input type="email" id="email" name="email_old" placeholder="Previous Email">-->
+                <!--<input type="email" id="email" name="email_new" placeholder="New Email">-->
+
+                <!--<br>
+
+                <button type="submit">Save Changes</button>
+
+                <br>
+                <br>-->
+                <button type="button" onclick="location.href='/auth/change-password'">Change Password</button>
 
                 <button type="button" onclick="location.href='/settings/download-data'">Download My Data</button>
 
                 <!--<button type="button" onclick="location.href='/settings/deactivate'">Deactivate My Account</button>-->
                 <!--<p><strong>Warning!</strong> Deleting your account deletes all of your data.</p>-->
-        
-                <!--<button type="submit">Save Changes</button>-->
             </form>
         </div>
     </div>

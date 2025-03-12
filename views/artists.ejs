@@ -1,0 +1,135 @@
+<%- include('partials/header'); -%>
+
+<script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+<script>
+    const user = <%- JSON.stringify(user) %>;
+</script>
+<script src="/profile.js"></script>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meet the Artists</title>
+    <style>
+        .artist-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .artist-list {
+            list-style: none;
+            padding: 0;
+        }
+        .artist-item {
+            background: #2e2e2e;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
+        .artist-text strong {
+            display: block;
+            font-size: 18px;
+            color: #ddd;
+            margin-bottom: 10px;
+        }
+        .deck {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-top: 1px solid #ddd;
+        }
+        .deck span {
+            font-weight: bold;
+            color: #ddd;
+        }
+        .deck p {
+            margin: 5px 0;
+        }
+        .artist-image {
+            width: 120px;
+            height: 180px;
+            background-color: yellow;
+            border-radius: 5px;
+            flex-shrink: 0;
+            margin-left: 10px;
+        }
+        a {
+            color: #f2c14e;
+        }
+
+        /* Responsive styling */
+        @media (max-width: 600px) {
+            .deck {
+                flex-direction: column;
+                align-items: center;
+                text-align: left;
+            }
+            .artist-image {
+                margin: 10px 0 0;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <h1>Meet the Artists</h1>
+    <p>Discover the talented artists behind the tarot deck. Some of these cards are licensed under 
+        <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">
+            Creative Commons Attribution-ShareAlike 4.0
+        </a>.
+    </p>
+
+    <div class="artist-container">
+        <ul class="artist-list">
+            <li class="artist-item">
+                <h1>Yve Lepkowski</h1>
+                <div class="deck">
+                    <div class="deck-text">
+                        <h2><span>Clown Town Tarot</span></h2>
+                        <p>Clown Town Tarot is a colorful deck full of clowns. It’s also the first tarot deck Yve created! The trumps and their coloring were particularly inspired by the Camoin-Jodorowsky Tarot de Marseille. However, to include as many clowns as humanly possible, the pip cards are also fully illustrated, based on numerology. The four suits are Court Jesters (Swords), White Clowns (Cups), Rodeo Clowns (Coins), and Tramp Clowns (Batons).</p>
+                    </div>
+                    <a href="https://stolen-thyme.com/clown-town-tarot/">
+                        <img src="https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/tarot_decks/clown_tarot/image_1.jpg" class="artist-image">
+                    </a>
+                </div>
+                <br>
+                <div class="deck">
+                    <div class="deck-text">
+                        <h2><span>Anecdotes Tarot</span></h2>
+                        <p>Anecdotes Tarot is a 78-card deck inspired by the music of Joanna Newsom. Yve worked on the pictures for this deck from 2018-2020, using colored pencils and alcohol-based markers. The deck was printed in 2020 thanks to a wonderful group of backers in a Kickstarter campaign.</p>
+                    </div>
+                    <a href="https://stolen-thyme.com/anecdotes-tarot/">
+                        <img src="https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/tarot_decks/anecdotes/image_1.jpg" class="artist-image">
+                    </a><img>
+                </div>
+                <br>
+                <div class="deck">
+                    <div class="deck-text">
+                        <h2><span>Arlecchino’s Augmented Arcana</span></h2>
+                        <p>Arlecchino’s Augmented Arcana is an 84-card tarot deck that expands on the Tarocchino Arlecchino. Like the original deck, the cards feature original Harlequin illustrations, inspired by costumes and stories from throughout the character’s colorful history. The compositions are modeled after the 62-card Bolognese tarocchino deck, but Yve added new pip cards in the same style to each suit to “complete” the 78-card tarot.</p>
+                    </div>
+                    <a href="https://stolen-thyme.com/tarocchino-arlecchino/arlecchinos-augmented-arcana/">
+                        <img src="https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/tarot_decks/arlecchinos/image_1.jpg" class="artist-image"> 
+                    </a>
+                </div>
+            </li>
+
+            <li class="artist-item">
+                <h1>William Rider & Son, A. E. Waite, and Pamela Colman Smith</h1>
+                <div class="deck">
+                    <div class="deck-text">
+                        <h2><span>Rider–Waite Taro</span></h2>
+                        <p>The Rider–Waite Tarot, created in 1909, is a highly influential tarot deck featuring 78 cards rich in symbolism and occult influences. Its innovative imagery and widespread publication, over 100 million copies across 20+ countries, have inspired numerous editions and variants.</p>
+                    </div>
+                    <img src="https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/tarot_decks/rider_white/image_1.jpg" class="artist-image"></a>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
+</body>
+</html>

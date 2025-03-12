@@ -12,6 +12,10 @@ h1, p, button, textarea {
     box-sizing: border-box;
 }
 
+a {
+  color: #f5c542;
+}
+
 header, footer {
   position: fixed;
   left: 50%;
@@ -39,6 +43,10 @@ header {
 /* Footer stays pinned at bottom */
 footer {
   bottom: 0;
+}
+
+footer a {
+  color: #f2c14e;
 }
 
 /* Brand Title (centered at the top) */
