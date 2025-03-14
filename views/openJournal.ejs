@@ -1,55 +1,43 @@
 <%- include('partials/header'); -%>
 
 <script src="/profile.js"></script>
-<style>
-    body {
-        font-family: 'Arial', sans-serif;
-        background-color: var(--background-dark);
-        color: #fff;
-        margin: 0;
-        padding: 0;
-        min-height: 100vh;
-        padding-top: 110px;
-        padding-bottom: 60px;
-        box-sizing: border-box;
-        overflow-x: hidden;
-    }
-    #journal-title {
-        width: 100%;
-    }
-</style>
 
 <div class="app-container">
-  <h1 class="page-title">Open Journal</h1>
-  <p>Journal about whatever you feel like and discover the tarot card that best matches your entry</p>
-
+    <h1 class="page-title gradient-text">Open Journal</h1>
+    <p>Journal about whatever you feel like and discover the tarot card that best matches your entry</p>
+  
     <div class="open-journal-section">
-        <div class="card-container hidden sleek-card-container">
-            <div class="card-header">
-            <span><h2 id="card-name">Card: </h2><h2 id="orientation"> </h2></span>
-            </div>
-            <div class="card-content">
-            <img id="tarot-image" src="" alt="Tarot Card Image">
-            <p id="reasoning"></p>
-            </div>
+      <!-- Updated card container uses both "card" and "glass" for the modern translucent style -->
+      <div class="card glass hidden sleek-card-container">
+        <div class="card-header">
+          <span>
+            <h2 id="card-name">Card:</h2>
+            <h2 id="orientation"></h2>
+          </span>
         </div>
-        
-        <input type="text" id="journal-title" name="title" placeholder="Journal title" required>
-    
-        <textarea id="response-2" class="open-journal-response-box" placeholder="Let your thoughts run free"></textarea>
-        
-        <!-- Mood Input Section -->
-        <div class="mood-slider-container">
-            <label for="mood-slider">Mood:</label>
-            <div class="slider-wrapper">
-                <span class="slider-icon" id="sad-icon">😞</span>
-                <input type="range" id="mood-slider" name="mood" min="1" max="5" value="3">
-                <span class="slider-icon" id="happy-icon">😊</span>
-            </div>
-            <p id="mood-display">Mood: 😐 (3)</p>
+        <div class="card-content">
+          <img id="tarot-image" src="" alt="Tarot Card Image">
+          <p id="reasoning"></p>
         </div>
-        
-        <button id="save-response-btn" class="save-button">Save Response</button>
+      </div>
+      
+      <input type="text" id="journal-title" name="title" placeholder="Journal title" required>
+      
+      <textarea id="response-2" class="open-journal-response-box" placeholder="Let your thoughts run free"></textarea>
+      
+      <!-- Mood Input Section remains the same -->
+      <div class="mood-slider-container">
+        <label for="mood-slider">Mood:</label>
+        <div class="slider-wrapper">
+          <span class="slider-icon" id="sad-icon">😞</span>
+          <input type="range" id="mood-slider" name="mood" min="1" max="5" value="3">
+          <span class="slider-icon" id="happy-icon">😊</span>
+        </div>
+        <p id="mood-display">Mood: 😐 (3)</p>
+      </div>
+      
+      <!-- Updated button class -->
+      <button id="save-response-btn" class="btn btn-primary">Save Response</button>
     </div>
 </div>
 

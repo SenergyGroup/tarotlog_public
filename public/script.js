@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const API_BASE_URL = '';
 
     const moodSlider = document.getElementById("mood-slider");
-    const drawCardBtn = document.getElementById('draw-card-btn');
+    const cardImage = document.getElementById('drawn-card');
     const saveResponseBtn = document.getElementById('save-response-btn');
 
     // Add a spinner element at the top
@@ -35,8 +35,8 @@ document.addEventListener("DOMContentLoaded", () => {
     let isDrawing = false; // Prevent multiple requests
 
     // Add event listener for draw-card-btn
-    if (drawCardBtn) {
-        drawCardBtn.addEventListener('click', async () => {
+    if (cardImage) {
+        cardImage.addEventListener('click', async () => {
             if (!isDrawing) {
                 isDrawing = true;
                 spinner.style.display = 'block';
@@ -201,9 +201,22 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (cardImage && cardTitleElement && cardHeaderElement && cardPrompt && responseBox && saveButton) {
+            // If the card is reversed, pre-set the transform so it appears upside down.
+            if (isReversed) {
+                cardImage.style.transform = 'rotateZ(180deg)';
+                cardImage.classList.add('flip-reversed');
+                cardImage.addEventListener('animationend', () => {
+                cardImage.classList.remove('flip-reversed');
+                }, { once: true });
+            } else {
+                cardImage.style.transform = 'rotateY(0deg)';
+                cardImage.classList.add('flip');
+                cardImage.addEventListener('animationend', () => {
+                cardImage.classList.remove('flip');
+                }, { once: true });
+            }
             cardImage.src = card.image_data;
             cardImage.dataset.cardId = card.card_id;
-            cardImage.style.transform = isReversed ? 'rotate(180deg)' : 'rotate(0deg)';
 
             cardTitleElement.innerText = `${card.suit}: ${card.card_name} (${card.orientation})`;
 

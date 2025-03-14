@@ -3,78 +3,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MyTarotTales</title>
-    <link rel="stylesheet" href="/styles.css">
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-    
-      body {
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-        font-family: 'Helvetica Neue', Arial, sans-serif;
-        background-color: #0b0b0b;
-        color: #e0e0e0;
-      }
-    
-      .hero {
-        text-align: center;
-      }
-    
-      .hero-image {
-        width: 100%;
-        height: 40vh;
-        object-fit: cover;
-        filter: brightness(60%);
-      }
-    
-      .hero-content {
-        padding: 2rem;
-        max-width: 600px;
-        margin: 0 auto;
-      }
-    
-      h1 {
-        font-size: 3rem;
-        margin-bottom: 0.5rem;
-        color: #c29fff;
-      }
-    
-      .description {
-        margin: 1.5rem 0;
-        font-size: 1.2rem;
-        line-height: 1.8;
-        color: #ccc;
-      }
-    
-      .cta-buttons {
-        display: flex;
-        justify-content: center;
-        gap: 1rem;
-        margin-top: 2rem;
-      }
-    
-    
-    </style>
-    
+    <link rel="stylesheet" href="/styles.css">   
     <script src="/profile.js"></script>
 </head>
-<body>
-<div class="hero">
-  <img src="https://images.unsplash.com/photo-1600430073932-e915854d9d4d" alt="Mystical Tarot Card" class="hero-image">
-  <div class="hero-content">
-    <h1>Welcom to MyTarotTales</h1>
-    <p class="description">
-      Draw a card for a personalized prompt, or open your journal to match a card with your entry. Track your insights and review your progress, one card at a time.
-    </p>
-    <div class="cta-buttons">
-      <a href="/auth/signup" class="btn">Sign Up</a>
-      <a href="/auth/login" class="btn secondary">Log In</a>
+<body class="bg-gradient">
+<div class="landing-container">
+  <div class="hero-section">
+    <h1 class="gradient-text">MyTarotTales</h1>
+    <p class="hero-subtitle">Draw a card for a personalized prompt, or free journal to match a card with your entry. Track your insights and review your progress, one card at a time.</p>
+    
+    <div class="auth-buttons">
+      <div class="btn btn-primary" onclick="window.location.href='/auth/login'">
+        Sign In
+      </div>
+      <div class="btn btn-outline" onclick="window.location.href='/auth/signup'">
+        Sign Up
+      </div>
+    </div>
+  </div>
+
+  <div class="features-grid">
+    <div class="feature-card card glass">
+      <div class="feature-icon">🎴</div>
+      <h3>Generated Prompts</h3>
+      <p>Get prompts based on tarot cards</p>
+    </div>
+    
+    <div class="feature-card card glass">
+      <div class="feature-icon">📖</div>
+      <h3>Journal Your Journey</h3>
+      <p>Record your reflections and track your growth</p>
+    </div>
+    
+    <div class="feature-card card glass">
+      <div class="feature-icon">🔮</div>
+      <h3>Get Matched</h3>
+      <p>Get paired with the tarot card that best reflects your entry</p>
     </div>
   </div>
 </div>
-
-<%- include('partials/footer'); -%>
