@@ -8,7 +8,7 @@
   
     <div class="open-journal-section">
       <!-- Updated card container uses both "card" and "glass" for the modern translucent style -->
-      <div class="card glass hidden sleek-card-container">
+      <div class="card hidden sleek-card-container">
         <div class="card-header">
           <span>
             <h2 id="card-name">Card:</h2>
@@ -83,7 +83,7 @@
             image.style.transform = data.orientation === 'reversed' ? 'rotate(180deg)' : 'rotate(0deg)';
 
             // Unhide card details
-            document.querySelector(".card-container").classList.remove("hidden");
+            document.querySelector(".sleek-card-container").classList.remove("hidden");
 
             resetOpenJournalUI();
         } catch (error) {
@@ -100,7 +100,7 @@
         const moodSliderContainer = document.querySelector(".mood-slider-container");
         const journalEntry = document.getElementById("response-2");
         const saveButton = document.getElementById("save-response-btn");
-        const cardContainer = document.querySelector(".card-container");
+        const cardContainer = document.querySelector(".sleek-card-container");
 
         // Hide the journal title input field
         if (journalTitle) {

@@ -259,8 +259,8 @@ gap: 20px;
 }
 
 .card-image {
-width: 100%;
-max-width: 200px;
+width: 85%;
+max-width: 182px;
 height: auto;
 object-fit: cover;
 border-radius: 0.75rem;
