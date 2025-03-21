@@ -311,13 +311,17 @@ transform: scale(1.02);
 }
 
 .card-header {
-margin-top: 1rem;
+margin-bottom: 1rem;
 font-size: 1.5rem;
 font-weight: bold;
 color: var(--primary);
 background: rgba(255, 255, 255, 0.05);
 border-radius: 1rem;
-padding: 15px;
+padding: 1px;
+}
+
+#reasoning {
+  text-align: left;
 }
 
 /* Sleek Card Container */
@@ -367,7 +371,7 @@ display: none !important;
 }
 
 /* Common Button Transitions */
-.draw-button, .save-button, form button, .btn {
+.draw-button, .save-button, form, button, .btn {
 transition: background-color 0.3s ease, transform 0.2s;
 }
 
@@ -437,6 +441,59 @@ background: rgba(255, 255, 255, 0.2);
 background: var(--primary);
 color: var(--foreground);
 box-shadow: 0 0 10px var(--primary);
+}
+
+/* ─── About Page Styling ───────────────────────────────────────────────────── */
+.about-page {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  padding: 3rem 1rem;
+}
+
+.about-page section {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+
+.about-page h1 {
+  grid-column: 1 / -1;
+  font-size: 3rem;
+  color: var(--primary);
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.about-page h2 {
+  font-size: 1.75rem;
+  margin-bottom: 1rem;
+  color: var(--accent-gold);
+}
+
+.about-page p,
+.about-page li {
+  line-height: 1.7;
+  color: var(--foreground);
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.about-page ol,
+.about-page ul {
+  padding-left: 1.5rem;
+}
+
+.action-buttons .btn-primary {
+  margin-top: 2rem;
+  width: 100%;
+  cursor: pointer;
+}
+.about-page {
+  padding: 2rem 0.5rem;
+  grid-template-columns: 1fr;
 }
 
 /* Open Journal Section */
@@ -757,11 +814,13 @@ text-align: center;
 .btn-primary {
 background: linear-gradient(to right, var(--primary), #ec4899);
 color: white;
+cursor: pointer;
 }
 
 .btn-outline {
 border: 1px solid var(--primary);
 color: var(--primary);
+cursor: pointer;
 }
 
 .btn-ghost {
@@ -783,7 +842,6 @@ box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
 max-width: 400px;
 min-width: 300px;
 margin: 0 auto;
-font-family: 'Cinzel', serif;
 }
 
 form h1 {
@@ -1099,7 +1157,6 @@ text-align: center;
 }
 
 .card-content img {
-  width: 100%;
   height: auto;
   border-radius: 0.5rem;
   margin-bottom: 0.5rem;
@@ -1439,7 +1496,7 @@ line-height: 1.6;
   .main-content {
     order: 2;
   }
-
+}
 
 @media (max-width: 768px) {
 .entries-list {
@@ -1533,4 +1590,41 @@ form button {
 .entries-list {
   max-width: 90%;
 }
+}
+
+@media (min-width: 950px) {
+  .about-page {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: auto 1fr;
+    grid-gap: 3rem;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 4rem 2rem;
+  }
+
+  /* Full‑width intro as “hero” */
+  .about-page > h1,
+  .about-page > p {
+    grid-column: 1 / -1;
+  }
+
+  /* All cards share equal min-height & top alignment */
+  .about-page section {
+    min-height: 350px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    transition: transform .2s, box-shadow .2s;
+  }
+  .about-page section:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+  }
+
+  /* Center CTA below grid */
+  .action-buttons {
+    grid-column: 1 / -1;
+    justify-self: center;
+  }
 }

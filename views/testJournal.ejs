@@ -1,0 +1,294 @@
+<%- include('partials/header'); -%>
+
+<div class="app-container">
+    <h1 class="page-title gradient-text">Open Journal</h1>
+    <p>Journal about whatever you feel like and discover the tarot card that best matches your entry</p>
+
+    <!-- 1) Modal HTML (initially hidden) -->
+    <div id="account-modal-overlay" class="modal-overlay hidden">
+        <div id="account-modal-box" class="modal-box">
+        <h2>Save Your Data</h2>
+        <p>
+            You are not logged in. Make an account to save your journals.
+        </p>
+        <br>
+        <div class="modal-buttons">
+            <button id="modal-make-account-btn" class="btn btn-primary">Make an Account</button>
+        </div>
+        </div>
+    </div>
+  
+    <div class="open-journal-section">
+      <!-- Updated card container uses both "card" and "glass" for the modern translucent style -->
+      <div class="card hidden sleek-card-container">
+        <div class="card-header">
+          <span>
+            <h2 id="card-name">Card:</h2>
+            <h3 id="orientation"></h3>
+          </span>
+        </div>
+        <div class="card-content">
+          <img id="tarot-image" src="" alt="Tarot Card Image">
+          <p id="reasoning"></p>
+        </div>
+      </div>
+      
+      <input type="text" id="journal-title" name="title" placeholder="Journal title" required>
+      
+      <textarea id="response-2" class="open-journal-response-box" placeholder="Let your thoughts run free"></textarea>
+      
+      <!-- Mood Input Section remains the same -->
+      <div class="mood-slider-container">
+        <label for="mood-slider">Mood:</label>
+        <div class="slider-wrapper">
+          <span class="slider-icon" id="sad-icon">😞</span>
+          <input type="range" id="mood-slider" name="mood" min="1" max="5" value="3">
+          <span class="slider-icon" id="happy-icon">😊</span>
+        </div>
+        <p id="mood-display">Mood: 😐 (3)</p>
+      </div>
+      
+      <!-- Updated button class -->
+      <button id="save-response-btn" class="btn btn-primary">Save Response</button>
+    </div>
+
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const user = window.user; // from EJS
+        const API_BASE_URL = '';  // Adjust if needed
+
+        // 1) If the user is logged in, sync any offline entries
+        if (user) {
+            syncLocalStorageDataToServer(user, API_BASE_URL);
+        } else {
+            // 2) Set up "Save Response" button
+            checkPendingJournal();
+        }
+        // 2) "Save" button
+        const saveBtn = document.getElementById("save-response-btn");
+        saveBtn?.addEventListener("click", handleSaveResponse);
+    });
+
+    /**
+     * checkPendingJournal: if localStorage "pendingJournal" is present,
+     * then the user already created an offline entry and we disable
+     * further entries until they sign in or discard it.
+     */
+    function checkPendingJournal() {
+    const pending = localStorage.getItem("pendingJournal");
+    if (pending) {
+        // Disable the UI so they can't create a new one
+        document.getElementById("journal-title").disabled = true;
+        document.getElementById("response-2").disabled = true;
+        document.getElementById("mood-slider").disabled = true;
+        const saveBtn = document.getElementById("save-response-btn");
+        saveBtn.disabled = true;
+        saveBtn.textContent = "You already have an entry. Login or sign up to make another.";
+    }
+    }
+
+    /**
+     * handleSaveResponse:
+     *  - Gather the journaling fields
+     *  - If user is logged in => do the normal server call => stores in DB
+     *  - If not logged in => store offline + show the "Sign Up" modal
+     */
+    async function handleSaveResponse() {
+    const journalEntry = document.getElementById("response-2").value.trim();
+    const mood         = document.getElementById("mood-slider").value;
+    const title        = document.getElementById("journal-title").value.trim();
+    const saveButton   = document.getElementById("save-response-btn");
+
+    if (!journalEntry) {
+        alert("Please enter your journal entry.");
+        return;
+    }
+
+    // If not logged in, enforce single offline limit
+    if (!window.user) {
+        const existing = localStorage.getItem("pendingJournal");
+        if (existing) {
+        alert("You already have an entry. Login or sign up to make another.");
+        return;
+        }
+    }
+
+    saveButton.disabled = true;
+    saveButton.innerText = "Saving...";
+
+    try {
+        // 1) Attempt to get a card from backend – or skip if you want
+        // The code below calls /get-tarot-card with your journaling info
+        // so the server can pick a “matching” or “inspired” tarot card
+        const resp = await fetch("/api/get-tarot-card-offline", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ journalEntry, mood, title }),
+        });
+
+        if (!resp.ok) {
+        const errorData = await resp.json();
+        throw new Error(errorData.error || "Failed to fetch card");
+        }
+
+        const data = await resp.json();
+        console.log("Received data from backend:", data);
+
+        // 2) We have a “data” object that includes the card + reasoning
+        // Build a "payload" for saving (locally or to DB)
+        const payload = {
+            card_id:      data.card_id,                // from server
+            prompt_text:  data.reasoning,              // your "prompt" is the reasoning
+            response_text: journalEntry,               // the journaling
+            orientation:   data.orientation || "Upright",
+            selected_meanings: null,                   // or empty array
+            mood: parseInt(mood, 10),
+            // user_id is only set if user is logged in, so we'll add that in sendResponseToApi
+        };
+
+        // 3) If user is logged in, send to DB. If not, store offline + modal.
+        if (window.user) {
+        await sendResponseToApi(payload, window.user, "");
+        alert("Your journal entry + card were saved to your account!");
+        localStorage.removeItem("pendingJournal");
+        resetOpenJournalUI();
+        } else {
+        // Not logged in => local storage
+        localStorage.setItem("pendingJournal", JSON.stringify(payload));
+        resetOpenJournalUI();
+        showMakeAccountModal();
+        }
+
+        // 4) Update the UI with the card details
+        showTarotCard(data);
+
+    } catch (error) {
+        console.error("Error:", error);
+        alert(`Failed to fetch tarot card. ${error.message}`);
+    } finally {
+        saveButton.disabled = false;
+        saveButton.innerText = "Save Response";
+    }
+    }
+
+    /**
+     * Show the returned card in the UI
+     */
+    function showTarotCard(data) {
+    document.getElementById("card-name").innerText = `Card: ${data.card_name}`;
+    document.getElementById("orientation").innerText = `(${data.orientation})`;
+    document.getElementById("reasoning").innerText = data.reasoning;
+
+    const image = document.getElementById("tarot-image");
+    image.src = data.image_data;
+    image.alt = `${data.card_name || "Tarot Card"} Tarot Card`;
+    image.style.transform = data.orientation === "Reversed" ? "rotate(180deg)" : "rotate(0deg)";
+
+    // Unhide card details
+    document.querySelector(".sleek-card-container").classList.remove("hidden");
+    }
+
+    /**
+     * Reset the journaling UI – hide fields, etc.
+     */
+    function resetOpenJournalUI() {
+    const journalTitle   = document.getElementById("journal-title");
+    const moodSlider     = document.querySelector(".mood-slider-container");
+    const journalEntry   = document.getElementById("response-2");
+    const saveButton     = document.getElementById("save-response-btn");
+
+    journalTitle?.classList.add("hidden");
+    moodSlider?.classList.add("hidden");
+    journalEntry?.classList.add("hidden");
+    saveButton?.classList.add("hidden");
+    }
+
+    /**
+     * If user logs in next time, push these offline journals to the DB
+     */
+    async function syncLocalStorageDataToServer(user, apiBaseUrl) {
+    const pendingData = localStorage.getItem("pendingJournal");
+    if (!pendingData) return;
+
+    try {
+        const payload = JSON.parse(pendingData);
+        await sendResponseToApi(payload, user, apiBaseUrl);
+        // If successful, remove from localStorage
+        localStorage.removeItem("pendingJournal");
+        alert("Offline journal entry has been synced to your account!");
+    } catch (err) {
+        console.error("Error syncing entry:", err);
+        alert("Some offline entries could not be synced. Try again later.");
+    }
+    }
+
+    /**
+     * Actually send data to your DB. Note that your /api/save-response or 
+     * some new route must accept the “journalEntry” plus card info.
+     */
+    async function sendResponseToApi(payload, user, apiBaseUrl) {
+    const fullPayload = { ...payload, user_id: user.id };
+    // Possibly your endpoint is different for journal. 
+    // If using the same route, you must handle the extra fields (journalEntry, etc.).
+    const res = await fetch(`${apiBaseUrl}/api/save-response`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(fullPayload)
+    });
+
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text);
+    }
+    }
+
+    /**
+     * Show a popup modal prompting them to sign up
+     */
+    function showMakeAccountModal() {
+    const overlay = document.getElementById('account-modal-overlay');
+    if (!overlay) {
+        console.error("Modal overlay not found in DOM.");
+        return;
+    }
+    overlay.classList.remove('hidden');
+
+    const makeAccountBtn = document.getElementById('modal-make-account-btn');
+
+    makeAccountBtn.onclick = () => {
+        // Keep local storage, just redirect
+        location.href = "/auth/signup";
+    };
+}
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const moodSlider = document.getElementById("mood-slider");
+        const moodDisplay = document.getElementById("mood-display");
+
+        const moodMap = {
+            1: "😞",
+            2: "😒",
+            3: "😐",
+            4: "🙂",
+            5: "😊",
+        };
+
+        const updateMoodDisplay = (value) => {
+            const moodIcon = moodMap[value] || "😐"; // Default to neutral
+            moodDisplay.textContent = `${moodIcon} (${value})`;
+        };
+
+        // Initial mood display
+        updateMoodDisplay(moodSlider.value);
+
+        // Update mood display on slider change
+        moodSlider.addEventListener("input", () => {
+            updateMoodDisplay(moodSlider.value);
+        });
+    });
+</script>

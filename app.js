@@ -7,7 +7,7 @@ const cookieParser = require('cookie-parser');
 const { sequelize } = require('./config/database');
 const authRoutes = require('./routes/authRoutes');
 const settingsRoutes = require('./routes/settingsRoutes');
-const entriesController = require('./controllers/entriesController');
+const testRoutes = require('./routes/testRoutes');
 const { checkUser } = require('./middleware/authMiddleware');
 // const cleanupExpiredTokens = require('./tasks/cleanupExpiredTokens');
 const { encrypt } = require('./utils/encryption');
@@ -75,8 +75,58 @@ sequelize.sync({ force: false }) // Set force to true to drop and recreate table
   .then(() => console.log('Database synced'))
   .catch(err => console.error('Error syncing database:', err));
 
+/**
+ * Serve a random card without daily-limit logic
+ */
+async function serveRandomCardNoLimit(pool, res) {
+  try {
+    // Pull a random card from the database
+    const result = await pool.query(
+      'SELECT * FROM tarot_cards ORDER BY RANDOM() LIMIT 1'
+    );
+    const card = result.rows[0];
+
+    if (!card || !card.card_id) {
+      throw new Error('Card ID missing in database response.');
+    }
+
+    // Randomly determine orientation
+    const isReversed = Math.random() < 0.5; // 50% chance
+
+    // For non-logged-in users, default to some deck, e.g. "rider_white"
+    const userDeck = 'rider_white';
+
+    // Build an image URL or use the same logic from your code
+    const cardNumber = card.card_id;
+    const imageURL = `https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/tarot_decks/${userDeck}/image_${cardNumber}.jpg`;
+
+    // Build the final response object
+    const cardWithOrientation = {
+      ...card,
+      orientation: isReversed ? 'Reversed' : 'Upright',
+      description: isReversed ? card.description_reversed : card.description_upright,
+      meanings: isReversed
+        ? card.meaning_reversed.split(',')
+        : card.meaning_upright.split(','),
+      image_data: imageURL,
+    };
+
+    // Return JSON directly
+    return res.json(cardWithOrientation);
+  } catch (error) {
+    console.error('Error fetching card:', error);
+    return res.status(500).json({ error: 'Database error' });
+  }
+}
+
 // Route to draw a random card
 app.get('/api/draw-card', async (req, res) => {
+  // If no user => skip the draw limit
+  if (!req.user) {
+    // Just serve a random card with orientation
+    return serveRandomCardNoLimit(pool, res);
+  }
+
   const userId = req.user.id;
   const today = new Date().toISOString().split('T')[0];
 
@@ -368,11 +418,6 @@ app.post("/get-tarot-card", async (req, res) => {
       return res.status(500).json({ error: "Failed to generate tarot card recommendation." });
     }
 
-    // Define normalization functions
-    const normalizeCardName = (cardName) => {
-      return cardName.trim().replace(/^- /, '').toLowerCase();
-    };
-
     const normalizeOrientation = (orientation) => {
       return orientation.trim().replace(/^- /, '').toLowerCase();
     };
@@ -382,7 +427,6 @@ app.post("/get-tarot-card", async (req, res) => {
     };
 
     // Parse the OpenAI response
-    console.log("[INFO] Parsing OpenAI response...");
     const parseResponse = (responseText) => {
       const lines = responseText.split("\n").map((line) => line.trim());
       return {
@@ -396,18 +440,12 @@ app.post("/get-tarot-card", async (req, res) => {
 
     if (!search_name || !orientation || !reasoning) {
       console.error("[ERROR] Parsed response is invalid:", { search_name, orientation, reasoning });
-      return res.status(400).json({ error: "Invalid response from OpenAI" });
+      return res.status(400).json({ error: "Unable to pair you with a card right now." });
     }
 
-    // Normalize the parsed values
     const normalizedSearchName = normalizeCardName(search_name);
     const normalizedOrientation = normalizeOrientation(orientation);
     const normalizedReasoning = normalizeReasoning(reasoning);
-
-    console.log("[INFO] Parsed response:", { normalizedSearchName, normalizedOrientation, normalizedReasoning });
-
-    // Query the database for the card
-    console.log("[INFO] Querying database for card:", normalizedSearchName);
     
     try {
       const query = `
@@ -453,7 +491,7 @@ app.post("/get-tarot-card", async (req, res) => {
       const insertValues = [
         userId,
         card.card_id,
-        title, // prompt_text is the title of their prompt
+        normalizedReasoning, // prompt_text is the reasoning
         encryptedResponse, // response_text is the journal entry
         normalizedOrientation, // From OpenAI response
         null, // selected_meanings is null for now
@@ -493,10 +531,92 @@ app.post("/get-tarot-card", async (req, res) => {
   }
 });
 
+// Offline tarot card generation route (skip DB insertion)
+app.post("/api/get-tarot-card-offline", async (req, res) => {
+  try {
+    const { journalEntry, mood, title } = req.body;
+    if (!journalEntry || !mood || !title) {
+      return res.status(400).json({ error: "All fields are required" });
+    }
+
+    // Generate the OpenAI prompt (as in your main route)
+    const prompt = `
+      You are a tarot guide. Based on the journal entry below, recommend the tarot card that aligns most. Please use upright and reverse meanings in your classifcation. Once you have a result, respond with exactly the format as follows with no bullets or textual accents, just plain text:
+      [card_name]
+      orientation of card (upright or reversed)
+      A small paragraph on your reasoning
+      Exceptions:
+      - For Major Arcana card that most align still do: [card_name]
+      - For Lesser Arcana card that most aligns do: [number(digit, not spelled out unless an ace)_of_suit]
+      Examples:
+      - If the card was a Major Arcana: the_fool then a new line upright then a new line with your small paragraph reasoning.
+      - If the card was a Lesser Arcana: 2_of_wands then a new line reversed then a new line with your small paragraph reasoning.
+      User's journal entry: ${journalEntry}
+    `;
+    
+    // Call the OpenAI API (using your existing logic)
+    const openAIResponse = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [{ role: "user", content: prompt }],
+    });
+    const responseText = openAIResponse.choices?.[0]?.message?.content;
+    if (!responseText) {
+      throw new Error("Empty response from OpenAI.");
+    } else {
+      console.log(responseText)
+    }
+
+    const lines = responseText.split("\n").map(line => line.trim());
+    const search_name = lines[0];
+    const orientation = lines[1];
+    const reasoning = lines.slice(2).join(" ");
+    const normalizedSearchName = normalizeCardName(search_name);
+    const normalizedOrientation = orientation.toLowerCase();
+    const normalizedReasoning = reasoning;
+
+    // console.log("1. ", lines,"2. ", search_name,"3. ", orientation,"4. ", reasoning,"5. ", normalizedSearchName,"6. ", normalizedOrientation,"7. ", normalizedReasoning)
+
+    // Query the database for the card
+    const query = `SELECT * FROM tarot_cards WHERE search_name = $1`;
+    const result = await pool.query(query, [normalizedSearchName]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Card not found in database" });
+    }
+    const card = result.rows[0];
+
+    // Use a default deck for offline users
+    const userDeck = 'rider_white';
+    const cardNumber = card.card_id;
+    const imageURL = `https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/tarot_decks/${userDeck}/image_${cardNumber}.jpg`;
+
+    // Return the generated card data without saving it to the DB
+    res.json({
+      card_name: card.card_name,
+      orientation: normalizedOrientation,
+      reasoning: normalizedReasoning,
+      image_data: imageURL,
+    });
+  } catch (error) {
+    console.error("Error in offline tarot route:", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Parse and normalize the response
+function normalizeCardName(cardName) {
+  return cardName
+    .trim()                           // Remove surrounding whitespace
+    .replace(/^[-\*\u2022\s]+/, '')     // Remove leading bullets or special characters
+    .replace(/\[|\]/g, '')             // Remove any square brackets
+    .toLowerCase()                    // Convert to lowercase
+    .replace(/\s+/g, '_');             // Replace spaces with underscores
+}
+
 
 const dataController = require('./controllers/dataController'); 
 const storeController = require('./controllers/storeController');
 const dashboardController = require('./controllers/dashboardController');
+const entriesController = require('./controllers/entriesController');
 
 //EJS Routes
 app.get('/', checkUser, (req, res) => {
@@ -631,12 +751,12 @@ app.get('/api/top-cards', async (req, res) => {
 
 //Artists Routes
 app.get('/artists', checkUser, (req, res) => {
-  // If the user is authenticated, req.user will be set by checkUser
-  if (!req.user) {
-    return res.redirect('/');
-  }
-  // Otherwise, render the home page
   res.render('artists');
+});
+
+//About Route
+app.get('/about', checkUser, (req, res) => {
+  res.render('about');
 });
 
 // Route files
@@ -646,6 +766,7 @@ app.use('/entries', entriesController);
 app.use('/data', dataController);
 app.get('/store', storeController.store_get);
 app.use('/settings', settingsRoutes);
+app.use('/test', testRoutes);
 
 // Global Error Handler
 app.use((err, req, res, next) => {

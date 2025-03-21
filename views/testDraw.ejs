@@ -1,0 +1,508 @@
+<%- include('partials/header'); -%>
+
+<script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+<script>
+    const user = <%= JSON.stringify(user || null) %>;
+</script>
+<style>
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    
+    .modal-box {
+      background: linear-gradient(145deg, var(--muted), var(--background));
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 1rem;
+      padding: 2rem;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
+      color: var(--foreground);
+      text-align: center;
+    }
+    
+    .modal-title {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: var(--primary);
+    }
+        
+    .modal-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem; /* ↑ increases space between buttons */
+        margin-top: 1.5rem;
+    }
+
+    .modal-buttons .btn {
+        flex: 1;
+    }
+    
+    .hidden {
+      display: none !important;
+    }
+</style>
+    
+
+<h1 class="page-title gradient-text">Draw a Card</h1>
+
+<div class="app-container">
+    <div class="card-section">
+            <img id="drawn-card" 
+                 src="https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/deck_backs/<%= user && user.deck_back ? user.deck_back : 'image_back_4' %>.png" 
+                 alt="Facedown Card" 
+                 class="card-image">
+        
+        <div class="card-header hidden">
+            <h2 id="card-title"></h2>
+        </div>
+    </div>
+    
+    <div class="prompt-section hidden">
+        <p id="card-prompt" class="prompt-text"></p>
+
+        <!-- Mood Input Section -->
+        <div class="mood-slider-container">
+            <label for="mood-slider">Mood:</label>
+            <div class="slider-wrapper">
+                <span class="slider-icon" id="sad-icon">😞</span>
+                <input type="range" id="mood-slider" name="mood" min="1" max="5" value="3">
+                <span class="slider-icon" id="happy-icon">😊</span>
+            </div>
+            <p id="mood-display">Mood: 😐 (3)</p>
+        </div>
+        
+
+        <textarea id="response-1" class="response-box" placeholder="Your answer to the prompt..."></textarea>
+        <button id="save-response-btn" class="btn btn-primary">Save Response</button>
+    </div>
+
+    <!-- 1) Modal HTML (initially hidden) -->
+    <div id="account-modal-overlay" class="modal-overlay hidden">
+        <div id="account-modal-box" class="modal-box">
+        <h2>Save Your Data</h2>
+        <p>
+            You are not logged in. Make an account to save your journals.
+        </p>
+        <div class="modal-buttons">
+            <button id="modal-make-account-btn" class="btn btn-primary">Make an Account</button>
+            <button id="modal-lose-data-btn" class="btn btn-outline">Lose My Data</button>
+        </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const moodSlider = document.getElementById("mood-slider");
+        const moodDisplay = document.getElementById("mood-display");
+
+        const moodMap = {
+            1: "😞",
+            2: "😒",
+            3: "😐",
+            4: "🙂",
+            5: "😊",
+        };
+
+        const updateMoodDisplay = (value) => {
+            const moodIcon = moodMap[value] || "😐"; // Default to neutral
+            moodDisplay.textContent = `${moodIcon} (${value})`;
+        };
+
+        // Initial mood display
+        updateMoodDisplay(moodSlider.value);
+
+        // Update mood display on slider change
+        moodSlider.addEventListener("input", () => {
+            updateMoodDisplay(moodSlider.value);
+        });
+    });
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const API_BASE_URL = ''; 
+    const user         = window.user;           // from EJS: user || null
+
+    // 1) Possibly sync offline data if the user just logged in:
+    if (user) {
+        syncLocalStorageDataToServer(user, API_BASE_URL);
+    } else {
+        checkPendingCard();
+    }
+
+     // Add a spinner element at the top
+    const spinner = document.createElement('div');
+    spinner.id = 'spinner';
+    spinner.style.display = 'none';
+    spinner.style.position = 'absolute';
+    spinner.style.top = '50%';
+    spinner.style.left = '50%';
+    spinner.style.transform = 'translate(-50%, -50%)';
+    spinner.style.border = '4px solid rgba(0,0,0,0.1)';
+    spinner.style.borderTop = '4px solid #f3f3f3';
+    spinner.style.borderRadius = '50%';
+    spinner.style.width = '40px';
+    spinner.style.height = '40px';
+    spinner.style.animation = 'spin 1s linear infinite';
+    document.body.appendChild(spinner);
+
+    // Add CSS animation for the spinner
+    const style = document.createElement('style');
+    style.innerHTML = `
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }`;
+    document.head.appendChild(style);
+
+    let isDrawing = false; // Prevent multiple requests
+
+    // 2) "Draw Card" button
+    const drawBtn = document.getElementById('drawn-card');
+    drawBtn?.addEventListener('click', async () => {
+        if (!isDrawing) {
+            await handleDrawCard();
+        }
+    });
+
+    async function handleDrawCard() {
+        // If user is NOT logged in, check if they already have a card
+        if (!user) {
+        const pending = localStorage.getItem('pendingCard');
+        if (pending) {
+            alert('You already drew a card. Please sign up or login to draw another.');
+            return;
+        }
+        }
+
+        // Show spinner
+        isDrawing = true;
+        spinner.style.display = 'block';
+
+        try {
+        const card = await fetchRandomCard(API_BASE_URL);
+        // Update UI with the new card
+        await updateCardUI(card, API_BASE_URL);
+
+        // If user is not logged in => store "pendingCard" so they can’t draw again
+        if (!user) {
+            localStorage.setItem('pendingCard', JSON.stringify(card));
+        }
+        } catch (err) {
+        console.error(err);
+        alert(err.message);
+        } finally {
+        isDrawing = false;
+        spinner.style.display = 'none';
+        }
+    }
+
+  // 3) "Save" button
+  const moodSlider = document.getElementById("mood-slider");
+  const saveBtn = document.getElementById('save-response-btn');
+  saveBtn?.addEventListener('click', async () => {
+    const responseBox = document.getElementById('response-1');
+    const cardPrompt  = document.getElementById('card-prompt');
+    if (!responseBox || !cardPrompt) return;
+
+    const responseText = responseBox.value.trim();
+    const promptText   = cardPrompt.textContent?.trim();
+    if (!responseText || !promptText) {
+      alert("Please fill out your journal response.");
+      return;
+    }
+
+    const moodValue = moodSlider.value;
+
+    // Build the payload with your drawnCard data
+    const payload = {
+      card_id:         window.drawnCard?.card_id,      // from updateCardUI
+      orientation:     window.drawnCard?.orientation,  
+      prompt_text:     promptText,
+      response_text:   responseText,
+      selected_meanings: window.drawnCard?.selectedMeanings || [],
+      mood: parseInt(moodValue, 10),
+    };
+
+    if (user) {
+      // Logged in => send to backend
+      try {
+        await sendResponseToApi(payload, user, API_BASE_URL);
+        alert("Your response was saved successfully!");
+        // Remove the "pendingCard" if it exists, letting them draw again
+        localStorage.removeItem('pendingCard');
+        resetCardUI();
+      } catch (err) {
+        console.error(err);
+        alert(`Failed to save: ${err.message}`);
+      }
+    } else {
+      // Not logged in => store in localStorage
+      storeResponseInLocalStorage(payload);
+      showMakeAccountModal();
+    }
+  });
+});
+
+// ------------------------------------------------------
+// Helper functions
+// ------------------------------------------------------
+function checkPendingCard() {
+  const pending = localStorage.getItem('pendingCard');
+  if (pending) {
+    const drawElement = document.getElementById('drawn-card');
+    if (drawElement) {
+      drawElement.style.pointerEvents = 'none';
+      drawElement.style.opacity = '0.5';
+      drawElement.title = "You already drew a card. Please sign up or login to draw another.";
+    }
+  }
+}
+
+// Fetch function for random card
+async function fetchRandomCard(apiBaseUrl) {
+  const res = await fetch(`${apiBaseUrl}/api/draw-card`);
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || "Failed to draw card");
+  }
+  return await res.json();
+}
+
+// Update UI to show the drawn card & prompt
+async function updateCardUI(card, apiBaseUrl) {
+  // Store the card globally so we can reference it on save
+  window.drawnCard = card;
+
+  // e.g. fetch AI prompt logic here if needed
+  // show the cardTitle, etc.
+    const cardImage = document.getElementById('drawn-card');
+    const cardTitleElement = document.getElementById('card-title');
+    const cardHeaderElement = document.querySelector('.card-header');
+
+    const cardPrompt = document.getElementById('card-prompt');
+    const responseBox = document.getElementById('response-1');
+    const saveButton = document.getElementById('save-response-btn');
+    const promptSection = document.querySelector('.prompt-section');
+
+    // Get meanings based on orientation
+    const isReversed = card.orientation.toLowerCase() === 'reversed';
+    const meanings = isReversed
+        ? card.meaning_reversed.split(',').map(m => m.trim())
+        : card.meaning_upright.split(',').map(m => m.trim())
+    // fetch AI prompt
+    const aiPrompt = await getAiPrompt(card, apiBaseUrl);
+
+    cardPrompt.innerText = aiPrompt;
+  
+    // Clear any existing meanings
+    const existingMeanings = document.querySelector('.meanings-container');
+        if (existingMeanings) {
+            existingMeanings.remove();
+        }
+
+    const meaningsContainer = document.createElement('div');
+    meaningsContainer.className = 'meanings-container';
+
+    // Track selected meanings
+    const selectedMeanings = new Set();
+
+    if (card.meanings) {
+        card.meanings.forEach(meaning => {
+        const bubble = document.createElement('div');
+        bubble.className = 'meaning-bubble';
+        bubble.textContent = meaning.trim();
+
+        // Add click listener to toggle selection
+        bubble.addEventListener('click', () => {
+            if (selectedMeanings.has(meaning.trim())) {
+            selectedMeanings.delete(meaning.trim());
+            bubble.classList.remove('selected');
+            } else {
+            selectedMeanings.add(meaning.trim());
+            bubble.classList.add('selected');
+            }
+        });
+
+        meaningsContainer.appendChild(bubble);
+        });
+    }
+
+    // Append meaningsContainer after cardPrompt
+    cardPrompt.insertAdjacentElement('afterend', meaningsContainer);
+
+    // Safety checks
+    if (!cardImage || !cardTitleElement || !cardPrompt || !cardHeaderElement) {
+        console.error('UI elements for card display not found.');
+        return;
+    }
+
+    if (cardImage && cardTitleElement && cardHeaderElement && cardPrompt && responseBox && saveButton) {
+        // If the card is reversed, pre-set the transform so it appears upside down.
+        if (isReversed) {
+            cardImage.style.transform = 'rotateZ(180deg)';
+            cardImage.classList.add('flip-reversed');
+            cardImage.addEventListener('animationend', () => {
+            cardImage.classList.remove('flip-reversed');
+            }, { once: true });
+        } else {
+            cardImage.style.transform = 'rotateY(0deg)';
+            cardImage.classList.add('flip');
+            cardImage.addEventListener('animationend', () => {
+            cardImage.classList.remove('flip');
+            }, { once: true });
+        }
+        cardImage.src = card.image_data;
+        cardImage.dataset.cardId = card.card_id;
+
+        cardTitleElement.innerText = `${card.suit}: ${card.card_name} (${card.orientation})`;
+
+        cardHeaderElement.classList.remove('hidden');
+        cardTitleElement.classList.remove('hidden');
+        promptSection.classList.remove('hidden');
+        responseBox.classList.remove('hidden');
+        saveButton.classList.remove('hidden');
+    } else {
+        console.error('UI elements for card display not found.');
+    }
+}
+
+// Example prompt generator
+async function getAiPrompt(card, apiBaseUrl) {
+  try {
+    const resp = await fetch(`${apiBaseUrl}/api/generate-prompt`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        cardName:    card.card_name,
+        orientation: card.orientation,
+        meanings:    card.meanings
+      })
+    });
+    if (resp.ok) {
+      const data = await resp.json();
+      return data.aiPrompt;
+    }
+    return "An error occurred generating a prompt.";
+  } catch (err) {
+    console.error("Prompt error:", err);
+    return "An error occurred generating a prompt.";
+  }
+}
+
+// Actually send data to your /api/save-response
+async function sendResponseToApi(payload, user, apiBaseUrl) {
+  // Usually you need user_id in the payload
+  const fullPayload = { ...payload, user_id: user.id };
+
+  const res = await fetch(`${apiBaseUrl}/api/save-response`, {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(fullPayload)
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text);
+  }
+}
+
+// Store offline in localStorage
+function storeResponseInLocalStorage(payload) {
+  const localEntries = JSON.parse(localStorage.getItem('tarotOfflineEntries') || '[]');
+  localEntries.push(payload);
+  localStorage.setItem('tarotOfflineEntries', JSON.stringify(localEntries));
+}
+
+// On page load (if user logs in), push local data to server
+async function syncLocalStorageDataToServer(user, apiBaseUrl) {
+  const localEntries = JSON.parse(localStorage.getItem('tarotOfflineEntries') || '[]');
+  if (!localEntries.length) return; // no data
+
+  let allSynced = true;
+  for (let entry of localEntries) {
+    try {
+      await sendResponseToApi(entry, user, apiBaseUrl);
+    } catch (err) {
+      console.error("Error syncing entry:", err);
+      allSynced = false;
+    }
+  }
+  if (allSynced) {
+    localStorage.removeItem('tarotOfflineEntries');
+    alert("Offline entries have been synced to your account!");
+  } else {
+    alert("Some offline entries could not be synced. Try again later.");
+  }
+}
+
+// Reset UI after saving
+function resetCardUI() {
+        const cardImage = document.getElementById('drawn-card');
+        const cardTitleContainer = document.querySelector('.card-header');
+        const promptSection = document.querySelector('.prompt-section');
+
+        if (cardImage) {
+            const deckBack = user && user.deck_back ? user.deck_back : 'image_back_4';
+            cardImage.src = `https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/deck_backs/${deckBack}.png`;
+            cardImage.alt = 'Facedown Card';
+            cardImage.style.transform = 'rotate(0deg)';
+        }
+
+        if (document.getElementById('response-1')) {
+            document.getElementById('response-1').value = '';
+        }
+
+        if (cardTitleContainer) {
+            cardTitleContainer.classList.add('hidden');
+        }
+        if (promptSection) {
+            promptSection.classList.add('hidden');
+        }
+
+        drawnCard = null;
+    }
+
+/**
+ * Show a pop-up modal with two buttons:
+ * 1) Make an Account -> go to /auth/signup
+ * 2) Lose my Data -> close the modal
+ */
+ function showMakeAccountModal(latestPayload) {
+  const overlay = document.getElementById('account-modal-overlay');
+  if (!overlay) {
+    console.error("Modal overlay not found in DOM.");
+    return;
+  }
+  overlay.classList.remove('hidden');
+
+  const makeAccountBtn = document.getElementById('modal-make-account-btn');
+  const loseDataBtn    = document.getElementById('modal-lose-data-btn');
+
+  // If user clicks "Make an Account"
+  makeAccountBtn.onclick = () => {
+    // Keep local storage. Just redirect to signup
+    // They can sign up or log in, and we will sync local storage upon next page load
+    location.href = "/auth/signup";
+  };
+
+  // If user clicks "Lose My Data"
+  loseDataBtn.onclick = () => {
+    closeModal();
+  };
+
+  function closeModal() {
+    overlay.classList.add('hidden');
+  }
+}
+  </script>
+
+<%- include('partials/footer'); -%>

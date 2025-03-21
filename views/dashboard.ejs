@@ -1,6 +1,58 @@
 <%- include('partials/header'); -%>
+<script>
+  window.user = <%- JSON.stringify(user || {}) %>;
+</script>
 
 <script src="/profile.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const API_BASE_URL = ''; 
+        const user         = window.user;
+
+        // 1) Possibly sync offline data if the user just logged in:
+        if (user) {
+            syncLocalStorageDataToServer(user, API_BASE_URL);
+        }
+    });
+
+    // On page load (if user logs in), push local data to server
+    async function syncLocalStorageDataToServer(user, apiBaseUrl) {
+      const localEntries = JSON.parse(localStorage.getItem('tarotOfflineEntries') || '[]');
+      if (!localEntries.length) return; // no data
+
+      let allSynced = true;
+      for (let entry of localEntries) {
+        try {
+          await sendResponseToApi(entry, user, apiBaseUrl);
+        } catch (err) {
+          console.error("Error syncing entry:", err);
+          allSynced = false;
+        }
+      }
+      if (allSynced) {
+        localStorage.removeItem('tarotOfflineEntries');
+        alert("Offline entries have been synced to your account!");
+      } else {
+        alert("Some offline entries could not be synced. Try again later.");
+      }
+    }
+    // Actually send data to your /api/save-response
+    async function sendResponseToApi(payload, user, apiBaseUrl) {
+      // Usually you need user_id in the payload
+      const fullPayload = { ...payload, user_id: user.id };
+
+      const res = await fetch(`${apiBaseUrl}/api/save-response`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(fullPayload)
+      });
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text);
+      }
+    }
+</script>
 
 <body class="bg-gradient">
   <main class="dashboard">
