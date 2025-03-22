@@ -487,8 +487,6 @@ box-shadow: 0 0 10px var(--primary);
 }
 
 .action-buttons .btn-primary {
-  margin-top: 2rem;
-  width: 100%;
   cursor: pointer;
 }
 .about-page {
@@ -1144,7 +1142,6 @@ text-align: center;
 }
 
 .card:hover {
-  background: var(--primary-dark);
   transform: scale(1.02);
 }
 
@@ -1349,9 +1346,6 @@ h2, h3 {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   
   transition: transform 0.2s ease;
-}
-.card:hover {
-  transform: scale(1.02);
 }
 .card h2 {
   margin-bottom: 15px;

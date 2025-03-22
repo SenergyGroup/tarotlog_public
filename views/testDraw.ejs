@@ -177,7 +177,7 @@ document.addEventListener("DOMContentLoaded", () => {
     async function handleDrawCard() {
         // If user is NOT logged in, check if they already have a card
         if (!user) {
-        const pending = localStorage.getItem('pendingCard');
+        const pending = localStorage.getItem('pendingdrawCard');
         if (pending) {
             alert('You already drew a card. Please sign up or login to draw another.');
             return;
@@ -193,13 +193,13 @@ document.addEventListener("DOMContentLoaded", () => {
         // Update UI with the new card
         await updateCardUI(card, API_BASE_URL);
 
-        // If user is not logged in => store "pendingCard" so they can’t draw again
+        // If user is not logged in => store "pendingdrawCard" so they can’t draw again
         if (!user) {
-            localStorage.setItem('pendingCard', JSON.stringify(card));
+            localStorage.setItem('pendingdrawCard', JSON.stringify(card));
         }
         } catch (err) {
         console.error(err);
-        alert(err.message);
+        alert('Something happened on our end, please try again later.');
         } finally {
         isDrawing = false;
         spinner.style.display = 'none';
@@ -238,12 +238,12 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         await sendResponseToApi(payload, user, API_BASE_URL);
         alert("Your response was saved successfully!");
-        // Remove the "pendingCard" if it exists, letting them draw again
-        localStorage.removeItem('pendingCard');
+        // Remove the "pendingdrawCard" if it exists, letting them draw again
+        localStorage.removeItem('pendingdrawCard');
         resetCardUI();
       } catch (err) {
         console.error(err);
-        alert(`Failed to save: ${err.message}`);
+        alert(`Failed to save. Please try again later.`);
       }
     } else {
       // Not logged in => store in localStorage
@@ -257,7 +257,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // Helper functions
 // ------------------------------------------------------
 function checkPendingCard() {
-  const pending = localStorage.getItem('pendingCard');
+  const pending = localStorage.getItem('pendingdrawCard');
   if (pending) {
     const drawElement = document.getElementById('drawn-card');
     if (drawElement) {
@@ -478,6 +478,7 @@ function resetCardUI() {
  */
  function showMakeAccountModal(latestPayload) {
   const overlay = document.getElementById('account-modal-overlay');
+  const saveButton = document.getElementById('save-response-btn');
   if (!overlay) {
     console.error("Modal overlay not found in DOM.");
     return;
@@ -501,6 +502,7 @@ function resetCardUI() {
 
   function closeModal() {
     overlay.classList.add('hidden');
+    saveButton.classList.add('hidden');
   }
 }
   </script>

@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     await updateCardUI(card);
                 } catch (error) {
                     console.error('Can not draw a card:', error);
-                    alert(`Can not draw a card: ${error.message}`);
+                    alert(`Can not draw a card right now. Please try again later.`);
                 } finally {
                     isDrawing = false;
                     spinner.style.display = 'none';
@@ -110,7 +110,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 resetCardUI();
             } catch (error) {
                 console.error('Error saving response:', error);
-                alert(`Failed to save responses: ${error.message}`);
+                alert(`Failed to save responses. Please try again later.`);
             }
         });
     }

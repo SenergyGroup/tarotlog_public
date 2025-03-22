@@ -18,11 +18,30 @@
 
     // On page load (if user logs in), push local data to server
     async function syncLocalStorageDataToServer(user, apiBaseUrl) {
-      const localEntries = JSON.parse(localStorage.getItem('tarotOfflineEntries') || '[]');
-      if (!localEntries.length) return; // no data
+      // Get offline card draw
+      const offlineEntries = JSON.parse(localStorage.getItem('tarotOfflineEntries') || '[]');
+
+      // Get pending offline free journal
+      let pendingJournalEntries = [];
+      const pendingJournalRaw = localStorage.getItem('pendingJournal');
+      if (pendingJournalRaw) {
+        try {
+          const parsedJournal = JSON.parse(pendingJournalRaw);
+          // Support both a single entry (object) and an array of entries
+          pendingJournalEntries = Array.isArray(parsedJournal)
+            ? parsedJournal
+            : [parsedJournal];
+        } catch (err) {
+          console.error("Error parsing offline free Journal:", err);
+        }
+      }
+
+      // Combine both types of entries
+      const allEntries = [...offlineEntries, ...pendingJournalEntries];
+      if (!allEntries.length) return; // no data to sync
 
       let allSynced = true;
-      for (let entry of localEntries) {
+      for (let entry of allEntries) {
         try {
           await sendResponseToApi(entry, user, apiBaseUrl);
         } catch (err) {
@@ -32,9 +51,12 @@
       }
       if (allSynced) {
         localStorage.removeItem('tarotOfflineEntries');
+        localStorage.removeItem('pendingJournal');
+        localStorage.removeItem('pendingdrawCard');
+        localStorage.removeItem('pendingCard');
         alert("Offline entries have been synced to your account!");
       } else {
-        alert("Some offline entries could not be synced. Try again later.");
+        alert("Some offline entries could not be synced. Please try again later.");
       }
     }
     // Actually send data to your /api/save-response

@@ -1,4 +1,49 @@
 <%- include('partials/header'); -%>
+<style>
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    
+    .modal-box {
+      background: linear-gradient(145deg, var(--muted), var(--background));
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 1rem;
+      padding: 2rem;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
+      color: var(--foreground);
+      text-align: center;
+    }
+    
+    .modal-title {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: var(--primary);
+    }
+        
+    .modal-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem; /* ↑ increases space between buttons */
+        margin-top: 1.5rem;
+    }
+
+    .modal-buttons .btn {
+        flex: 1;
+    }
+    
+    .hidden {
+      display: none !important;
+    }
+</style>
 
 <div class="app-container">
     <h1 class="page-title gradient-text">Open Journal</h1>
@@ -14,6 +59,7 @@
         <br>
         <div class="modal-buttons">
             <button id="modal-make-account-btn" class="btn btn-primary">Make an Account</button>
+            <button id="modal-lose-data-btn" class="btn btn-outline">Lose My Data</button>
         </div>
         </div>
     </div>
@@ -135,7 +181,6 @@
         }
 
         const data = await resp.json();
-        console.log("Received data from backend:", data);
 
         // 2) We have a “data” object that includes the card + reasoning
         // Build a "payload" for saving (locally or to DB)
@@ -152,7 +197,7 @@
         // 3) If user is logged in, send to DB. If not, store offline + modal.
         if (window.user) {
         await sendResponseToApi(payload, window.user, "");
-        alert("Your journal entry + card were saved to your account!");
+        alert("Your journal entry was saved to your account!");
         localStorage.removeItem("pendingJournal");
         resetOpenJournalUI();
         } else {
@@ -167,7 +212,7 @@
 
     } catch (error) {
         console.error("Error:", error);
-        alert(`Failed to fetch tarot card. ${error.message}`);
+        alert(`Failed to fetch tarot card. Please try again later.`);
     } finally {
         saveButton.disabled = false;
         saveButton.innerText = "Save Response";
@@ -257,11 +302,21 @@
     overlay.classList.remove('hidden');
 
     const makeAccountBtn = document.getElementById('modal-make-account-btn');
+    const loseDataBtn    = document.getElementById('modal-lose-data-btn');
 
     makeAccountBtn.onclick = () => {
         // Keep local storage, just redirect
         location.href = "/auth/signup";
     };
+
+    // If user clicks "Lose My Data"
+    loseDataBtn.onclick = () => {
+        closeModal();
+    };
+
+    function closeModal() {
+        overlay.classList.add('hidden');
+    }
 }
 </script>
 

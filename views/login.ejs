@@ -49,15 +49,12 @@ const form = document.querySelector('form');
                 body: JSON.stringify({ email, password }),
                 headers: { 'Content-Type': 'application/json' }
             });
-            console.log('Fetch response:', res);
             const data = await res.json();
-            console.log('Response data:', data);
             if (data.errors) {
                 emailError.textContent = data.errors.email;
                 passwordError.textContent = data.errors.password;
             }
             if (data.userID) {
-                console.log('Successful login, redirecting...');
                 const successAlert = document.getElementById("success-alert");
                 const overlay = document.getElementById("overlay");
 

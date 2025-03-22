@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 const errorText = await response.text();
                 console.error('Server error:', errorText);
-                alert('An error occurred while fetching entries. ${response.statusText}.');
+                alert('An error occurred while fetching entries. Please try again later.');
             }
         } catch (err) {
             console.error('Error fetching entries:', err);
