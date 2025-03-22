@@ -82,6 +82,10 @@ const login_post = async (req, res) => {
 
   try {
     const user = await User.login(email, password);
+
+    // Update the lastlogin column explicitly by performing an update
+    await user.update({ lastlogin: new Date() });
+
     const token = jwt.sign({ id: user.user_id, username: user.username }, process.env.JWT_SECRET, { expiresIn: maxAge });
     setJwtCookie(req, res, token, 3 * 24 * 60 * 60 * 1000);
     res.status(200).json({ userID: user.user_id, username: user.username });

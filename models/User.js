@@ -63,13 +63,16 @@ const User = sequelize.define('User', {
       allowNull: false,
       defaultValue: 'image_back_4'
     },
+    lastlogin: { 
+      type: DataTypes.DATE, 
+      allowNull: true, 
+    },
 }, {
     tableName: 'users', 
     timestamps: true,
     hooks: {
       // Hash password before saving the user (on create and update)
       beforeCreate: async (user) => {
-        console.log('Before create hook:', user);
         const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(user.password, salt);
       },

@@ -11,8 +11,10 @@ const testRoutes = require('./routes/testRoutes');
 const { checkUser } = require('./middleware/authMiddleware');
 // const cleanupExpiredTokens = require('./tasks/cleanupExpiredTokens');
 const { encrypt } = require('./utils/encryption');
-require('./tasks/dailyCardScheduler');
 
+// Tasks
+require('./tasks/dailyCardScheduler');
+require('./tasks/dailyUserCount');
 
 
 // Neon Database Backend and API
@@ -286,7 +288,6 @@ app.post('/api/generate-prompt', checkUser, async (req, res) => {
   const fullPrompt = `${prePrompt}\n\n${dynamicPrompt}`;
 
   try {
-    console.log('Calling OpenAI API with prompt:', fullPrompt);
     const response = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [
@@ -316,8 +317,6 @@ app.post('/api/generate-prompt', checkUser, async (req, res) => {
 // Route to handle API response and fetch card details
 app.post("/get-tarot-card", async (req, res) => {
   try {
-    console.log("[INFO] Received request to /get-tarot-card");
-
     const userId = req.user?.id; // Use optional chaining to handle cases where req.user might be undefined
     if (!userId) {
       console.error("[ERROR] User is not authenticated.");
@@ -334,7 +333,6 @@ app.post("/get-tarot-card", async (req, res) => {
     `;
     console.log(`[INFO] Executing rate limit query: ${rateLimitQuery}, user_id: ${userId}, request_date: ${today}`);
     const { rows } = await pool.query(rateLimitQuery, [userId, today]);
-    console.log(`[INFO] Query result: ${JSON.stringify(rows)}`);
     const requestCount = rows[0]?.request_count || 0;
 
     const REQUEST_LIMIT = 5; // Set your desired daily limit here
@@ -359,16 +357,10 @@ app.post("/get-tarot-card", async (req, res) => {
       await pool.query(updateQuery, [userId, today]);
     }
 
-    console.log("[INFO] User request count updated.");
-
     const { journalEntry, mood, title } = req.body;
     if (!journalEntry || !mood || !title) {
       return res.status(400).json({ error: "All fields are required" });
-    }
-
-    console.log("[INFO] Journal entry received:", journalEntry);
-
-    
+    }  
 
     // Generate a response from OpenAI
     const prompt = `
@@ -385,11 +377,9 @@ app.post("/get-tarot-card", async (req, res) => {
       User's journal entry: ${journalEntry}
     `;
 
-    console.log("[INFO] Generated OpenAI prompt:", prompt);
     let responseText;
 
     try {
-      console.log("[INFO] Calling OpenAI API...");
       const openAIResponse = await openai.chat.completions.create({
         model: 'gpt-4o-mini',
         messages: [
@@ -404,10 +394,8 @@ app.post("/get-tarot-card", async (req, res) => {
           },
         ],
       });
-      console.log("[INFO] OpenAI raw response:", openAIResponse);
 
       responseText = openAIResponse.choices?.[0]?.message?.content;
-      console.log("[INFO] OpenAI response received:", responseText);
 
       if (!responseText) {
         console.error("[ERROR] OpenAI response did not include valid content:", openAIResponse.data?.choices?.[0]?.message);
@@ -513,13 +501,6 @@ app.post("/get-tarot-card", async (req, res) => {
       image_data: imageURL,
     });
 
-    console.log("[INFO] Response sent to frontend:", {
-      card_name: card.card_name,
-      orientation: normalizedOrientation,
-      reasoning: normalizedReasoning,
-      image_data: imageURL,
-    });
-
     } catch (error) {
       console.error("[ERROR] Database query failed:", error.message);
       return res.status(500).json({ error: "Database error" });
@@ -563,7 +544,7 @@ app.post("/api/get-tarot-card-offline", async (req, res) => {
     if (!responseText) {
       throw new Error("Empty response from OpenAI.");
     } else {
-      console.log(responseText)
+      console.log('[Error] Open AI response: ',responseText)
     }
 
     const lines = responseText.split("\n").map(line => line.trim());
@@ -574,13 +555,11 @@ app.post("/api/get-tarot-card-offline", async (req, res) => {
     const normalizedOrientation = orientation.toLowerCase();
     const normalizedReasoning = reasoning;
 
-    // console.log("1. ", lines,"2. ", search_name,"3. ", orientation,"4. ", reasoning,"5. ", normalizedSearchName,"6. ", normalizedOrientation,"7. ", normalizedReasoning)
-
     // Query the database for the card
     const query = `SELECT * FROM tarot_cards WHERE search_name = $1`;
     const result = await pool.query(query, [normalizedSearchName]);
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: "Card not found in database" });
+      return res.status(404).json({ error: "Unable to pair you with a card. Please try again later." });
     }
     const card = result.rows[0];
 
@@ -591,6 +570,7 @@ app.post("/api/get-tarot-card-offline", async (req, res) => {
 
     // Return the generated card data without saving it to the DB
     res.json({
+      card_id: cardNumber,
       card_name: card.card_name,
       orientation: normalizedOrientation,
       reasoning: normalizedReasoning,
@@ -598,7 +578,7 @@ app.post("/api/get-tarot-card-offline", async (req, res) => {
     });
   } catch (error) {
     console.error("Error in offline tarot route:", error.message);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Unable to save your response. Please try again later." });
   }
 });
 
