@@ -597,6 +597,10 @@ const dataController = require('./controllers/dataController');
 const storeController = require('./controllers/storeController');
 const dashboardController = require('./controllers/dashboardController');
 const entriesController = require('./controllers/entriesController');
+const feedbackController = require('./controllers/feedbackController');
+
+// API endpoint for submitting feedback
+app.post('/api/submit-feedback', feedbackController.submitFeedback);
 
 //EJS Routes
 app.get('/', checkUser, (req, res) => {

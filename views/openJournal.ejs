@@ -87,7 +87,7 @@
       <div class="card hidden sleek-card-container">
         <div class="card-header">
           <span>
-            <h2 id="card-name">Card:</h2>
+            <h2 id="card-name"></h2>
             <h3 id="orientation"></h3>
           </span>
         </div>
@@ -95,24 +95,19 @@
           <img id="tarot-image" src="" alt="Tarot Card Image">
           <p id="reasoning"></p>
           <div class="card-footer">
-            <button class="shareButton pt">
+            <button class="shareButton pin">
               <svg style="width:24px;height:24px" viewBox="0 0 24 24">
                 <path d="M12 0c-6.627 0-12 5.372-12 12 0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738.098.119.112.224.083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.631-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146 1.124.347 2.317.535 3.554.535 6.627 0 12-5.373 12-12 0-6.628-5.373-12-12-12z"></path>
               </svg>
             </button>
-            <button class="shareButton fb" onclick="window.open('https://www.facebook.com/sharer/sharer.php?u=mytarottales.com&amp;t=Today, my day aligned with {card-name}!', 'sharewindow', 'width=75%,height=50%'); return false;">
+            <button class="shareButton fb">
               <svg style="width:24px;height:24px" viewBox="0 0 24 24">
                 <path d="M17,2V2H17V6H15C14.31,6 14,6.81 14,7.5V10H14L17,10V14H14V22H10V14H7V10H10V6A4,4 0 0,1 14,2H17Z"></path>
               </svg>
             </button>
-            <button class="shareButton tw" onclick="window.open('https://twitter.com/intent/tweet?url=https%3A%2F%2Fwww.mytarottales.com&text=Today%2C%20my%20vibe%20aligned%20with%20%7Bcard%20name%7D!'">
+            <button class="shareButton tw">
               <svg style="width:24px;height:24px" viewBox="0 0 24 24">
                 <path d="M22.46,6C21.69,6.35 20.86,6.58 20,6.69C20.88,6.16 21.56,5.32 21.88,4.31C21.05,4.81 20.13,5.16 19.16,5.36C18.37,4.5 17.26,4 16,4C13.65,4 11.73,5.92 11.73,8.29C11.73,8.63 11.77,8.96 11.84,9.27C8.28,9.09 5.11,7.38 3,4.79C2.63,5.42 2.42,6.16 2.42,6.94C2.42,8.43 3.17,9.75 4.33,10.5C3.62,10.5 2.96,10.3 2.38,10C2.38,10 2.38,10 2.38,10.03C2.38,12.11 3.86,13.85 5.82,14.24C5.46,14.34 5.08,14.39 4.69,14.39C4.42,14.39 4.15,14.36 3.89,14.31C4.43,16 6,17.26 7.89,17.29C6.43,18.45 4.58,19.13 2.56,19.13C2.22,19.13 1.88,19.11 1.54,19.07C3.44,20.29 5.7,21 8.12,21C16,21 20.33,14.46 20.33,8.79C20.33,8.6 20.33,8.42 20.32,8.23C21.16,7.63 21.88,6.87 22.46,6Z"></path>
-              </svg>
-            </button>
-            <button class="shareButton ig">
-              <svg style="width:24px;height:24px" viewBox="0 0 24 24">
-                <path d="M7.8,2H16.2C19.4,2 22,4.6 22,7.8V16.2A5.8,5.8 0 0,1 16.2,22H7.8C4.6,22 2,19.4 2,16.2V7.8A5.8,5.8 0 0,1 7.8,2M7.6,4A3.6,3.6 0 0,0 4,7.6V16.4C4,18.39 5.61,20 7.6,20H16.4A3.6,3.6 0 0,0 20,16.4V7.6C20,5.61 18.39,4 16.4,4H7.6M17.25,5.5A1.25,1.25 0 0,1 18.5,6.75A1.25,1.25 0 0,1 17.25,8A1.25,1.25 0 0,1 16,6.75A1.25,1.25 0 0,1 17.25,5.5M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9Z"></path>
               </svg>
             </button>
           </div>
@@ -182,6 +177,7 @@
             document.querySelector(".sleek-card-container").classList.remove("hidden");
 
             resetOpenJournalUI();
+            updateShareButtons(data);
         } catch (error) {
             console.error("Error:", error);
             alert(`Failed to fetch tarot card. Please try again later.`);
@@ -223,6 +219,94 @@
             cardContainer.classList.remove("hidden");
         }
     }
+
+    function updateShareButtons(card) {
+      try {
+        // Base homepage URL
+        const baseUrl = 'https://www.mytarottales.com/';
+        
+        // Capture the current user's ID if available; otherwise mark as anonymous
+        const referrerId = user && user.id ? user.id : 'anonymous';
+        
+        // Personalized share text based on the drawn card
+        const shareText = `Today, my day most aligned with ${card.card_name}!`;
+        
+        // Create a common URL with UTM parameters and the referrer
+        const createShareUrl = (source) => {
+          return `${baseUrl}?utm_source=${source}&utm_medium=social&utm_campaign=tarot_share&referrer=${referrerId}`;
+        };
+
+        // Facebook share button
+        const fbShareButton = document.querySelector('.shareButton.fb');
+        if (fbShareButton) {
+          fbShareButton.onclick = () => {
+            try {
+              const fbUrl = createShareUrl('facebook');
+              console.log('Facebook Share URL:', fbUrl);
+              console.log('Facebook Share Text:', shareText);
+              window.open(
+                `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(fbUrl)}&t=${encodeURIComponent(shareText)}`,
+                'sharewindow',
+                'width=750,height=550'
+              );
+            } catch (err) {
+              console.error('Error in Facebook share button:', err);
+            }
+            return false;
+          };
+        } else {
+          console.warn('Facebook share button not found.');
+        }
+
+        // Twitter share button
+        const twShareButton = document.querySelector('.shareButton.tw');
+        if (twShareButton) {
+          twShareButton.onclick = () => {
+            try {
+              const twUrl = createShareUrl('twitter');
+              console.log('Twitter Share URL:', twUrl);
+              console.log('Twitter Share Text:', shareText);
+              window.open(
+                `https://twitter.com/intent/tweet?url=${encodeURIComponent(twUrl)}&text=${encodeURIComponent(shareText)}`,
+                'sharewindow',
+                'width=750,height=550'
+              );
+            } catch (err) {
+              console.error('Error in Twitter share button:', err);
+            }
+            return false;
+          };
+        } else {
+          console.warn('Twitter share button not found.');
+        }
+
+        // Pinterest share button
+        const pinShareButton = document.querySelector('.shareButton.pin');
+        if (pinShareButton) {
+          pinShareButton.onclick = () => {
+            try {
+              const pinUrl = createShareUrl('pinterest');
+              console.log('Pinterest Share URL:', pinUrl);
+              console.log('Pinterest Share Text:', shareText);
+              console.log('Pinterest Media URL:', card.image_data);
+              window.open(
+                `https://pinterest.com/pin/create/button/?description=${encodeURIComponent(shareText)}&url=${encodeURIComponent(pinUrl)}&media=${encodeURIComponent(card.image_data)}&`,
+                'sharewindow',
+                'width=750,height=550'
+              );
+            } catch (err) {
+              console.error('Error in Pinterest share button:', err);
+            }
+            return false;
+          };
+        } else {
+          console.warn('Pinterest share button not found.');
+        }
+      } catch (error) {
+        console.error('Error in updateShareButtons:', error);
+      }
+    }
+
 </script>
 
 <script>
