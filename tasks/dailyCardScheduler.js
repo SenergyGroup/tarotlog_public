@@ -2,7 +2,7 @@
 const cron = require('node-cron');
 const { pool } = require('../config/database'); // Adjust the path if needed
 
-cron.schedule('0 0 * * *', async () => { // Runs at midnight every day
+cron.schedule('0 22 * * *', async () => { // Runs at midnight every day
   try {
     const today = new Date().toISOString().slice(0, 10);
     // Check if today's card is already set
