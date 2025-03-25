@@ -2,7 +2,7 @@
 const cron = require('node-cron');
 const { sequelize  } = require('../config/database'); // Adjust the path if needed
 
-cron.schedule('0 0 * * *', async () => { // Runs at midnight every day
+cron.schedule('0 22 * * *', async () => { // Runs at midnight every day
     try {
         // Count distinct users who logged in today.
         // NOTE: Adjust the query if you have a separate login log or need to account for timezone issues.
