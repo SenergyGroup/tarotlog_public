@@ -1,8 +1,8 @@
 // tasks/dailyCardScheduler.js
 const cron = require('node-cron');
-const { pool } = require('../config/database'); // Adjust the path if needed
+const { pool } = require('../config/database');
 
-cron.schedule('0 22 * * *', async () => { // Runs at midnight every day
+cron.schedule('0 17 * * *', async () => { // Runs at 5pm every day
   try {
     const today = new Date().toISOString().slice(0, 10);
     // Check if today's card is already set
@@ -39,4 +39,6 @@ cron.schedule('0 22 * * *', async () => { // Runs at midnight every day
   } catch (error) {
     console.error('Error setting daily card:', error);
   }
-});
+},
+{ timezone: 'America/Chicago' }
+);
