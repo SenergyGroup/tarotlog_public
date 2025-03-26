@@ -2,10 +2,10 @@
 const cron = require('node-cron');
 const { sequelize  } = require('../config/database'); 
 
-cron.schedule('0 17 * * *', async () => { // Runs at midnight every day
+cron.schedule('15 17 * * *', async () => { // Runs at 5:15 PM every day
     try {
         // Count distinct users who logged in today.
-        const [results] = await sequelize.query(`
+        const [rows] = await sequelize.query(`
           SELECT COUNT(*) AS dailyCount
           FROM users
           WHERE DATE("lastlogin") = CURRENT_DATE
