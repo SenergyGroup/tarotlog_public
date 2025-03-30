@@ -4,6 +4,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MyTarotTales</title>
     <link rel="stylesheet" href="/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-JYXX0G315R"></script>
     <script>
@@ -12,7 +13,57 @@
     gtag('js', new Date());
 
     gtag('config', 'G-JYXX0G315R');
-    </script>
+    </script>     
+      <style>
+      .btn-google {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        padding-top: 12px;
+        padding-bottom: 12px;
+        background: white;
+        color: #5f6368;
+        border: 1px solid #dadce0;
+        border-radius: 4px;
+        font-family: 'Roboto', sans-serif;
+        font-weight: 500;
+        font-size: 14px;
+        text-decoration: none;
+        transition: background-color 0.2s, box-shadow 0.2s;
+        width: 100%;
+        max-width: 300px;
+        margin: 10px 0;
+      }
+      
+      .btn-google:hover {
+        background: #f8f9fa;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        color: #202124;
+      }
+      
+      .btn-google:active {
+        background: #f1f3f4;
+      }
+      
+      .google-icon {
+        width: 18px;
+        height: 18px;
+      }
+      
+      /* For dark mode compatibility */
+      @media (prefers-color-scheme: dark) {
+        .btn-google {
+          background: #2b2b2b;
+          border-color: #5f6368;
+          color: #e8eaed;
+        }
+        
+        .btn-google:hover {
+          background: #3c4043;
+        }
+      }
+      </style>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             if (window.innerWidth <= 768) {
