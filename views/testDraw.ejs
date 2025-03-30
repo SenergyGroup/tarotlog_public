@@ -1,6 +1,30 @@
-<%- include('partials/header'); -%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>MyTarotTales</title>
 
-<script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+  <!-- Main site stylesheet (if you have an external one, keep this link) -->
+  <link rel="stylesheet" href="/styles.css"> 
+
+  <!-- Include a decorative serif font (for headings & buttons) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link 
+    href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&display=swap" 
+    rel="stylesheet"
+  >
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-JYXX0G315R"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-JYXX0G315R');
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
 <script>
     const user = <%= JSON.stringify(user || null) %>;
 </script>
@@ -49,17 +73,22 @@
       display: none !important;
     }
 </style>
-    
-
-<h1 class="page-title gradient-text">Draw a Card</h1>
-
-<div class="app-container">
+</head>
+<body>
+<section class="hero-swirls">
+<div class="hero-text">
+  <h1>Draw Your Card</h1>
+  <div class="app-container">
     <div class="card-section">
-            <img id="drawn-card" 
-                 src="https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/deck_backs/<%= user && user.deck_back ? user.deck_back : 'image_back_4' %>.png" 
+      <img id="drawn-card" 
+            src="https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/deck_backs/tarot-card-default.webp" 
+            alt="Facedown Card" 
+            class="card-image">
+            <!-- <img id="drawn-card" 
+            https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/deck_backs/tarot-card-default.webp
+                  src="https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/deck_backs/<%= user && user.deck_back ? user.deck_back : 'image_back_4' %>.png" 
                  alt="Facedown Card" 
-                 class="card-image">
-        
+                 class="card-image"> -->
         <div class="card-header hidden">
             <h2 id="card-title"></h2>
         </div>
@@ -98,6 +127,8 @@
         </div>
     </div>
 </div>
+</section>
+
 
 <script>
     document.addEventListener("DOMContentLoaded", () => {
@@ -506,5 +537,5 @@ function resetCardUI() {
   }
 }
   </script>
-
-<%- include('partials/footer'); -%>
+</body>
+</html>

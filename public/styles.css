@@ -160,6 +160,16 @@ min-height: 100vh;
   -webkit-text-fill-color: transparent;
 }
 
+/* Hero Styles */
+
+.hero-text h1 {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 5rem;
+  line-height: 1.1;
+  margin-bottom: 1rem;
+  letter-spacing: 0.6px;
+}
+
 /* Container */
 .container {
 max-width: 1200px;
@@ -260,10 +270,9 @@ gap: 20px;
 
 .card-image {
 width: 85%;
-max-width: 182px;
+max-width: 300px;
 height: auto;
 object-fit: cover;
-border-radius: 0.75rem;
 box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
 border: 1px solid rgba(255, 255, 255, 0.2);
 transition: transform 0.3s ease;
@@ -512,7 +521,7 @@ flex-direction: column;
 align-items: center;
 gap: 1.5rem;
 background: rgba(255, 255, 255, 0.05);
-padding: 2rem;
+padding: 1rem;
 border-radius: 1rem;
 box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
 min-width: 85%;
@@ -870,7 +879,8 @@ color: var(--muted-foreground);
 form input[type="text"],
 form input[type="password"] {
 width: 100%;
-padding: 10px;
+padding-top: 10px;
+padding-bottom: 10px;
 margin-bottom: 10px;
 border-radius: 5px;
 border: 1px solid rgba(255, 255, 255, 0.2);
@@ -911,6 +921,55 @@ transform: scale(1.05);
 
 form div {
 margin-bottom: 15px;
+}
+
+.btn-google {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  background: white;
+  color: #5f6368;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  text-decoration: none;
+  transition: background-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+  max-width: 300px;
+  margin: 10px 0;
+}
+
+.btn-google:hover {
+  background: #f8f9fa;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  color: #202124;
+}
+
+.btn-google:active {
+  background: #f1f3f4;
+}
+
+.google-icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* For dark mode compatibility */
+@media (prefers-color-scheme: dark) {
+  .btn-google {
+    background: #2b2b2b;
+    border-color: #5f6368;
+    color: #e8eaed;
+  }
+  
+  .btn-google:hover {
+    background: #3c4043;
+  }
 }
 
 /* Profile Menu & Dropdown */
@@ -1603,10 +1662,11 @@ line-height: 1.6;
 .app-container {
   padding: 10px;
   gap: 1rem;
+  width: auto;
 }
 
 .card-image {
-  max-width: 150px;
+  width: 40%;
 }
 
 .prompt-section {
@@ -1619,6 +1679,9 @@ line-height: 1.6;
 }
 
 @media (max-width: 480px) {
+.hero-text h1 {
+  font-size: 2.8rem;
+}
 form {
   padding: 15px;
 }

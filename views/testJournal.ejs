@@ -1,5 +1,117 @@
-<%- include('partials/header'); -%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>MyTarotTales</title>
+
+  <!-- Main site stylesheet (if you have an external one, keep this link) -->
+  <link rel="stylesheet" href="/styles.css"> 
+
+  <!-- Include a decorative serif font (for headings & buttons) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link 
+    href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&display=swap" 
+    rel="stylesheet"
+  >
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-JYXX0G315R"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-JYXX0G315R');
+  </script>
+  <script src="/profile.js"></script>
 <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+      width: 100%;
+      box-sizing: border-box;
+      background-color: #000;
+    }
+
+    .hero-swirls {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background:
+        linear-gradient(to right, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.95) 100%),
+        url('https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/swirl-bg.jpg')
+          center center / cover no-repeat;
+    }
+    .hero-text h1 {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 3.5rem;
+      line-height: 1.1;
+      margin-bottom: 1rem;
+      margin-top: 3.5rem;
+      letter-spacing: 0.6px;
+    }
+
+    /* Update journal container */
+    .app-container {
+      position: relative;
+      z-index: 2;
+      padding: 2rem;
+      max-width: 800px;
+      margin: 0 auto;
+      color: #fff;
+    }
+
+    /* Match input styles from homepage */
+    #journal-title, .open-journal-response-box {
+      width: 90%;
+      margin: 1rem 0;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    #journal-title:focus, .open-journal-response-box:focus {
+      outline: none;
+      border-color: #8b5cf6;
+      box-shadow: 0 0 8px rgba(139, 92, 246, 0.4);
+    }
+
+    /* Update card styling */
+    .sleek-card-container {
+      background: rgba(255, 255, 255, 0.1) !important;
+      border: 1px solid rgba(255, 255, 255, 0.2) !important;
+      backdrop-filter: blur(8px);
+      border-radius: 12px;
+      margin: 2rem 0;
+    }
+
+    /* Match button styles */
+    .btn {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 1rem;
+      padding: 0.8rem 1.5rem;
+      border-radius: 50px;
+      border: 2px solid #fff;
+      background: transparent;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+      background: #fff;
+      color: #000;
+      transform: translateY(-2px);
+    }
+
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -39,22 +151,127 @@
     .modal-buttons .btn {
         flex: 1;
     }
+    /* Top Nav */
+    .top-nav {
+      position: absolute;
+      top: 1rem;
+      right: 1.5rem;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+    }
+    .desktop-nav ul {
+      display: flex;
+      gap: 1rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .desktop-nav a {
+      display: inline-block;
+      font-family: 'Cinzel Decorative', serif;
+      font-weight: 400;
+      font-size: 0.9rem;
+      padding: 0.5rem 1.2rem;
+      border-radius: 50px;
+      border: 2px solid #fff;
+      background: transparent;
+      color: #fff;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .desktop-nav a:hover {
+      background: #fff;
+      color: #000;
+    }
+    /* Hamburger menu for mobile */
+    .hamburger {
+      position: absolute; /* Moves it to the top right corner */
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      font-size: 2rem;
+      color: #fff;
+      cursor: pointer;
+      display: none; /* hidden on large screens */
+      z-index: 11;
+    }
+    .mobile-menu {
+      display: none;
+      position: absolute;
+      top: 3rem;
+      right: 1rem;
+      background: #fff;
+      border: 2px solid #fff;
+      border-radius: 5px;
+      flex-direction: column;
+      z-index: 10;
+    }
+    .mobile-menu a {
+      display: block;
+      padding: 0.5rem 1rem;
+      color: #000;
+      text-decoration: none;
+    }
+    .mobile-menu a:hover {
+      background: #f0f0f0;
+    }
     
     .hidden {
       display: none !important;
     }
+    @media (max-width: 1099px) {
+      .desktop-nav {
+        display: none;
+      }
+      .hamburger {
+        display: block;
+      }
+    }
+    @media (max-width: 768px) {
+      .desktop-nav {
+        display: none;
+      }
+      .app-container {
+        padding: 1rem;
+      }
+      .hero-text h1 {
+      font-size: 3rem;
+      margin-top: 9rem;
+    }
+      
+      #journal-title, .open-journal-response-box {
+        width: 100%;
+      }
+    }
 </style>
-
+</head>
+<body>
+    <nav class="desktop-nav top-nav">
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/auth/login">Sign In</a></li>
+        <li><a href="/auth/signup">Sign Up</a></li>
+      </ul>
+    </nav>
+    <button class="hamburger" onclick="toggleMenu()">&#9776;</button>
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="/">Home</a>
+      <a href="/auth/login">Sign In</a>
+      <a href="/auth/signup">Sign Up</a>
+    </div>
+<div class="hero-swirls"></div>
 <div class="app-container">
-    <h1 class="page-title gradient-text">Open Journal</h1>
-    <p>Journal about whatever you feel like and discover the tarot card that best matches your entry</p>
-
+    <div class="hero-text"><h1>Start Writing</h1></div>
+    
     <!-- 1) Modal HTML (initially hidden) -->
     <div id="account-modal-overlay" class="modal-overlay hidden">
         <div id="account-modal-box" class="modal-box">
-        <h2>Save Your Data</h2>
+        <h2>Uh Oh!</h2>
         <p>
-            You are not logged in. Make an account to save your journals.
+            I looks like you are not logged in. Make an account to save your journals.
         </p>
         <br>
         <div class="modal-buttons">
@@ -79,7 +296,7 @@
         </div>
       </div>
       
-      <input type="text" id="journal-title" name="title" placeholder="Journal title" required>
+      <p>Write freely and we’ll reveal the tarot card that resonates most with your entry.</p>
       
       <textarea id="response-2" class="open-journal-response-box" placeholder="Let your thoughts run free"></textarea>
       
@@ -97,10 +314,14 @@
       <!-- Updated button class -->
       <button id="save-response-btn" class="btn btn-primary">Save Response</button>
     </div>
-
-
 </div>
-
+<!-- Toggle script for mobile hamburger menu -->
+<script>
+  function toggleMenu() {
+    var menu = document.getElementById('mobileMenu');
+    menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+  }
+</script>
 <script>
     document.addEventListener("DOMContentLoaded", () => {
         const user = window.user; // from EJS
@@ -145,7 +366,6 @@
     async function handleSaveResponse() {
     const journalEntry = document.getElementById("response-2").value.trim();
     const mood         = document.getElementById("mood-slider").value;
-    const title        = document.getElementById("journal-title").value.trim();
     const saveButton   = document.getElementById("save-response-btn");
 
     if (!journalEntry) {
@@ -172,7 +392,7 @@
         const resp = await fetch("/api/get-tarot-card-offline", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ journalEntry, mood, title }),
+        body: JSON.stringify({ journalEntry, mood }),
         });
 
         if (!resp.ok) {
@@ -240,12 +460,10 @@
      * Reset the journaling UI – hide fields, etc.
      */
     function resetOpenJournalUI() {
-    const journalTitle   = document.getElementById("journal-title");
     const moodSlider     = document.querySelector(".mood-slider-container");
     const journalEntry   = document.getElementById("response-2");
     const saveButton     = document.getElementById("save-response-btn");
 
-    journalTitle?.classList.add("hidden");
     moodSlider?.classList.add("hidden");
     journalEntry?.classList.add("hidden");
     saveButton?.classList.add("hidden");
@@ -347,5 +565,5 @@
         });
     });
 </script>
-
-<%- include('partials/footer'); -%>
+</body>
+</html>
