@@ -27,15 +27,24 @@ const User = sequelize.define('User', {
         isLowercase: true // Ensure email is lowercase
       }
     },
+    googleid: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: true
+    },
     password: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
       validate: {
-        notNull: { msg: 'Password is required' },
         len: {
           args: [6, 100], // Minimum length of 6 characters
           msg: 'Minimum password length is 6 characters'
         },
+        passwordRequired() {
+          if (!this.googleid && !this.password) {
+            throw new Error('Password is required');
+          }
+        }
       },
       field: 'password_hash'
     },
@@ -73,11 +82,13 @@ const User = sequelize.define('User', {
     hooks: {
       // Hash password before saving the user (on create and update)
       beforeCreate: async (user) => {
-        const salt = await bcrypt.genSalt(10);
-        user.password = await bcrypt.hash(user.password, salt);
+        if (user.password) { // Only hash if password exists
+          const salt = await bcrypt.genSalt(10);
+          user.password = await bcrypt.hash(user.password, salt);
+        }
       },
       beforeUpdate: async (user) => {
-        if (user.changed('password')) { // Hash only if password has been updated
+        if (user.changed('password')&& user.password) { // Hash only if password has been updated
           const salt = await bcrypt.genSalt(10);
           user.password = await bcrypt.hash(user.password, salt);
         }

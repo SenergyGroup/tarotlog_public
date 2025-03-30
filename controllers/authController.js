@@ -1,6 +1,8 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const { Op } = require('sequelize');
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
 // JWT function
 const maxAge = 7 * 24 * 60 * 60;
@@ -11,15 +13,19 @@ const setJwtCookie = (req, res, token, maxAgeCookieValue) => {
   const cookieOptions = {
     httpOnly: true,
     maxAge: maxAgeCookieValue,
-    secure: true,
+    secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax'
   };
 
-  // If running on your custom domain, set the domain option.
-  if (req.hostname && req.hostname.includes('www.mytarottales.com')) {
+  // Allow localhost cookies
+  if (req.hostname === 'localhost') {
+    cookieOptions.secure = false; // Disable secure for localhost
+    delete cookieOptions.domain;
+  } else if (req.hostname.includes('www.mytarottales.com')) {
     cookieOptions.domain = 'www.mytarottales.com';
   }
-  
+
+  console.log('Setting cookie with options:', cookieOptions);  
   res.cookie('jwt', token, cookieOptions);
 };
 
@@ -27,6 +33,74 @@ const createToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: maxAge,
   });
+};
+
+// Google Passport Signin
+const initializePassport = () => {
+  passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: '/auth/google/callback',
+    scope: ['profile', 'email'],
+    passReqToCallback: true
+  }, async (req, accessToken, refreshToken, profile, done) => {
+    try {
+      let user = await User.findOne({ 
+        where: { 
+          [Op.or]: [
+            { googleid: profile.id },
+            { email: profile.emails[0].value }
+          ]
+        }
+      });
+
+      if (!user) {
+        user = await User.create({
+          googleid: profile.id,
+          email: profile.emails[0].value,
+          username: profile.displayName || profile.emails[0].value.split('@')[0],
+          password: null,
+          lastlogin: new Date()
+        });
+      } else if (!user.googleid) {
+        // Merge accounts if email exists
+        user.googleid = profile.id;
+        await user.save();
+      }
+      
+      done(null, user);
+    } catch (error) {
+      console.error('Google strategy error:', error);
+      done(error);
+    }
+  }));
+};
+
+const googleLogin = passport.authenticate('google', {
+  scope: ['email', 'profile'],
+  session: false
+});
+
+const googleCallback = (req, res) => {
+  passport.authenticate('google', { session: false }, (err, user) => {
+    if (err) {
+      console.error('Google auth error:', err);
+      return res.redirect('/auth/login?error=google_failed');
+    }
+    if (!user) {
+      console.log('No user returned from Google');
+      return res.redirect('/auth/login?error=no_user');
+    }
+    
+    try {
+      const token = createToken(user.user_id);
+      setJwtCookie(req, res, token, maxAgeCookie);
+      res.redirect('/dashboard');
+    } catch (tokenError) {
+      console.error('Token generation error:', tokenError);
+      res.redirect('/auth/login?error=token_failure');
+    }
+  })(req, res);
 };
 
 // Render signup page
@@ -42,6 +116,13 @@ const login_get = (req, res) => {
 // Handle signup
 const signup_post = async (req, res) => {
   const { username, email, password } = req.body;
+
+  // Add explicit password check
+  if (!password) {
+    return res.status(400).json({ 
+      errors: { password: 'Password is required' } 
+    });
+  }
 
   try {
     const userData = { 
@@ -79,6 +160,13 @@ const signup_post = async (req, res) => {
 // Handle login
 const login_post = async (req, res) => {
   const { email, password } = req.body;
+
+  // Add explicit password check
+  if (!password) {
+    return res.status(400).json({ 
+      errors: { password: 'Password is required' } 
+    });
+  }
 
   try {
     const user = await User.login(email, password);
@@ -252,5 +340,8 @@ module.exports = {
   forgotPassword_post,
   resetPassword_get,
   resetPassword_post,
-  changePassword_get
+  changePassword_get,
+  initializePassport,
+  googleLogin,
+  googleCallback
 };

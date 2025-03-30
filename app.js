@@ -4,6 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
 const cookieParser = require('cookie-parser');
+const passport = require('passport');
 const { sequelize } = require('./config/database');
 const authRoutes = require('./routes/authRoutes');
 const settingsRoutes = require('./routes/settingsRoutes');
@@ -76,6 +77,11 @@ const User = require('./models/User');
 sequelize.sync({ force: false }) // Set force to true to drop and recreate tables during development
   .then(() => console.log('Database synced'))
   .catch(err => console.error('Error syncing database:', err));
+
+// Google Passport
+const { initializePassport } = require('./controllers/authController');
+initializePassport();
+app.use(passport.initialize());
 
 /**
  * Serve a random card without daily-limit logic
@@ -515,8 +521,8 @@ app.post("/get-tarot-card", async (req, res) => {
 // Offline tarot card generation route (skip DB insertion)
 app.post("/api/get-tarot-card-offline", async (req, res) => {
   try {
-    const { journalEntry, mood, title } = req.body;
-    if (!journalEntry || !mood || !title) {
+    const { journalEntry, mood } = req.body;
+    if (!journalEntry || !mood ) {
       return res.status(400).json({ error: "All fields are required" });
     }
 
