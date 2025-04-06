@@ -1,44 +1,503 @@
-<%- include('partials/header'); -%>
-<script>
-  window.user = <%- JSON.stringify(user || {}) %>;
-</script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MyTarotTales</title>
+  <link rel="stylesheet" href="/styles.css">
+  <!-- Include a decorative serif font (for headings & buttons) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link 
+    href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&display=swap" 
+    rel="stylesheet"
+  >
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-JYXX0G315R"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-JYXX0G315R');
+  </script>
+  <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.innerWidth <= 768) {
+                let lastScrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                const header = document.querySelector('header');
+                const delta = 10; // minimal change in scroll to consider
+                const topOffset = 25; // always show header if near the top
 
-<script src="/profile.js"></script>
+                window.addEventListener('scroll', () => {
+                let st = window.pageYOffset || document.documentElement.scrollTop;
+                
+                // If close to the top, always show header
+                if (st < topOffset) {
+                    header.classList.remove('header-hidden');
+                }
+                // Only act if scroll difference is greater than delta
+                else if (Math.abs(st - lastScrollTop) > delta) {
+                    if (st > lastScrollTop && st > header.offsetHeight) {
+                    // Scrolling down: hide header
+                    header.classList.add('header-hidden');
+                    } else if (st < lastScrollTop) {
+                    // Scrolling up: show header
+                    header.classList.remove('header-hidden');
+                    }
+                    lastScrollTop = st;
+                }
+                }, { passive: true });
+            }
+            });
+  </script>       
+  <style>
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    
+    .modal-box {
+      background: linear-gradient(145deg, var(--muted), var(--background));
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 1rem;
+      padding: 2rem;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
+      color: var(--foreground);
+      text-align: center;
+      position: relative;
+    }
 
-<script>
+    .modal-box textarea {
+    width: 100%;
+    border-radius: 5px;
+    padding: 10px;
+    border: 1px solid #555;
+    background-color: #1f1f1f;
+    color: #e0e0e0;
+    margin-bottom: 15px;
+    }
+    
+    .modal-title {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: var(--primary);
+    }
+        
+    .modal-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem; /* ↑ increases space between buttons */
+        margin-top: 1.5rem;
+    }
+
+    .modal-buttons .btn {
+        flex: 1;
+    }
+
+    .close-modal {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 24px;
+        cursor: pointer;
+    }
+    
+    .hidden {
+      display: none !important;
+    }
+</style>
+  <style>
+    /* Background swirl */
+    .hero-swirls {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background:
+        linear-gradient(to right, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.95) 100%),
+        url('https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/swirl-bg.jpg')
+          center center / cover no-repeat;
+      z-index: -1;
+    }
+
+    /* Main container */
+    .dashboard-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* New grid to achieve the requested layout */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-rows: auto auto auto;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    /* Stats container (occupies row 1, columns 1-2) */
+    .stats-container {
+      grid-column: 1 / 3;
+      grid-row: 1;
+    }
+    .stats-row {
+      display: flex;
+      gap: 2rem;
+      justify-content: space-between;
+    }
+    .stat-card {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: bold;
+      background: linear-gradient(to right, #a78bfa, #ec4899);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin: 0.5rem 0;
+    }
+
+    /* Card of the Day spans row 1-2 in column 3 */
+    .card-of-day {
+      grid-column: 3;
+      grid-row: 1 / 3;
+      background: rgba(255, 255, 255, 0.05);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    .card-of-day img {
+      max-width: 220px;
+      border-radius: 1rem;
+      margin: 1rem auto;
+      display: block;
+      cursor: pointer;
+    }
+
+    /* Recent Entries (row 2, column 1) */
+    .recent-entries {
+      grid-column: 1;
+      grid-row: 2;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+    }
+    .recent-entries h3 {
+      margin-bottom: 1rem;
+    }
+    .recent-entries-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .recent-entry-item {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* Card actions (row 2, column 2) */
+    .center-actions {
+      grid-column: 2;
+      grid-row: 2;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      gap: 2rem;
+      align-items: flex-start;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+    .card-wrapper {
+      position: relative;
+    }
+    .tarot-back {
+      width: 100%;
+      height: auto;
+      box-shadow: 0 12px 25px rgba(0,0,0,0.6);
+      cursor: pointer;
+      backface-visibility: hidden;
+      border-radius: 5px;
+      display: block;
+    }
+    .card-button {
+      font-family: 'Cinzel Decorative', serif;
+      font-weight: 700;
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background:  rgba(0,0,0,0.7);
+      color: #fff;
+      border: 2px solid #fff;
+      border-radius: 5px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      font-size: 0.6rem;
+    }
+    .card-button:hover {
+      background: #fff;
+      color: #000;
+    }
+
+    /* Feedback (row 3, columns 1-3) */
+    .feedback-card {
+      grid-column: 1 / 4;
+      grid-row: 3;
+      text-align: center;
+      padding: 2rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+    .feedback-btn {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 1rem;
+      font-weight: 400;
+      padding: 0.8rem 1.5rem;
+      margin-top: 20px;
+      border-radius: 50px;
+      border: 2px solid #fff;
+      background: transparent;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .feedback-btn:hover {
+      background: #fff;
+      color: #000;
+    }
+
+    /* Responsive layout */
+    @media (max-width: 1000px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto auto;
+      }
+      .stats-container {
+        grid-column: 1;
+        grid-row: 1;
+      }
+      .card-of-day {
+        grid-column: 1;
+        grid-row: 2;
+      }
+      .recent-entries {
+        grid-column: 1;
+        grid-row: 3;
+      }
+      .center-actions {
+        grid-column: 1;
+        grid-row: 4;
+      }
+      .feedback-card {
+        grid-column: 1;
+        grid-row: 5;
+      }
+      .stats-row {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <!-- Brand Title (centered) -->
+    <h1 class="brand-title">
+        <% if (user) { %>
+        <a href="/dashboard">MyTarotTales</a>
+        <% } else { %>
+        <a href="/">MyTarotTales</a>
+        <% } %>
+    </h1>
+
+    <!-- Navigation Container -->
+    <nav class="header-nav">
+        <!-- Hamburger Icon (hidden on large screens) -->
+        <div class="nav-left">
+            <!-- Hamburger Icon (hidden on large screens) -->
+            <div class="hamburger" id="hamburger">&#9776;</div>
+        </div>
+
+        <!-- Nav Center -->
+        <% if (user) { %>
+        <div class="nav-center" id="nav-center">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/tarot">Draw a Card</a>
+            <a href="/open-journal">Open Journal</a>
+            <a href="/entries">Entries</a>
+            <a href="/data">Data</a>
+            <a href="/card-glossary">Card Glossary</a>
+        <!-- <a href="/store">Store</a> -->
+        </div>
+        <% } else { %>
+        <% } %>
+
+        <!-- Nav Right -->
+        <div class="nav-right" id="nav-right">
+        <% if (user) { %>
+            <div class="profile-menu">
+            <div class="profile-circle" id="profile-circle">👤</div>
+            <div class="dropdown-menu" id="dropdown-menu">
+                <a href="/settings">Settings</a>
+                <a href="/auth/logout">Log Out</a>
+            </div>
+            </div>
+        <% } else { %>
+            <!--<h1><a href="/auth/login">Log In</a></h1> -->
+            <!--<h1><a href="/auth/signup">Sign Up</a></h1> -->
+        <% } %>
+        </div>
+    </nav>
+  </header>
+  <!-- 1) Modal HTML (initially hidden) -->
+  <div id="feedback-modal" class="modal-overlay hidden">
+    <div class="modal-box">
+        <span id="close-feedback" class="close-modal">&times;</span>
+        <h1 class="gradient-text">We value your feedback</h1>
+        <textarea id="feedback-input" placeholder="Share your thoughts..." rows="6"></textarea>
+        <div class="modal-buttons">
+            <button id="feedback-submit" class="btn btn-primary">Submit Feedback</button>
+        </div>
+    </div>
+  </div>
+  <div class="hero-swirls"></div>
+  <main class="dashboard-container">
+
+    <!-- New 3-column grid that spans multiple rows -->
+    <div class="dashboard-grid">
+
+      <!-- Row 1, Columns 1-2: Stats Container -->
+      <div class="stats-container">
+        <div class="stats-row">
+          <div class="stat-card">
+            <h3>Current Streak</h3>
+            <div class="stat-value"><%= dailyStreak %></div>
+            <div>days</div>
+          </div>
+          <div class="stat-card">
+            <h3>Total Responses</h3>
+            <div class="stat-value"><%= totalResponses %></div>
+          </div>
+          <div class="stat-card">
+            <h3>Average Mood</h3>
+            <div class="stat-value"><%= formattedAvgMood || '-' %></div>
+            <div>/5</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 1-2, Column 3: Card of the Day -->
+      <div class="card-of-day card">
+        <h2>Card of the Day</h2>
+        <% if (dailyCard) { %>
+          <img src="<%= dailyCard.image_data %>" alt="<%= dailyCard.card_name %>" onclick="location.href='/card-glossary?card_id=<%= dailyCard.card_id %>'">
+          <h3><%= dailyCard.card_name %></h3>
+          <p class="motto"><%= dailyCard.mottos %></p>
+        <% } else { %>
+          <p>No card available for today.</p>
+        <% } %>
+      </div>
+
+      <!-- Row 2, Column 1: Recent Entries -->
+      <div class="recent-entries" onclick="location.href='/entries'">
+        <h3>Recent Entries</h3>
+        <% if (latestEntries && latestEntries.length > 0) { %>
+          <div class="recent-entries-list">
+            <% latestEntries.forEach(function(entry){ %>
+              <div class="recent-entry-item">
+                <span><%= entry.card_name %></span>
+                <span><%= new Date(entry.created_at).toLocaleDateString() %></span>
+              </div>
+            <% }) %>
+          </div>
+        <% } else { %>
+          <p>No recent entries</p>
+        <% } %>
+      </div>
+
+      <!-- Row 2, Column 2: Card Actions -->
+      <div class="center-actions">
+        <div class="card-wrapper">
+          <img
+            src="https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/deck_backs/tarot-card-default.webp"
+            alt="Tarot Card"
+            class="tarot-back"
+          />
+          <button class="card-button" onclick="location.href='/tarot'">Draw a Card</button>
+        </div>
+        <div class="card-wrapper">
+          <img
+            src="https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/deck_backs/tarot-card-default.webp"
+            alt="Tarot Card"
+            class="tarot-back"
+          />
+          <button class="card-button" onclick="location.href='/open-journal'">Open Journal</button>
+        </div>
+      </div>
+
+      <!-- Row 3, Columns 1-3: Feedback Card -->
+      <div class="feedback-card">
+        <h2>Share Feedback</h2>
+        <p>Help us improve your experience</p>
+        <button id="feedback-button" class="feedback-btn">Give Feedback</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Scripts -->
+  <script>
+    window.user = <%- JSON.stringify(user || {}) %>;
+  </script>
+  <script src="/profile.js"></script>
+  <script>
     document.addEventListener("DOMContentLoaded", () => {
-        const API_BASE_URL = ''; 
-        const user         = window.user;
+      const API_BASE_URL = '';
+      const user         = window.user;
 
-        // 1) Possibly sync offline data if the user just logged in:
-        if (user) {
-            syncLocalStorageDataToServer(user, API_BASE_URL);
-        }
+      if (user) {
+        syncLocalStorageDataToServer(user, API_BASE_URL);
+      }
     });
 
-    // On page load (if user logs in), push local data to server
     async function syncLocalStorageDataToServer(user, apiBaseUrl) {
-      // Get offline card draw
       const offlineEntries = JSON.parse(localStorage.getItem('tarotOfflineEntries') || '[]');
-
-      // Get pending offline free journal
       let pendingJournalEntries = [];
       const pendingJournalRaw = localStorage.getItem('pendingJournal');
       if (pendingJournalRaw) {
         try {
           const parsedJournal = JSON.parse(pendingJournalRaw);
-          // Support both a single entry (object) and an array of entries
-          pendingJournalEntries = Array.isArray(parsedJournal)
-            ? parsedJournal
-            : [parsedJournal];
+          pendingJournalEntries = Array.isArray(parsedJournal) ? parsedJournal : [parsedJournal];
         } catch (err) {
           console.error("Error parsing offline free Journal:", err);
         }
       }
-
-      // Combine both types of entries
       const allEntries = [...offlineEntries, ...pendingJournalEntries];
-      if (!allEntries.length) return; // no data to sync
+      if (!allEntries.length) return;
 
       let allSynced = true;
       for (let entry of allEntries) {
@@ -59,11 +518,9 @@
         alert("Some offline entries could not be synced. Please try again later.");
       }
     }
-    // Actually send data to your /api/save-response
-    async function sendResponseToApi(payload, user, apiBaseUrl) {
-      // Usually you need user_id in the payload
-      const fullPayload = { ...payload, user_id: user.id };
 
+    async function sendResponseToApi(payload, user, apiBaseUrl) {
+      const fullPayload = { ...payload, user_id: user.id };
       const res = await fetch(`${apiBaseUrl}/api/save-response`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -74,113 +531,55 @@
         throw new Error(text);
       }
     }
-</script>
 
-<body class="bg-gradient">
-  <main class="dashboard">
-    <!-- Sidebar with updated structure and modern classes -->
-    <aside class="sidebar" id="sidebar-left" onclick="location.href='/data'">
-      <h1 class="page-title">My Stats</h1>
-      <div class="card">
-        <ul>
-          <h4>Current Streak</h4>
-          <li><strong><%= dailyStreak %></strong> days</li>
-          <h4>Total Responses</h4>
-          <li><strong><%= totalResponses %></strong></li>
-          <h4>Times Journaled (Month)</h4>
-          <li><strong><%= monthResponses %></strong></li>
-          <h4>Average Mood (Month)</h4>
-          <li><strong><%= formattedAvgMood || 'No Data Yet' %></strong></li>
-          <h4>Most Pulled Card</h4>
-          <li><strong><%= mostPulledCard || 'No Data Yet' %></strong></li>
-        </ul>
-      </div>
-    </aside>
-  
-    <!-- Main content updated to use modern card styles -->
-    <section class="main-content">
-      <!-- Previous Entry Card -->
-      <div class="card" id="prevEntry" onclick="toggleEntry()">
-        <h2>Previous Entry</h2>
-        <p>Click to load your previous entry.</p>
-      </div>
-    
-      <!-- Actions Card with updated button classes -->
-      <div class="card">
-        <h2>Actions</h2>
-        <div class="action-buttons">
-          <a href="/tarot" class="btn btn-primary">Draw a Card</a>
-          <a href="/open-journal" class="btn btn-outline">Open Journal</a>
-        </div>
-      </div>
-    </section>
-  
-    <!-- Extras using modern card styling -->
-    <aside class="extras">
-      <h1 class="page-title">Card of the Day</h1>
-      <div class="card" onclick="location.href='/card-glossary?card_id=<%= dailyCard.card_id %>'">
-        <% if (dailyCard) { %>
-          <img src="<%= dailyCard.image_data %>" alt="<%= dailyCard.card_name %>" class="daily-card-image">
-          <h4 class="card-name"><%= dailyCard.card_name %></h4>
-          <p class="card-motto"><%= dailyCard.mottos %></p>
-        <% } else { %>
-          <p>No card available for today.</p>
-        <% } %>
-      </div>
-    </aside>
-  </main>
-  <script>
-    // Global variable to store the expanded HTML content
+    /* Toggle expanded entry preview example */
     let fullEntryHtml = null;
-    
     function toggleEntry() {
-      const prevEntryCard = document.getElementById('prevEntry');
-      const dashboard = document.querySelector('.dashboard');
-      const isExpanded = dashboard.classList.contains('expanded');
-  
+      const preview = document.getElementById('entryPreview');
+      const isExpanded = preview.classList.contains('expanded');
+
       if (isExpanded) {
-        // Collapse: remove 'expanded' from .dashboard
-        dashboard.classList.remove('expanded');
-        // Reset the card content
-        prevEntryCard.innerHTML = `
-          <h2>Previous Entry</h2>
-          <p>Click to load your previous entry.</p>
+        preview.classList.remove('expanded');
+        preview.innerHTML = `
+          <h3>Recent Entry</h3>
+          <% if (latestEntry) { %>
+            <p><%= latestEntry.response_text.substring(0, 100) %>...</p>
+          <% } else { %>
+            <p>No recent entries</p>
+          <% } %>
         `;
       } else {
-        // Expand: add 'expanded' to .dashboard
-        dashboard.classList.add('expanded');
-        
-        // If we already have the full entry stored, reuse it
+        preview.classList.add('expanded');
         if (fullEntryHtml) {
-          prevEntryCard.innerHTML = fullEntryHtml;
+          preview.innerHTML = fullEntryHtml;
         } else {
-          // Otherwise, fetch the entry data from the API
           fetch('/dashboard/latest-entry')
             .then(response => response.json())
             .then(data => {
               if (data.latestEntry) {
                 fullEntryHtml = `
-                  <h2>Previous Entry</h2>
-                  <p class="last-entry"><strong>Prompt:</strong> ${data.latestEntry.prompt_text}</p><br>
-                  <p class="last-entry"><strong>Response:</strong> ${data.latestEntry.response_text}</p><br>
+                  <h3>Recent Entry</h3>
+                  <p><strong>Prompt:</strong> ${data.latestEntry.prompt_text}</p><br>
+                  <p><strong>Response:</strong> ${data.latestEntry.response_text}</p><br>
                   <p><small><strong>Date:</strong> ${
                     new Date(data.latestEntry.created_at).toLocaleString()
                   }</small></p>
                 `;
               } else {
-                fullEntryHtml = '<h2>Previous Entry</h2><p>No previous entry found. Start your journal!</p>';
+                fullEntryHtml = '<h3>Recent Entry</h3><p>No previous entry found. Start your journal!</p>';
               }
-              prevEntryCard.innerHTML = fullEntryHtml;
+              preview.innerHTML = fullEntryHtml;
             })
             .catch(err => {
               console.error("Error fetching latest entry:", err);
-              fullEntryHtml = '<h2>Previous Entry</h2><p>Error loading entry</p>';
-              prevEntryCard.innerHTML = fullEntryHtml;
+              fullEntryHtml = '<h3>Recent Entry</h3><p>Error loading entry</p>';
+              preview.innerHTML = fullEntryHtml;
             });
         }
       }
-      // Scroll the card into view smoothly
-      prevEntryCard.scrollIntoView({ behavior: 'smooth' });
+      preview.scrollIntoView({ behavior: 'smooth' });
     }
   </script>
-<%- include('partials/footer'); -%>
+  <script src="feedback.js"></script>
+</body>
+</html>

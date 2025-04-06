@@ -139,6 +139,38 @@ router.get('/', checkUser, async (req, res) => {
         const imageURL = `https://raw.githubusercontent.com/SenergyGroup/tarotlog_assets/refs/heads/main/tarot_decks/${userDeck}/image_${cardNumber}.jpg`;
         dailyCard.image_data = imageURL;
       }
+
+      // Get the 5 latest entries (date + card name).
+        const latestFiveQuery = `
+        SELECT r.created_at, tc.card_name
+        FROM responses r
+        JOIN tarot_cards tc ON r.card_id = tc.card_id
+        WHERE r.user_id = $1
+        ORDER BY r.created_at DESC
+        LIMIT 5
+      `;
+      const latestFiveResult = await pool.query(latestFiveQuery, [userId]);
+      const latestEntries = latestFiveResult.rows; // Could be 0 to 5 records
+
+      // Also get the single most recent
+      const singleLatestQuery = `
+        SELECT r.prompt_text, r.response_text, r.created_at, tc.card_name
+        FROM responses r
+        JOIN tarot_cards tc ON r.card_id = tc.card_id
+        WHERE r.user_id = $1
+        ORDER BY r.created_at DESC
+        LIMIT 1
+      `;
+      const singleLatestResult = await pool.query(singleLatestQuery, [userId]);
+      let latestEntry = singleLatestResult.rows[0] || null;
+      if (latestEntry) {
+        try {
+          latestEntry.response_text = decrypt(latestEntry.response_text);
+        } catch (err) {
+          console.error("Error decrypting response_text:", err);
+          latestEntry.response_text = '[Error decrypting response]';
+        }
+      }
   
       // Render the dashboard and pass the computed daily streak
       res.render('dashboard', { 
@@ -147,7 +179,9 @@ router.get('/', checkUser, async (req, res) => {
         monthResponses,
         formattedAvgMood,
         mostPulledCard,
-        dailyCard  
+        dailyCard,
+        latestEntries,
+        latestEntry
       });
       
     } catch (err) {
